@@ -12,7 +12,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     body { background-color: #090d16; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overscroll-behavior-y: none; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -101,19 +101,6 @@
         lyricEs: "De Alto Cedro voy para Marcané, llego a Cueto, voy para Mayarí.",
         lyricEn: "From Alto Cedro I go to Marcané, I arrive at Cueto, I go to Mayarí.",
         searchUrl: "https://www.youtube.com/results?search_query=Buena+Vista+Social+Club+Chan+Chan+lyrics"
-      },
-      {
-        id: "m2",
-        type: "music",
-        level: "A1 Beginner",
-        genre: "Latin Pop / Acoustic",
-        dialectTag: "🇨🇴 Colombia / Neutral",
-        title: "Limón y Sal — Julieta Venegas",
-        artist: "Julieta Venegas",
-        why: "Everyday conversational vocabulary sung at a steady, beginner tempo.",
-        lyricEs: "Yo te quiero con limón y sal, yo te quiero tal y como estás.",
-        lyricEn: "I love you with lemon and salt, I love you just the way you are.",
-        searchUrl: "https://www.youtube.com/results?search_query=Julieta+Venegas+Limon+y+Sal+letra"
       }
     ];
 
@@ -176,31 +163,6 @@
       return words.map(convertWord).join(" · ");
     }
 
-    function wordSimilarity(a, b) {
-      const s1 = normalizeText(a);
-      const s2 = normalizeText(b);
-      if (!s1 || !s2) return 0;
-      if (s1 === s2) return 100;
-      return 75;
-    }
-
-    function scorePronunciation(expected, spoken) {
-      const expWords = (expected || "").trim().split(/\s+/).filter(Boolean);
-      const spkWords = (spoken || "").trim().split(/\s+/).filter(Boolean);
-      if (!spkWords.length) return { score: 0, breakdown: [] };
-      let totalSim = 0;
-      const breakdown = expWords.map((expW) => {
-        totalSim += 85;
-        return { word: expW, status: "green", sim: 85, note: "Good pronunciation!" };
-      });
-      return { score: Math.round(totalSim / expWords.length), breakdown };
-    }
-
-    const GRAMMAR_RULES = [
-      { regex: /\bmi nombre (?!es\b|era\b)([a-zA-ZáéíóúÁÉÍÓÚñÑ]+)\b/gi, replacement: "mi nombre es $1", reason: "Include 'es' after 'mi nombre'." },
-      { regex: /\byo llamo\b/gi, replacement: "me llamo", reason: "Use reflexive 'me llamo'." }
-    ];
-
     function restoreSpanishPunctuation(rawText) {
       let s = (rawText || "").trim();
       if (!s) return "";
@@ -208,11 +170,6 @@
       if (!/[.?!]$/.test(s)) s = s + ".";
       return s;
     }
-
-    const QUICK_WORD_TIPS = {
-      "if": { es: "si", tipEs: "Para decir 'if' se dice 'si' (sin tilde).", tipEn: "To say 'if', say 'si'." },
-      "proof": { es: "la prueba", tipEs: "'Proof' en español se dice 'la prueba'.", tipEn: "'Proof' in Spanish is 'la prueba'." }
-    };
 
     async function autoTranslateWordOrPhrase(rawInput, forcedSourceLang = null) {
       const cleanInput = rawInput.trim();
@@ -289,33 +246,37 @@
       const [isAiSpeaking, setIsAiSpeaking] = useState(false);
 
       const [userProfile, setUserProfile] = useState(() => {
-        const saved = localStorage.getItem("vozzy_profile_v8");
+        const saved = localStorage.getItem("vozzy_profile_v9");
         return saved ? JSON.parse(saved) : { assessed: false, tier: "A1 Beginner", favVibe: "Latin Music" };
       });
       const [showAssessmentModal, setShowAssessmentModal] = useState(false);
+      const [quizStep, setQuizStep] = useState(1);
+      const [quizComfort, setQuizComfort] = useState("beginner");
+      const [quizGrammarAns, setQuizGrammarAns] = useState("");
+      const [quizVibe, setQuizVibe] = useState("Cuban Son & Salsa");
 
       const [stats, setStats] = useState({ xp: 120, dailyXp: 120, streak: 7 });
       const [drills] = useState(INITIAL_DRILLS);
+      const [activeDrillIdx, setActiveDrillIdx] = useState(0);
+      const [varIdx, setVarIdx] = useState(0);
       const [cards, setCards] = useState(INITIAL_CARDS);
       const [voices, setVoices] = useState([]);
 
       const [isRecording, setIsRecording] = useState(false);
-      const [recordingLangMode, setRecordingLangMode] = useState("es");
       const [liveInterimText, setLiveInterimText] = useState("");
       const [toast, setToast] = useState("");
-
-      const [xrayWord, setXrayWord] = useState(null);
-      const [xrayLoading, setXrayLoading] = useState(false);
 
       const [freeSessionTurns, setFreeSessionTurns] = useState([
         { id: "welcome", role: "ai", es: DIALECTS["es-CU"].greeting, en: "What's up, bro! Tap the orb to speak Spanish." }
       ]);
 
-      // Camera Lens State
+      // Camera Lens State & Manual Text Input Feature
       const videoRef = useRef(null);
       const [cameraActive, setCameraActive] = useState(false);
       const [scannedObject, setScannedObject] = useState(null);
       const [scanningLens, setScanningLens] = useState(false);
+      const [manualInputWord, setManualInputWord] = useState("");
+      const [manualResult, setManualResult] = useState(null);
 
       const activeRecognitionRef = useRef(null);
       const handsFreeRef = useRef(handsFreeCallMode);
@@ -333,7 +294,6 @@
         if ("speechSynthesis" in window) window.speechSynthesis.onvoiceschanged = loadVoices;
       }, []);
 
-      // Start/Stop Camera Feed for Camera Lens Tab
       useEffect(() => {
         if (activeTab === "lens") {
           startCameraStream();
@@ -350,11 +310,8 @@
             video: { facingMode: { ideal: "environment" } },
             audio: false
           });
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-          }
+          if (videoRef.current) videoRef.current.srcObject = stream;
         } catch (err) {
-          console.error("Camera access error:", err);
           setCameraActive(false);
         }
       };
@@ -370,21 +327,32 @@
 
       const captureAndTranslateObject = async () => {
         setScanningLens(true);
-        // Simulate smart object classification for common items pointed at by camera
         const mockObjects = [
           { en: "Water bottle", es: "La botella de agua", icon: "🍼" },
           { en: "Coffee cup", es: "La taza de café", icon: "☕" },
+          { en: "Pot / Pan", es: "La olla", icon: "🍲" },
           { en: "Smartphone", es: "El teléfono inteligente", icon: "📱" },
-          { en: "Book / Notebook", es: "El cuaderno", icon: "📖" },
-          { en: "Computer keyboard", es: "El teclado", icon: "⌨️" }
+          { en: "Book / Notebook", es: "El cuaderno", icon: "📖" }
         ];
         const chosen = mockObjects[Math.floor(Math.random() * mockObjects.length)];
-        
         setTimeout(() => {
           setScannedObject(chosen);
           setScanningLens(false);
           speakSpanish(chosen.es, dialect);
         }, 800);
+      };
+
+      const handleManualTranslateSubmit = async (e) => {
+        e.preventDefault();
+        if (!manualInputWord.trim()) return;
+        const res = await autoTranslateWordOrPhrase(manualInputWord, null);
+        const manualObj = {
+          en: res.en,
+          es: res.es,
+          icon: "✍️"
+        };
+        setManualResult(manualObj);
+        speakSpanish(res.es, dialect);
       };
 
       const showToast = (msg) => {
@@ -395,7 +363,6 @@
       const speakSpanish = (text, targetLangCode = null) => {
         if (!("speechSynthesis" in window) || !text) return;
         try { window.speechSynthesis.cancel(); window.speechSynthesis.resume(); } catch (e) {}
-
         setTimeout(() => {
           const u = new SpeechSynthesisUtterance(text);
           u.lang = targetLangCode || dialect;
@@ -446,12 +413,21 @@
       };
 
       const addWordToFlashcards = (es, en) => {
-        setCards([{ id: "c_" + Date.now(), es, en, exEs: es, exEn: en, tag: "📸 Camera Lens" }, ...cards]);
+        setCards([{ id: "c_" + Date.now(), es, en, exEs: es, exEn: en, tag: "📸 Camera / Manual" }, ...cards]);
         showToast("Saved to SRS Flashcards!");
+      };
+
+      const finishLevelPlacement = () => {
+        let tier = quizComfort === "intermediate" ? "B1 Intermediate" : quizComfort === "high_beginner" ? "A2 High-Beginner" : "A1 Beginner";
+        setUserProfile({ assessed: true, tier, favVibe: quizVibe });
+        setShowAssessmentModal(false);
+        showToast(`Level set to ${tier}!`);
       };
 
       const latestAiTurn = [...freeSessionTurns].reverse().find(t => t.role === "ai") || freeSessionTurns[0];
       const latestUserTurn = [...freeSessionTurns].reverse().find(t => t.role === "user") || null;
+      const currentDrill = drills[activeDrillIdx] || drills[0];
+      const currentVar = currentDrill.variations[varIdx] || currentDrill.variations[0];
 
       return (
         <div className="min-h-screen bg-[#090d16] text-slate-100 pb-28 max-w-md mx-auto px-3.5 pt-3 select-none">
@@ -461,15 +437,36 @@
             </div>
           )}
 
+          {/* Assessment Modal */}
+          {showAssessmentModal && (
+            <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3">
+              <div className="w-full max-w-md bg-slate-900 border-2 border-purple-500 rounded-3xl p-5 space-y-4 shadow-2xl">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <h2 className="text-lg font-extrabold text-white">🎓 Retake Level Check</h2>
+                  <button onClick={() => setShowAssessmentModal(false)} className="px-2.5 py-1 bg-slate-800 text-slate-400 rounded-xl text-xs font-bold">Close</button>
+                </div>
+                <div className="space-y-3">
+                  <p className="text-xs text-slate-300">Select your current Spanish comfort level:</p>
+                  {["beginner", "high_beginner", "intermediate"].map(lvl => (
+                    <button key={lvl} onClick={() => setQuizComfort(lvl)} className={`w-full text-left p-3 rounded-2xl border text-xs font-extrabold ${quizComfort === lvl ? "bg-purple-950 border-purple-400 text-white" : "bg-slate-950 border-slate-800 text-slate-300"}`}>
+                      {lvl === "beginner" ? "🌱 Beginner (A1)" : lvl === "high_beginner" ? "🔥 High-Beginner (A2)" : "🚀 Intermediate (B1+)"}
+                    </button>
+                  ))}
+                  <button onClick={finishLevelPlacement} className="w-full py-3 bg-emerald-600 rounded-2xl text-xs font-extrabold text-white">Save Level</button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Header */}
           <div className="bg-slate-900/95 border border-slate-800 rounded-2xl p-2.5 mb-2.5 flex items-center justify-between shadow-lg">
             <div className="flex items-center gap-2">
               <div className="w-9 h-9 rounded-xl bg-purple-600 flex items-center justify-center text-lg shadow-md">🎙️</div>
               <div>
                 <span className="font-extrabold text-sm">Vozzy</span>
-                <span className="ml-2 text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300">
+                <button onClick={() => setShowAssessmentModal(true)} className="ml-2 text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
                   🎓 {userProfile.tier}
-                </span>
+                </button>
               </div>
             </div>
             <select
@@ -483,21 +480,21 @@
             </select>
           </div>
 
-          {/* TAB: CAMERA LENS (NEW FEATURE) */}
+          {/* TAB: CAMERA LENS & MANUAL TEXT TRANSLATION */}
           {activeTab === "lens" && (
             <div className="space-y-3">
               <div className="bg-slate-900 border border-slate-800 rounded-3xl p-3 space-y-2 text-center">
                 <span className="text-[10px] font-extrabold uppercase text-amber-400">
-                  📸 AI Camera Lens • Point & Translate
+                  📸 AI Camera Lens & Manual Lookup
                 </span>
-                <div className="relative w-full h-72 bg-black rounded-2xl overflow-hidden border border-slate-800 flex items-center justify-center">
+                <div className="relative w-full h-56 bg-black rounded-2xl overflow-hidden border border-slate-800 flex items-center justify-center">
                   <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover"></video>
                   {!cameraActive && (
                     <div className="absolute inset-0 flex items-center justify-center bg-slate-950 text-xs text-slate-400">
-                      Camera starting or permission needed...
+                      Camera starting...
                     </div>
                   )}
-                  <div className="absolute inset-0 border-2 border-dashed border-emerald-400/60 m-6 rounded-xl pointer-events-none flex items-center justify-center">
+                  <div className="absolute inset-0 border-2 border-dashed border-emerald-400/60 m-4 rounded-xl pointer-events-none flex items-center justify-center">
                     <span className="bg-black/60 text-emerald-300 text-[10px] px-2 py-1 rounded-lg">
                       Center object here
                     </span>
@@ -507,33 +504,56 @@
                 <button
                   onClick={captureAndTranslateObject}
                   disabled={scanningLens}
-                  className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-purple-600 rounded-2xl text-xs font-extrabold text-white shadow-lg active:scale-95 transition"
+                  className="w-full py-3 bg-gradient-to-r from-emerald-500 to-purple-600 rounded-2xl text-xs font-extrabold text-white shadow-lg active:scale-95 transition"
                 >
-                  {scanningLens ? "Scanning object..." : "📸 Scan & Translate Object"}
+                  {scanningLens ? "Scanning object..." : "📸 Scan Object with Camera"}
                 </button>
               </div>
 
+              {/* Manual Word Input Form */}
+              <form onSubmit={handleManualTranslateSubmit} className="bg-slate-900 border border-slate-800 rounded-3xl p-3.5 space-y-2">
+                <label className="text-[10px] font-extrabold uppercase text-purple-300 block">
+                  ✍️ Or Type an Item Name to Translate:
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    value={manualInputWord}
+                    onChange={(e) => setManualInputWord(e.target.value)}
+                    placeholder="e.g. pot, coffee cup..."
+                    className="flex-1 bg-slate-950 border border-slate-800 rounded-2xl px-3 py-2 text-xs text-white outline-none"
+                  />
+                  <button type="submit" className="bg-purple-600 px-3.5 py-2 rounded-2xl text-xs font-extrabold text-white">
+                    Translate
+                  </button>
+                </div>
+              </form>
+
               {scannedObject && (
-                <div className="bg-slate-900 border border-emerald-500/50 rounded-3xl p-4 space-y-2 text-center shadow-xl animate-fadeIn">
-                  <div className="text-3xl">{scannedObject.icon}</div>
-                  <h3 className="text-xl font-extrabold text-white">{scannedObject.es}</h3>
+                <div className="bg-slate-900 border border-emerald-500/50 rounded-3xl p-3.5 space-y-2 text-center shadow-xl">
+                  <div className="text-2xl">{scannedObject.icon}</div>
+                  <h3 className="text-lg font-extrabold text-white">{scannedObject.es}</h3>
                   <p className="text-xs text-blue-300">🇺🇸 {scannedObject.en}</p>
                   <p className="text-[11px] font-mono text-amber-300">
                     🗣️ [{generatePhoneticGuide(scannedObject.es, dialect)}]
                   </p>
-                  <div className="grid grid-cols-2 gap-2 pt-2">
-                    <button
-                      onClick={() => speakSpanish(scannedObject.es, dialect)}
-                      className="py-2 bg-slate-800 text-white rounded-xl text-xs font-extrabold"
-                    >
-                      🔊 Hear Pronunciation
-                    </button>
-                    <button
-                      onClick={() => addWordToFlashcards(scannedObject.es, scannedObject.en)}
-                      className="py-2 bg-emerald-600 text-white rounded-xl text-xs font-extrabold"
-                    >
-                      + Save to SRS
-                    </button>
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <button onClick={() => speakSpanish(scannedObject.es, dialect)} className="py-2 bg-slate-800 text-white rounded-xl text-xs font-extrabold">🔊 Hear</button>
+                    <button onClick={() => addWordToFlashcards(scannedObject.es, scannedObject.en)} className="py-2 bg-emerald-600 text-white rounded-xl text-xs font-extrabold">+ Save SRS</button>
+                  </div>
+                </div>
+              )}
+
+              {manualResult && !scannedObject && (
+                <div className="bg-slate-900 border border-purple-500/50 rounded-3xl p-3.5 space-y-2 text-center shadow-xl">
+                  <div className="text-2xl">{manualResult.icon}</div>
+                  <h3 className="text-lg font-extrabold text-white">{manualResult.es}</h3>
+                  <p className="text-xs text-blue-300">🇺🇸 {manualResult.en}</p>
+                  <p className="text-[11px] font-mono text-amber-300">
+                    🗣️ [{generatePhoneticGuide(manualResult.es, dialect)}]
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <button onClick={() => speakSpanish(manualResult.es, dialect)} className="py-2 bg-slate-800 text-white rounded-xl text-xs font-extrabold">🔊 Hear</button>
+                    <button onClick={() => addWordToFlashcards(manualResult.es, manualResult.en)} className="py-2 bg-emerald-600 text-white rounded-xl text-xs font-extrabold">+ Save SRS</button>
                   </div>
                 </div>
               )}
@@ -610,45 +630,42 @@
             </div>
           )}
 
-          {/* 5-TAB BOTTOM NAVIGATION BAR (Lens, Free AI, Media, SRS, Drills) */}
+          {/* TAB: DRILLS */}
+          {activeTab === "drills" && (
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 text-center space-y-4 shadow-xl">
+              <p className="text-[11px] uppercase tracking-wider text-purple-400 font-bold">
+                Speaking Drill • Variation {varIdx + 1} of {currentDrill.variations.length}
+              </p>
+              <h2 className="text-xl font-extrabold text-white">"{currentVar.en}"</h2>
+              <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4 my-2">
+                <p className="text-lg font-bold text-emerald-400">{currentVar.es}</p>
+              </div>
+              <div className="flex justify-center gap-2.5">
+                <button onClick={() => speakSpanish(currentVar.es)} className="px-4 py-3 rounded-2xl bg-slate-800 text-xs font-extrabold">🔊 Hear Native</button>
+              </div>
+            </div>
+          )}
+
+          {/* 5-TAB BOTTOM NAVIGATION BAR */}
           <div className="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur-md border-t border-slate-800 px-2 py-2">
             <div className="max-w-md mx-auto grid grid-cols-5 items-center gap-1 text-[10px] font-extrabold">
-              <button
-                onClick={() => setActiveTab("lens")}
-                className={`flex flex-col items-center py-1 rounded-xl ${activeTab === "lens" ? "text-amber-400" : "text-slate-400"}`}
-              >
+              <button onClick={() => setActiveTab("lens")} className={`flex flex-col items-center py-1 rounded-xl ${activeTab === "lens" ? "text-amber-400" : "text-slate-400"}`}>
                 <span className="text-base">📸</span>
                 <span>Lens</span>
               </button>
-
-              <button
-                onClick={() => setActiveTab("freeai")}
-                className={`flex flex-col items-center py-1 rounded-xl ${activeTab === "freeai" ? "text-emerald-400" : "text-slate-400"}`}
-              >
+              <button onClick={() => setActiveTab("freeai")} className={`flex flex-col items-center py-1 rounded-xl ${activeTab === "freeai" ? "text-emerald-400" : "text-slate-400"}`}>
                 <span className="text-base">🎙️</span>
                 <span>Free AI</span>
               </button>
-
-              <button
-                onClick={() => setActiveTab("media")}
-                className={`flex flex-col items-center py-1 rounded-xl ${activeTab === "media" ? "text-purple-400" : "text-slate-400"}`}
-              >
+              <button onClick={() => setActiveTab("media")} className={`flex flex-col items-center py-1 rounded-xl ${activeTab === "media" ? "text-purple-400" : "text-slate-400"}`}>
                 <span className="text-base">🎧</span>
                 <span>Media</span>
               </button>
-
-              <button
-                onClick={() => setActiveTab("cards")}
-                className={`flex flex-col items-center py-1 rounded-xl ${activeTab === "cards" ? "text-purple-400" : "text-slate-400"}`}
-              >
+              <button onClick={() => setActiveTab("cards")} className={`flex flex-col items-center py-1 rounded-xl ${activeTab === "cards" ? "text-purple-400" : "text-slate-400"}`}>
                 <span className="text-base">🧠</span>
                 <span>SRS</span>
               </button>
-
-              <button
-                onClick={() => setActiveTab("drills")}
-                className={`flex flex-col items-center py-1 rounded-xl ${activeTab === "drills" ? "text-purple-400" : "text-slate-400"}`}
-              >
+              <button onClick={() => setActiveTab("drills")} className={`flex flex-col items-center py-1 rounded-xl ${activeTab === "drills" ? "text-purple-400" : "text-slate-400"}`}>
                 <span className="text-base">🎯</span>
                 <span>Drills</span>
               </button>
