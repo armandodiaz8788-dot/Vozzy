@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Vozzy — Voice Spanish Coach</title>
+  <title>Vozzy — Live AI Spanish Coach</title>
   <meta name="theme-color" content="#090d16" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -36,7 +36,7 @@
         coolWord: "en talla",
         curseExclaim: "¡Ño, de pinga!",
         phoneticNote: "Drops final 's' to soft 'h' & blends words",
-        greeting: "¡Qué bolá, asere! Toca cualquier palabra para ver su rayos-X o elige una misión abajo para meterle duro al español."
+        greeting: "¡Qué bolá, asere! Soy Yordanis. Preséntate o dime qué tal va tu día para empezar a conversar."
       },
       "es-MX": {
         name: "Mexico (CDMX)",
@@ -48,7 +48,7 @@
         coolWord: "bien chingón",
         curseExclaim: "¡No mames, güey!",
         phoneticNote: "Crisp final 's' & singing CDMX cadence",
-        greeting: "¡Qué onda, carnal! Elige una misión o háblame libremente. Te califico cada palabra en verde, amarillo o rojo."
+        greeting: "¡Qué onda, carnal! Soy Mateo. Preséntate o cuéntame cómo va tu día para platicar a gusto."
       },
       "es-CO": {
         name: "Colombia (Bogotá)",
@@ -60,7 +60,7 @@
         coolWord: "una chimba",
         curseExclaim: "¡Uy, qué gonorrea!",
         phoneticNote: "Clear bogotano pronunciation & melodic rhythm",
-        greeting: "¡Quiubo, parcero! Toque cualquier palabra para ver cómo suena o empecemos una misión en vivo."
+        greeting: "¡Quiubo, parcero! Soy Valentina. Preséntese o cuénteme cómo va todo hoy para charlar un rato."
       },
       "es-ES": {
         name: "Spain (Madrid)",
@@ -72,7 +72,7 @@
         coolWord: "de puta madre",
         curseExclaim: "¡Joder, hostia!",
         phoneticNote: "Uses 'th' for z/ce/ci & strong 'kh' for j/g",
-        greeting: "¡Buenas, tío! Elige una misión o suéltate a hablar. Te marco la pronunciación y la gramática al instante."
+        greeting: "¡Buenas, tío! Soy Alejandro. Preséntate o cuéntame qué tal llevas el día."
       },
       "es-AR": {
         name: "Argentina (BsAs)",
@@ -84,61 +84,60 @@
         coolWord: "re copado",
         curseExclaim: "¡La concha de la lora!",
         phoneticNote: "Pronounces 'll' and 'y' as 'sh' (sheísmo)",
-        greeting: "¡Che, todo bien! Elegí una misión o hablame de lo que quieras. Toca cualquier palabra para escucharla."
+        greeting: "¡Che, todo bien! Soy Camila. Presentate o contame cómo viene tu día."
       }
     };
 
-    // Guided Scenario Missions for Tab 2 (Free AI)
     const SCENARIO_MISSIONS = [
       {
         id: "free",
-        title: "🎙️ Open Free Talk",
-        badge: "Any Topic",
-        desc: "Talk about anything—daily life, slang, or curse words.",
-        starterEs: "¡Qué bolá, asere! Háblame de lo que quieras hoy. ¿Qué tienes en mente?",
-        starterEn: "What's up, bro! Talk to me about whatever you want today. What's on your mind?",
+        title: "🎙️ Live Conversation",
+        badge: "Natural Chat",
+        desc: "Introduce yourself, ask questions, and chat like a real phone call.",
+        starterEs: "¡Qué bolá, asere! Soy Yordanis. ¿Cómo te llamas y qué tal va tu día hoy?",
+        starterEn: "What's up, bro! I'm Yordanis. What's your name and how's your day going today?",
         goals: [
-          { id: "g1", label: "Speak at least 4 words in a single turn", check: (text) => text.trim().split(/\s+/).length >= 4 },
-          { id: "g2", label: "Ask a question (use qué, cómo, dónde, o por qué)", check: (text) => /\b(que|como|donde|cuando|por que|quien|cual)\b/i.test(normalizeText(text)) || text.includes("?") },
-          { id: "g3", label: "Use a regional slang word (asere, talla, chido, parcero, tío, che)", check: (text) => /\b(asere|talla|chido|chingon|carnal|parcero|chimba|tio|boludo|che)\b/i.test(normalizeText(text)) }
+          { id: "g1", label: "Introduce yourself or greet the tutor", check: (text) => /\b(hola|llamo|soy|nombre|buenas|que tal|que bola|como estas)\b/i.test(normalizeText(text)) },
+          { id: "g2", label: "Tell the tutor something about your day or interests", check: (text) => text.trim().split(/\s+/).length >= 4 },
+          { id: "g3", label: "Ask the tutor a question back", check: (text) => /\b(que|como|donde|cuando|por que|quien|cual|tu|usted)\b/i.test(normalizeText(text)) || text.includes("?") }
         ]
       },
       {
         id: "habana",
         title: "🇨🇺 Visiting Family in La Habana",
         badge: "Havana Immersion",
-        desc: "Catch up with family in Centro Habana, ask about the neighborhood, and use Cuban slang.",
+        desc: "Catch up in Centro Habana, talk about family and food.",
         starterEs: "¡Ño, qué alegría verte por Cayo Hueso, mi hermano! ¿Cómo estuvo el viaje y cómo está la familia?",
         starterEn: "Damn, what a joy seeing you in Cayo Hueso, my brother! How was the trip and how is the family?",
         goals: [
-          { id: "h1", label: "Mention family, house, or trip (familia, casa, viaje, bien)", check: (text) => /\b(familia|casa|viaje|todo|bien|bueno)\b/i.test(normalizeText(text)) },
+          { id: "h1", label: "Mention family, house, or trip", check: (text) => /\b(familia|casa|viaje|todo|bien|bueno)\b/i.test(normalizeText(text)) },
           { id: "h2", label: "Use Cuban slang (asere, qué bolá, en talla, lucha, jama)", check: (text) => /\b(asere|bola|talla|lucha|jama|pinga|yunta)\b/i.test(normalizeText(text)) },
-          { id: "h3", label: "Ask about food or plans (comer, vamos, hacer, dónde)", check: (text) => /\b(comer|comida|jama|vamos|hacer|donde|cafe)\b/i.test(normalizeText(text)) }
+          { id: "h3", label: "Talk about food or plans", check: (text) => /\b(comer|comida|jama|vamos|hacer|donde|cafe)\b/i.test(normalizeText(text)) }
         ]
       },
       {
         id: "planning",
         title: "📐 Customer Room & Design Consult",
         badge: "Workplace Pro",
-        desc: "Help a Spanish-speaking customer plan their kitchen/room layout, measurements, and delivery.",
+        desc: "Help a Spanish-speaking customer plan their room layout & delivery.",
         starterEs: "Buenas tardes, necesito ayuda para diseñar mi cocina y ver qué muebles caben en este espacio.",
         starterEn: "Good afternoon, I need help designing my kitchen and seeing what furniture fits in this space.",
         goals: [
-          { id: "p1", label: "Greet & offer help (buenas, ayudar, claro, gusto)", check: (text) => /\b(buenas|hola|ayudar|ayudo|claro|gusto|como)\b/i.test(normalizeText(text)) },
-          { id: "p2", label: "Discuss space, size, or design (espacio, medidas, grande, cocina, diseño, color)", check: (text) => /\b(espacio|medidas|grande|pequeno|cocina|diseno|color|mesa|muebles|pulgadas|metros)\b/i.test(normalizeText(text)) },
-          { id: "p3", label: "Mention price, order, or delivery (precio, ordenar, entrega, casa, listo)", check: (text) => /\b(precio|dinero|ordenar|comprar|entrega|casa|listo|hoy)\b/i.test(normalizeText(text)) }
+          { id: "p1", label: "Greet & offer help", check: (text) => /\b(buenas|hola|ayudar|ayudo|claro|gusto|como)\b/i.test(normalizeText(text)) },
+          { id: "p2", label: "Discuss space, size, or design", check: (text) => /\b(espacio|medidas|grande|pequeno|cocina|diseno|color|mesa|muebles)\b/i.test(normalizeText(text)) },
+          { id: "p3", label: "Mention price, order, or delivery", check: (text) => /\b(precio|dinero|ordenar|comprar|entrega|casa|listo|hoy)\b/i.test(normalizeText(text)) }
         ]
       },
       {
         id: "trash",
-        title: "🤬 18+ Unfiltered Gaming / Sports Trash Talk",
+        title: "🤬 18+ Unfiltered Trash Talk",
         badge: "18+ Uncensored",
-        desc: "Talk friendly trash with your crew during a hockey or soccer match using real street slang.",
+        desc: "Banter with your crew during a game using real street slang.",
         starterEs: "¡No me jodas, asere! ¿Viste ese golazo? ¡Te voy a ganar fácil hoy, ponte las pilas!",
         starterEn: "No fucking way, bro! Did you see that goal? I'm gonna beat you easy today, step it up!",
         goals: [
-          { id: "t1", label: "Use any 18+ curse or street intensifier (mierda, carajo, pinga, no mames, joder, boludo)", check: (text) => /\b(mierda|carajo|pinga|mames|verga|chingon|joder|puta|boludo|gonorrea|cojones|huevos)\b/i.test(normalizeText(text)) },
-          { id: "t2", label: "Talk about winning, playing, or scoring (ganar, jugar, partido, gol, mejor)", check: (text) => /\b(ganar|gano|jugar|partido|juego|gol|mejor|nunca|perder)\b/i.test(normalizeText(text)) },
+          { id: "t1", label: "Use any 18+ curse or street intensifier", check: (text) => /\b(mierda|carajo|pinga|mames|verga|chingon|joder|puta|boludo|gonorrea|cojones|huevos)\b/i.test(normalizeText(text)) },
+          { id: "t2", label: "Talk about winning, playing, or scoring", check: (text) => /\b(ganar|gano|jugar|partido|juego|gol|mejor|nunca|perder)\b/i.test(normalizeText(text)) },
           { id: "t3", label: "Deliver a full confident sentence (5+ words)", check: (text) => text.trim().split(/\s+/).length >= 5 }
         ]
       }
@@ -201,22 +200,6 @@
         }
       },
       {
-        keysEn: ["what the fuck", "wtf", "no fucking way", "bullshit", "no way"],
-        keysEs: ["que carajo", "no mames", "no me jodas", "que mierda", "que pinga", "que gonorrea"],
-        isCurse: true,
-        es: "¿Qué carajo? / ¡No me jodas!",
-        en: "What the fuck? / No fucking way!",
-        exEs: "¿Qué carajo me estás diciendo ahora mismo?",
-        exEn: "What the fuck are you telling me right now?",
-        byDialect: {
-          "es-CU": { term: "¿Qué pinga pasa? / ¡No comas mierda!", exEs: "¡No me jodas, asere! ¿Qué pinga pasó ahí?", exEn: "No fucking way, bro! What the fuck happened there?" },
-          "es-MX": { term: "¿Qué pedo? / ¡No mames, güey!", exEs: "¡No mames! ¿Qué chingados hiciste?", exEn: "No fucking way! What the fuck did you do?" },
-          "es-CO": { term: "¡No joda! / ¿Qué mierda es esto?", exEs: "¡No joda, parcero, usted sí habla mierda!", exEn: "No way bro, you really talk bullshit!" },
-          "es-ES": { term: "¿Pero qué coño? / ¡No me jodas!", exEs: "¿Pero qué coño haces aquí a esta hora?", exEn: "What the fuck are you doing here at this hour?" },
-          "es-AR": { term: "¿Qué carajo? / ¡Dejate de joder!", exEs: "¡Dejate de joder, boludo, no te puedo creer!", exEn: "Stop bullshitting me, dude, I can't believe you!" }
-        }
-      },
-      {
         keysEn: ["shit", "crap", "eat shit", "talk shit", "bullshitter"],
         keysEs: ["mierda", "comer mierda", "hablar mierda", "cagar", "la cagada"],
         isCurse: true,
@@ -225,8 +208,8 @@
         exEs: "Deja de hablar mierda y ponte a trabajar.",
         exEn: "Stop talking shit and get to work.",
         byDialect: {
-          "es-CU": { term: "mierda / comer mierda (waste time or talk nonsense)", exEs: "Estuvimos comiendo mierda toda la tarde.", exEn: "We were bullshitting / hanging around all afternoon." },
-          "es-MX": { term: "mierda / cagarla (to fuck up) / desmadre", exEs: "Ya la cagaste bien feo, carnal.", exEn: "You already fucked up really badly, bro." },
+          "es-CU": { term: "mierda / comer mierda", exEs: "Estuvimos comiendo mierda toda la tarde.", exEn: "We were bullshitting / hanging around all afternoon." },
+          "es-MX": { term: "mierda / cagarla / desmadre", exEs: "Ya la cagaste bien feo, carnal.", exEn: "You already fucked up really badly, bro." },
           "es-CO": { term: "mierda / hablar mierda / embarrarla", exEs: "Ese man solo habla mierda todo el día.", exEn: "That guy just talks bullshit all day." },
           "es-ES": { term: "mierda / cagarla / me cago en todo", exEs: "¡Me cago en la leche, se ha roto el coche!", exEn: "Holy shit, the car broke down!" },
           "es-AR": { term: "mierda / hacerse mierda / irse al carajo", exEs: "Se fue todo a la mierda en un segundo.", exEn: "Everything went to shit in a second." }
@@ -241,75 +224,11 @@
         exEs: "Ese tipo es un tremendo comemierda.",
         exEn: "That guy is a massive asshole.",
         byDialect: {
-          "es-CU": { term: "comemierda / singao / penco / guanajo", exEs: "Ese singao se cree que sabe más que nadie.", exEn: "That asshole thinks he knows more than anyone." },
-          "es-MX": { term: "pendejo (idiot) / culero (asshole) / cabrón", exEs: "No seas pendejo, fíjate por dónde caminas.", exEn: "Don't be a dumbass, watch where you walk." },
-          "es-CO": { term: "malparido / gonorrea / pirobo / güevón", exEs: "Ese malparido nunca paga lo que debe.", exEn: "That asshole never pays what he owes." },
+          "es-CU": { term: "comemierda / singao / penco", exEs: "Ese singao se cree que sabe más que nadie.", exEn: "That asshole thinks he knows more than anyone." },
+          "es-MX": { term: "pendejo / culero / cabrón", exEs: "No seas pendejo, fíjate por dónde caminas.", exEn: "Don't be a dumbass, watch where you walk." },
+          "es-CO": { term: "malparido / gonorrea / pirobo", exEs: "Ese malparido nunca paga lo que debe.", exEn: "That asshole never pays what he owes." },
           "es-ES": { term: "gilipollas / capullo / cabrón", exEs: "No seas gilipollas y escúchame un momento.", exEn: "Don't be an idiot and listen to me a second." },
-          "es-AR": { term: "pelotudo (huge idiot) / boludo / forro (asshole)", exEs: "No seas pelotudo, che, hacelo bien.", exEn: "Don't be a dumbass, mate, do it right." }
-        }
-      },
-      {
-        keysEn: ["bitch", "son of a bitch", "motherfucker", "bastard"],
-        keysEs: ["puta", "hijo de puta", "hijueputa", "perra", "hijo de la chingada"],
-        isCurse: true,
-        es: "hijo de puta / cabrón / perra",
-        en: "son of a bitch / motherfucker / bitch",
-        exEs: "Ese hijo de puta me engañó con el precio.",
-        exEn: "That son of a bitch cheated me on the price.",
-        byDialect: {
-          "es-CU": { term: "hijo de puta / singao / qué clase de perra", exEs: "Ese hijo de puta se fue sin pagar.", exEn: "That son of a bitch left without paying." },
-          "es-MX": { term: "hijo de la chingada / cabrón", exEs: "Ese cabrón es un hijo de la chingada.", exEn: "That motherfucker is a son of a bitch." },
-          "es-CO": { term: "hijueputa / jueputa / triplehijueputa", exEs: "Ese hijueputa tráfico no se mueve nada.", exEn: "This motherfucking traffic isn't moving at all." },
-          "es-ES": { term: "hijo de puta / hijoputa / cabronazo", exEs: "Qué frío hace, hijo de puta.", exEn: "It's so fucking cold, son of a bitch." },
-          "es-AR": { term: "hijo de mil putas / la concha de tu madre", exEs: "¡Qué hijo de mil putas, qué golazo metió!", exEn: "What a son of a bitch, what a crazy goal he scored!" }
-        }
-      },
-      {
-        keysEn: ["cool", "awesome", "badass", "great", "sick", "dope"],
-        keysEs: ["genial", "en talla", "volao", "chingon", "chido", "padre", "chimba", "bacano", "de puta madre", "copado"],
-        isCurse: false,
-        es: "genial / brutal / a todo dar",
-        en: "cool / awesome / badass / dope",
-        exEs: "Esa película estuvo brutal de principio a fin.",
-        exEn: "That movie was badass from start to finish.",
-        byDialect: {
-          "es-CU": { term: "en talla / volao / escapao / criminal", exEs: "Oye asere, ese carro nuevo está volao.", exEn: "Hey bro, that new car is super badass." },
-          "es-MX": { term: "chingón (badass) / chido / a toda madre", exEs: "Te quedó bien chingón el diseño, carnal.", exEn: "The design turned out super badass, bro." },
-          "es-CO": { term: "una chimba / del putas (badass) / bacano", exEs: "¡Esa fiesta estuvo del putas, parcero!", exEn: "That party was fucking awesome, bro!" },
-          "es-ES": { term: "de puta madre (badass) / mola mazo / guay", exEs: "La comida en este sitio está de puta madre.", exEn: "The food at this spot is fucking awesome." },
-          "es-AR": { term: "re copado / zarpado (badass) / bárbaro", exEs: "Está zarpado ese juego nuevo, boludo.", exEn: "That new game is sick/badass, dude." }
-        }
-      },
-      {
-        keysEn: ["friend", "bro", "buddy", "dude", "mate"],
-        keysEs: ["amigo", "amiga", "asere", "yunta", "consorte", "carnal", "compa", "guey", "wey", "parcero", "parce", "tio", "colega", "chabon"],
-        isCurse: false,
-        es: "el amigo / el hermano",
-        en: "friend / bro / dude / buddy",
-        exEs: "Él es mi mejor amigo desde hace años.",
-        exEn: "He is my best friend for years.",
-        byDialect: {
-          "es-CU": { term: "asere / yunta / consorte / ecobio", exEs: "¡Qué bolá, mi yunta! Cuenta todo.", exEn: "What's up, my close bro! Tell me everything." },
-          "es-MX": { term: "carnal / compa / güey (wey)", exEs: "¿Qué onda, güey? ¿Vamos por unas chelas?", exEn: "What's up, dude? Shall we go get some beers?" },
-          "es-CO": { term: "parcero / parce / llave", exEs: "Hágale pues, mi parcero, yo le ayudo.", exEn: "Go for it, my bro, I'll help you." },
-          "es-ES": { term: "tío / tía / colega / tronco", exEs: "Pásame eso cuando puedas, tío.", exEn: "Pass me that when you can, man." },
-          "es-AR": { term: "che / boludo (friendly) / chabón / loco", exEs: "Che, boludo, ¿viste el partido de ayer?", exEn: "Hey dude, did you see yesterday's game?" }
-        }
-      },
-      {
-        keysEn: ["money", "cash", "bucks"],
-        keysEs: ["dinero", "plata", "fula", "guanikiki", "chavita", "lana", "varo", "lucas", "pasta", "guita", "mango"],
-        isCurse: false,
-        es: "el dinero / la plata",
-        en: "money / cash / bucks",
-        exEs: "Necesito sacar dinero del cajero automático.",
-        exEn: "I need to take money out of the ATM.",
-        byDialect: {
-          "es-CU": { term: "el fula / el guanikiki / la chavita", exEs: "Hay que buscar el guanikiki todos los días, asere.", exEn: "We gotta hustle for that cash every day, bro." },
-          "es-MX": { term: "la lana / el varo / la feria", exEs: "No traigo ni un varo encima ahorita.", exEn: "I don't have a single buck on me right now." },
-          "es-CO": { term: "la plata / las lucas / el billete", exEs: "Eso cuesta como cincuenta lucas, parce.", exEn: "That costs like fifty thousand pesos, bro." },
-          "es-ES": { term: "la pasta / los pavos / las pelas", exEs: "Ese reloj vale una buena pasta.", exEn: "That watch costs serious cash." },
-          "es-AR": { term: "la guita / el mango / las lucas", exEs: "No tengo un mango partido al medio.", exEn: "I don't have a single cent." }
+          "es-AR": { term: "pelotudo / boludo / forro", exEs: "No seas pelotudo, che, hacelo bien.", exEn: "Don't be a dumbass, mate, do it right." }
         }
       }
     ];
@@ -319,12 +238,9 @@
       { id: "s2", dialect: "es-CU", category: "curse", badge: "🇨🇺 Cuba 18+ Curse", phrase: "Comer mierda / Comemierda", literal: "Eat shit / Shit-eater", meaning: "To waste time, talk nonsense; an asshole/idiot", exEs: "Deja de comer mierda y ponte para las cosas.", exEn: "Stop bullshitting around and focus on business." },
       { id: "s3", dialect: "es-CU", category: "curse", badge: "🇨🇺 Cuba 18+ Curse", phrase: "Estar de pinga / ¡De pinga!", literal: "Of dick", meaning: "Extremely tough, crazy, fucked up (or mind-blowing)", exEs: "¡Ño, asere, el calor hoy está de pinga!", exEn: "Damn bro, the heat today is brutal/fucked up!" },
       { id: "s4", dialect: "es-MX", category: "curse", badge: "🇲🇽 Mexico 18+ Curse", phrase: "¡No mames! / A la verga", literal: "Don't suck / To the dick", meaning: "No fucking way! / Are you shitting me? / Screw it!", exEs: "¡No mames, güey, ganaste el premio!", exEn: "No fucking way, dude, you won the prize!" },
-      { id: "s5", dialect: "es-MX", category: "curse", badge: "🇲🇽 Mexico 18+ Curse", phrase: "Chingar / Chingón / Pendejo", literal: "To fuck / Badass / Dumbass", meaning: "Core Mexican street trio: to mess up, super badass, or an idiot", exEs: "No seas pendejo, ese trabajo te quedó bien chingón.", exEn: "Don't be a dumbass, that work turned out super badass." },
-      { id: "s6", dialect: "es-CO", category: "curse", badge: "🇨🇴 Colombia 18+ Curse", phrase: "Gonorrea / Hijueputa / Del putas", literal: "Street curse intensifiers", meaning: "Terrible person/situation ('gonorrea') or something amazing ('del putas')", exEs: "¡Jueputa frío tan berraco, pero el concierto estuvo del putas!", exEn: "Crazy fucking cold, but the concert was fucking awesome!" },
-      { id: "s7", dialect: "es-CO", category: "slang", badge: "🇨🇴 Colombia Slang", phrase: "Dar papaya", literal: "Give papaya", meaning: "Make yourself an easy target / leave yourself vulnerable", exEs: "No des papaya con el celular en la calle.", exEn: "Don't make yourself an easy target with your phone out." },
-      { id: "s8", dialect: "es-ES", category: "curse", badge: "🇪🇸 Spain 18+ Curse", phrase: "¡Joder! / ¡Hostia! / Gilipollas", literal: "Fuck! / Damn! / Asshole", meaning: "Everyday Spain swear words for shock, frustration, or calling someone a moron", exEs: "¡Hostia, tío, no seas gilipollas!", exEn: "Damn it man, don't be an asshole!" },
-      { id: "s9", dialect: "es-ES", category: "curse", badge: "🇪🇸 Spain 18+ Curse", phrase: "De puta madre / Me suda los cojones", literal: "Of whore mother / Sweats my balls", meaning: "'De puta madre' = fucking awesome! 'Me suda los cojones' = I don't give a fuck.", exEs: "El viaje salió de puta madre, tío.", exEn: "The trip turned out fucking awesome, man." },
-      { id: "s10", dialect: "es-AR", category: "curse", badge: "🇦🇷 Argentina 18+ Curse", phrase: "Boludo / Pelotudo / La concha de la lora", literal: "Dude / Huge idiot / Holy fuck", meaning: "'Boludo' = dude or fool; 'Pelotudo' = dumbass; 'La concha...' = Fuck!", exEs: "¡La concha de la lora, boludo, me olvidé las llaves!", exEn: "Fuck me, dude, I forgot the keys!" }
+      { id: "s5", dialect: "es-CO", category: "curse", badge: "🇨🇴 Colombia 18+ Curse", phrase: "Gonorrea / Hijueputa / Del putas", literal: "Street curse intensifiers", meaning: "Terrible person/situation ('gonorrea') or something amazing ('del putas')", exEs: "¡Jueputa frío tan berraco, pero el concierto estuvo del putas!", exEn: "Crazy fucking cold, but the concert was fucking awesome!" },
+      { id: "s6", dialect: "es-ES", category: "curse", badge: "🇪🇸 Spain 18+ Curse", phrase: "¡Joder! / ¡Hostia! / Gilipollas", literal: "Fuck! / Damn! / Asshole", meaning: "Everyday Spain swear words for shock, frustration, or calling someone a moron", exEs: "¡Hostia, tío, no seas gilipollas!", exEn: "Damn it man, don't be an asshole!" },
+      { id: "s7", dialect: "es-AR", category: "curse", badge: "🇦🇷 Argentina 18+ Curse", phrase: "Boludo / Pelotudo / La concha de la lora", literal: "Dude / Huge idiot / Holy fuck", meaning: "'Boludo' = dude or fool; 'Pelotudo' = dumbass; 'La concha...' = Fuck!", exEs: "¡La concha de la lora, boludo, me olvidé las llaves!", exEn: "Fuck me, dude, I forgot the keys!" }
     ];
 
     function normalizeText(str) {
@@ -336,7 +252,6 @@
         .trim();
     }
 
-    // Street Phonetic "How It Actually Sounds" Decoder (Adapts to Cuba, Argentina, Spain, Mexico, Colombia)
     function generatePhoneticGuide(spanishText, dialectCode = "es-CU") {
       if (!spanishText) return "";
       const words = spanishText
@@ -347,31 +262,22 @@
 
       const convertWord = (rawW) => {
         let w = rawW.toLowerCase();
-        // Dialect-specific street transformations
         if (dialectCode === "es-CU") {
-          // Cuban Spanish aspirates syllable-final 's' -> 'h' and drops 'd' in -ado
           w = w.replace(/ado$/, "ao").replace(/ada$/, "á");
           w = w.replace(/s([tpckfbgd])/g, "h$1").replace(/s$/, "h");
         } else if (dialectCode === "es-AR") {
-          // Argentine Rioplatense turns ll / y before vowels into 'sh'
           w = w.replace(/ll/g, "sh").replace(/\by([aeiouáéíóú])/g, "sh$1");
         } else if (dialectCode === "es-ES") {
-          // Castilian ceceo: z, ce, ci -> th
           w = w.replace(/z/g, "th").replace(/ce/g, "the").replace(/ci/g, "thi");
         }
-
-        // Standard Spanish phonetic mappings for English speakers
         w = w
           .replace(/qué/g, "KEH")
           .replace(/que/g, "keh")
           .replace(/qu([eiéí])/g, "k$1")
           .replace(/gue/g, "geh")
           .replace(/gui/g, "gee")
-          .replace(/güe/g, "gweh")
-          .replace(/güi/g, "gwee")
           .replace(/ñ/g, "ny")
           .replace(/ll/g, "y")
-          .replace(/ch/g, "ch")
           .replace(/j/g, "kh")
           .replace(/ge/g, "kheh")
           .replace(/gi/g, "khee")
@@ -380,7 +286,6 @@
           .replace(/z/g, "s")
           .replace(/^h/g, "")
           .replace(/v/g, "b");
-
         return w;
       };
 
@@ -392,12 +297,9 @@
       const s2 = normalizeText(b);
       if (!s1 || !s2) return 0;
       if (s1 === s2) return 100;
-      if (b.includes("*") && s1[0] === s2[0] && Math.abs(b.length - s1.length) <= 2) {
-        return 95;
-      }
-      const phoneticNorm = (w) =>
-        w.replace(/v/g, "b").replace(/z/g, "s").replace(/ll/g, "y").replace(/s$/, "");
-      if (phoneticNorm(s1) === phoneticNorm(s2)) return 84;
+      if (b.includes("*") && s1[0] === s2[0] && Math.abs(b.length - s1.length) <= 2) return 95;
+      const phoneticNorm = (w) => w.replace(/v/g, "b").replace(/z/g, "s").replace(/ll/g, "y").replace(/s$/, "");
+      if (phoneticNorm(s1) === phoneticNorm(s2)) return 82;
 
       const track = Array(s2.length + 1).fill(null).map(() => Array(s1.length + 1).fill(null));
       for (let i = 0; i <= s1.length; i += 1) track[0][i] = i;
@@ -426,7 +328,6 @@
           breakdown: expWords.map(w => ({ word: w, status: "red", sim: 0, note: "Not heard" }))
         };
       }
-
       let totalSim = 0;
       const breakdown = expWords.map((expW, idx) => {
         let bestSim = 0;
@@ -440,96 +341,303 @@
             matchedSpk = spkW;
           }
         });
-
         totalSim += bestSim;
         let status = "red";
-        let note = matchedSpk ? `Heard "${matchedSpk}" — tap for X-Ray & audio` : "Missed word — tap to hear";
+        let note = matchedSpk ? `Heard "${matchedSpk}" — tap for X-Ray & audio` : "Missed word";
         if (bestSim >= 85) {
           status = "green";
-          note = "Crisp native pronunciation!";
+          note = "Perfect pronunciation!";
         } else if (bestSim >= 65) {
           status = "yellow";
-          note = `Close ("${matchedSpk}") — slight slur`;
+          note = `Medium ("${matchedSpk}") — slight slur`;
         }
         return { word: expW, status, sim: bestSim, note };
       });
-
       const score = Math.round(totalSim / expWords.length);
       return { score, breakdown };
     }
 
+    // Grammar, Accent & Punctuation Rules
     const GRAMMAR_RULES = [
       { regex: /\byo gusto\b/gi, replacement: "me gusta", reason: "Use 'me gusta' (it pleases me) instead of 'yo gusto'." },
       { regex: /\btu gustas\b/gi, replacement: "te gusta", reason: "Use 'te gusta' to say 'you like'." },
-      { regex: /\byo sabo\b/gi, replacement: "yo sé", reason: "'Saber' is irregular in the yo form: 'yo sé'." },
-      { regex: /\byo pon[ií]\b/gi, replacement: "yo puse", reason: "'Poner' in the past tense is irregular: 'puse'." },
+      { regex: /\byo sabo\b/gi, replacement: "yo sé", reason: "'Saber' is irregular in the first person: 'yo sé'." },
+      { regex: /\byo pon[ií]\b/gi, replacement: "yo puse", reason: "'Poner' in the past tense is 'puse'." },
       { regex: /\byo ten[ií]\b/gi, replacement: "yo tuve", reason: "'Tener' in the past tense is 'tuve' or 'tenía'." },
-      { regex: /\byo hac[ií]\b/gi, replacement: "yo hice", reason: "'Hacer' in the preterite past is 'hice'." },
-      { regex: /\bla problema\b/gi, replacement: "el problema", reason: "'Problema' ends in -a but is masculine: 'el problema'." },
+      { regex: /\byo hac[ií]\b/gi, replacement: "yo hice", reason: "'Hacer' in the past tense is 'hice'." },
+      { regex: /\bla problema\b/gi, replacement: "el problema", reason: "'Problema' is masculine: 'el problema'." },
       { regex: /\bun problema buena\b/gi, replacement: "un buen problema", reason: "'Problema' is masculine." },
       { regex: /\bla dia\b|\bla día\b/gi, replacement: "el día", reason: "'Día' is masculine: 'el día'." },
-      { regex: /\bel mano\b/gi, replacement: "la mano", reason: "'Mano' ends in -o but is feminine: 'la mano'." },
-      { regex: /\bla agua\b/gi, replacement: "el agua", reason: "Use 'el agua' (singular) to avoid double 'a' sound." },
-      { regex: /\bmas mejor\b|\bmás mejor\b/gi, replacement: "mejor", reason: "'Mejor' already means 'better' — don't add 'más'." },
-      { regex: /\bmas peor\b|\bmás peor\b/gi, replacement: "peor", reason: "'Peor' already means 'worse' — don't add 'más'." },
-      { regex: /\bun otro\b/gi, replacement: "otro", reason: "Never put 'un' before 'otro' — just say 'otro'." },
-      { regex: /\bbuscando por\b/gi, replacement: "buscando", reason: "'Buscar' already includes 'for' — drop 'por'." },
+      { regex: /\bel mano\b/gi, replacement: "la mano", reason: "'Mano' is feminine: 'la mano'." },
+      { regex: /\bla agua\b/gi, replacement: "el agua", reason: "Use 'el agua' in the singular." },
+      { regex: /\bmas mejor\b|\bmás mejor\b/gi, replacement: "mejor", reason: "'Mejor' already means 'better' — drop 'más'." },
+      { regex: /\bun otro\b/gi, replacement: "otro", reason: "Never put 'un' before 'otro' in Spanish." },
+      { regex: /\bbuscando por\b/gi, replacement: "buscando", reason: "'Buscar' already means 'to look for' — drop 'por'." },
       { regex: /\besperando por\b/gi, replacement: "esperando", reason: "'Esperar' already means 'to wait for' — drop 'por'." },
-      { regex: /\bpensar de\b/gi, replacement: "pensar en", reason: "Use 'pensar en' to mean 'think about'." },
-      { regex: /\bestoy hambre\b|\bsoy hambre\b/gi, replacement: "tengo hambre", reason: "In Spanish you 'have hunger': 'tengo hambre'." },
-      { regex: /\bestoy frio\b|\bestoy frío\b/gi, replacement: "tengo frío", reason: "For feeling cold, use 'tengo frío'." },
-      { regex: /\bestoy calor\b/gi, replacement: "tengo calor", reason: "For feeling hot, use 'tengo calor'." },
-      { regex: /\bmucho gente\b/gi, replacement: "mucha gente", reason: "'Gente' is feminine: 'mucha gente'." },
-      { regex: /\bla gente son\b/gi, replacement: "la gente es", reason: "'La gente' is singular in Spanish: 'la gente es'." }
+      { regex: /\bestoy hambre\b|\bsoy hambre\b/gi, replacement: "tengo hambre", reason: "Use 'tener' for hunger: 'tengo hambre'." },
+      { regex: /\bestoy frio\b|\bestoy frío\b/gi, replacement: "tengo frío", reason: "Use 'tengo frío' for feeling cold." },
+      { regex: /\bestoy calor\b/gi, replacement: "tengo calor", reason: "Use 'tengo calor' for feeling hot." },
+      { regex: /\bsoy (\d+) anos\b|\bsoy (\d+) años\b/gi, replacement: "tengo $1 años", reason: "Use 'tengo ... años' to state your age." },
+      { regex: /\bmi nombre soy\b/gi, replacement: "mi nombre es", reason: "Use 'mi nombre es' or 'me llamo'." },
+      { regex: /\bme llama\b/gi, replacement: "me llamo", reason: "For 'I call myself', use 'me llamo' (ending in -o)." },
+      { regex: /\bestoy bien y tu\b/gi, replacement: "estoy bien, ¿y tú?", reason: "Add a comma and inverted question mark: '¿y tú?'." }
     ];
 
-    function gradeFreeSpeechWords(transcript, rawConfidence, grammarMatches) {
-      const words = (transcript || "").trim().split(/\s+/).filter(Boolean);
-      const baseConf = rawConfidence && rawConfidence > 0 ? rawConfidence : 0.88;
-      const yellowOrRedTokens = new Set();
-      const redTokens = new Set(["sabo", "poni", "poní", "teni", "tení", "haci", "hací"]);
+    // Add Proper Spanish Punctuation (¿ ? ¡ ! commas & accents)
+    function restoreSpanishPunctuation(rawText) {
+      let s = (rawText || "").trim();
+      if (!s) return "";
 
+      // Common accent restorations if speech-to-text stripped them
+      s = s
+        .replace(/\bcomo estas\b/gi, "¿cómo estás?")
+        .replace(/\bque tal\b/gi, "¿qué tal?")
+        .replace(/\bque bola\b/gi, "¿qué bolá?")
+        .replace(/\by tu\b$/gi, "¿y tú?")
+        .replace(/\btambien\b/gi, "también")
+        .replace(/\bmas\b/gi, "más");
+
+      // Capitalize first letter
+      s = s.charAt(0).toUpperCase() + s.slice(1);
+
+      // Add comma after greeting if followed by more words (e.g. "Hola me llamo Armando" -> "Hola, me llamo Armando.")
+      s = s.replace(/^(Hola|Buenas|Oye|Che|Quiubo)\s+(?=[a-záéíóúñ])/i, "$1, ");
+
+      // Detect if sentence is a question without question marks
+      const isQuestion = /^(Que|Qué|Como|Cómo|Donde|Dónde|Cuando|Cuándo|Por que|Por qué|Quien|Quién|Cual|Cuál)\b/i.test(s);
+      if (isQuestion && !s.includes("?")) {
+        s = "¿" + s.charAt(0).toLowerCase() + s.slice(1) + "?";
+        s = s.charAt(0) + s.charAt(1).toUpperCase() + s.slice(2);
+      } else if (!/[.?!]$/.test(s)) {
+        s = s + ".";
+      }
+      return s;
+    }
+
+    // Grade every word in Green (Perfect), Yellow (Medium), or Red (Bad)
+    function gradeFreeSpeechWords(originalText, correctedText, rawConfidence, grammarMatches) {
+      const origWords = (originalText || "").trim().split(/\s+/).filter(Boolean);
+      const corrWords = (correctedText || "").replace(/[¿?¡!.,;:"]/g, "").trim().split(/\s+/).filter(Boolean);
+      const baseConf = rawConfidence && rawConfidence > 0 ? rawConfidence : 0.88;
+
+      const wrongWordSet = new Set();
       (grammarMatches || []).forEach(m => {
-        const wrongParts = (m.wrong || "").toLowerCase().split(/\s+/);
-        wrongParts.forEach(p => yellowOrRedTokens.add(normalizeText(p)));
+        (m.wrong || "").toLowerCase().split(/\s+/).forEach(w => wrongWordSet.add(normalizeText(w)));
       });
 
-      const englishBleedWords = new Set(["the", "and", "because", "with", "about", "what", "where", "fuck", "shit", "money", "friend"]);
+      const hardRedSet = new Set(["sabo", "poni", "poní", "teni", "tení", "haci", "hací", "the", "and", "with", "what", "where", "because"]);
 
-      return words.map((w) => {
+      return origWords.map((w, idx) => {
         const norm = normalizeText(w);
-        if (w.includes("*")) {
-          return { word: w, status: "green", score: 94, reason: "Uncensored street slang recognized!" };
-        }
-        if (redTokens.has(norm) || englishBleedWords.has(norm)) {
+        const alignedCorr = corrWords[idx] || w;
+
+        if (hardRedSet.has(norm)) {
           return {
             word: w,
             status: "red",
-            score: 48,
-            reason: englishBleedWords.has(norm) ? `"${w}" is English — use Spanish here!` : `"${w}" is an invalid conjugation.`
+            label: "Bad / Fix",
+            score: 45,
+            reason: `Grammar/Language error on "${w}" — use Spanish "${alignedCorr}".`
           };
         }
-        if (yellowOrRedTokens.has(norm)) {
-          return { word: w, status: "yellow", score: 76, reason: `Pronounced clearly, but "${w}" needs a grammar tweak.` };
+
+        if (wrongWordSet.has(norm)) {
+          return {
+            word: w,
+            status: "yellow",
+            label: "Medium",
+            score: 74,
+            reason: `Understandable, but "${w}" needs a grammar or agreement adjustment.`
+          };
         }
-        const wordLenBonus = norm.length >= 4 ? 0.04 : 0;
-        const effectiveConf = Math.min(0.99, baseConf + wordLenBonus);
-        if (effectiveConf >= 0.82) {
-          return { word: w, status: "green", score: Math.round(effectiveConf * 100), reason: "Crisp pronunciation & valid Spanish cadence!" };
+
+        // Check if accent was missing compared to corrected word
+        const cleanOrig = w.replace(/[¿?¡!.,;:"]/g, "").toLowerCase();
+        const cleanCorr = alignedCorr.toLowerCase();
+        if (cleanOrig !== cleanCorr && normalizeText(cleanOrig) === normalizeText(cleanCorr)) {
+          return {
+            word: w,
+            status: "yellow",
+            label: "Medium (Accent)",
+            score: 80,
+            reason: `Good sound! Written with an accent mark: "${alignedCorr}".`
+          };
         }
-        if (effectiveConf >= 0.65) {
-          return { word: w, status: "yellow", score: Math.round(effectiveConf * 100), reason: "Slight slur/accent — tap for X-Ray & audio." };
+
+        if (baseConf >= 0.80) {
+          return {
+            word: w,
+            status: "green",
+            label: "Perfect",
+            score: Math.min(99, Math.round(baseConf * 100) + 4),
+            reason: "Perfect pronunciation & grammar!"
+          };
         }
-        return { word: w, status: "red", score: Math.round(effectiveConf * 100), reason: "Unclear pronunciation — tap to hear native audio." };
+
+        if (baseConf >= 0.65) {
+          return {
+            word: w,
+            status: "yellow",
+            label: "Medium",
+            score: Math.round(baseConf * 100),
+            reason: "Medium pronunciation — slight slur or hesitation detected."
+          };
+        }
+
+        return {
+          word: w,
+          status: "red",
+          label: "Needs Work",
+          score: Math.round(baseConf * 100),
+          reason: "Unclear pronunciation — tap to hear native speaker."
+        };
       });
     }
 
-    async function analyzeFreeSpeechAndCorrect(spokenEs, confidence, dialectCode) {
+    // Smart Multi-Turn Conversational Partner (Responds to Introductions, Questions, Work, Food, Sports, Slang, etc.)
+    async function generateContextualTutorReply(userSpanish, englishMeaning, dialectCode, turnHistoryCount) {
+      const d = DIALECTS[dialectCode] || DIALECTS["es-CU"];
+      const norm = normalizeText(userSpanish);
+
+      // 1. Try Live Free Conversational AI (Pollinations OpenAI-compatible endpoint) with fast 2.5s timeout
+      try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 2500);
+        const sysPrompt = `You are ${d.tutor}, a friendly native Spanish speaker from ${d.name}. Reply naturally to the user in 1 to 2 short conversational sentences in ${d.name} Spanish, using local slang like "${d.slangWord}" and "${d.coolWord}" naturally, and end with a follow-up question to keep the conversation flowing. Return ONLY valid JSON: {"es": "Spanish reply", "en": "English translation"}`;
+        const aiRes = await fetch("https://text.pollinations.ai/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
+          body: JSON.stringify({
+            messages: [
+              { role: "system", content: sysPrompt },
+              { role: "user", content: userSpanish }
+            ],
+            jsonMode: true,
+            model: "openai"
+          })
+        });
+        clearTimeout(timer);
+        if (aiRes.ok) {
+          const rawText = await aiRes.text();
+          const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            const parsed = JSON.parse(jsonMatch[0]);
+            if (parsed.es && parsed.en) {
+              return { es: parsed.es, en: parsed.en };
+            }
+          }
+        }
+      } catch (e) {
+        // Fallback to instant smart conversational engine below
+      }
+
+      // 2. Instant Smart Conversational Engine (Detects Introductions, Names, Feelings, Work, Food, Sports, Questions)
+      const nameMatch = userSpanish.match(/(?:me llamo|soy|mi nombre es)\s+([a-zA-ZáéíóúÁÉÍÓÚñÑ]+)/i);
+      if (nameMatch) {
+        const userName = nameMatch[1].charAt(0).toUpperCase() + nameMatch[1].slice(1);
+        const introReplies = {
+          "es-CU": {
+            es: `¡Mucho gusto, ${userName}! Qué bolá, asere, aquí tienes a Yordanis en La Habana. ¿De dónde eres y qué te gusta hacer en tu tiempo libre?`,
+            en: `Nice to meet you, ${userName}! What's up bro, you've got Yordanis here in Havana. Where are you from and what do you like doing in your free time?`
+          },
+          "es-MX": {
+            es: `¡Mucho gusto, ${userName}, carnal! Qué chingón conocerte. ¿De dónde eres y cómo va tu día hoy?`,
+            en: `Nice to meet you, ${userName}, bro! So cool meeting you. Where are you from and how's your day going today?`
+          },
+          "es-CO": {
+            es: `¡Mucho gusto, ${userName}, parcero! Qué chimba hablar contigo. ¿De dónde eres y qué planes tienes para hoy?`,
+            en: `Nice to meet you, ${userName}, bro! So cool talking with you. Where are you from and what plans do you have for today?`
+          },
+          "es-ES": {
+            es: `¡Encantado, ${userName}, tío! De puta madre que estemos practicando hoy. ¿A qué te dedicas o qué te gusta hacer?`,
+            en: `Pleased to meet you, ${userName}, man! Awesome that we're practicing today. What do you do for work or what do you like doing?`
+          },
+          "es-AR": {
+            es: `¡Un gusto enorme, ${userName}, che! Re copado charlar con vos. ¿De dónde sos y qué contás de bueno?`,
+            en: `Huge pleasure, ${userName}, mate! Super cool chatting with you. Where are you from and what's good?`
+          }
+        };
+        return introReplies[dialectCode] || introReplies["es-CU"];
+      }
+
+      // Greeting / "How are you?"
+      if (/\b(hola|buenas|que bola|como estas|que tal|todo bien)\b/.test(norm)) {
+        const greetReplies = {
+          "es-CU": {
+            es: `¡Todo en talla por aquí, asere, tranquilo y sin coger lucha! ¿Y tú cómo andas hoy, qué hiciste de bueno?`,
+            en: `Everything's great over here, bro, relaxed and stress-free! And how are you doing today, what have you been up to?`
+          },
+          "es-MX": {
+            es: `¡Todo bien chingón por acá, carnal! Con mucha actitud. ¿Y tú qué onda, cómo te ha tratado la semana?`,
+            en: `Everything's awesome over here, bro! Feeling great. What about you, how has the week treated you?`
+          },
+          "es-CO": {
+            es: `¡Todo súper bien, parcero, gracias por preguntar! ¿Y a usted cómo le va hoy, mucho trabajo o descanso?`,
+            en: `Everything's super good, bro, thanks for asking! And how's it going for you today, lots of work or relaxing?`
+          },
+          "es-ES": {
+            es: `¡Aquí andamos, tío, todo de puta madre! ¿Y tú qué tal llevas el día, tienes algún plan guay?`,
+            en: `Doing great here, man, everything's awesome! How's your day going, got any cool plans?`
+          },
+          "es-AR": {
+            es: `¡Todo re bien por acá, che! ¿Vos cómo andás, qué tenés pensado hacer más tarde?`,
+            en: `Everything's super good here, mate! How are you doing, what are you planning to do later?`
+          }
+        };
+        return greetReplies[dialectCode] || greetReplies["es-CU"];
+      }
+
+      // Work / Job / Busy
+      if (/\b(trabajo|trabajando|pincho|chamba|curro|laburo|ocupado|cansado|tienda|clientes)\b/.test(norm)) {
+        return {
+          es: `¡Ño, el trabajo siempre lleva su esfuerzo, ${d.slangWord}! Pero qué bueno que sacaste un ratico para practicar español. ¿A qué hora sales hoy para descansar?`,
+          en: `Man, work always takes effort, bro! But it's great you took a moment to practice Spanish. What time do you get off today to rest?`
+        };
+      }
+
+      // Food / Cooking / Eating / Hungry
+      if (/\b(comida|comer|hambre|jama|tacos|cafe|cocinar|pastel|cena|almuerzo)\b/.test(norm)) {
+        return {
+          es: `¡Ahora sí hablaste mi idioma, ${d.slangWord}! Una buena comida levanta el ánimo enseguida. ¿Cuál es tu plato favorito para preparar o pedir?`,
+          en: `Now you're speaking my language, bro! A good meal lifts the mood right away. What's your favorite dish to cook or order?`
+        };
+      }
+
+      // Sports / Hockey / Soccer / Games
+      if (/\b(hockey|futbol|partido|jugar|juego|equipo|ganar|deporte|patinar)\b/.test(norm)) {
+        return {
+          es: `¡Qué clase de adrenalina, ${d.slangWord}! Los deportes y los juegos se viven con tremenda pasión. ¿Cuál es tu equipo favorito o cada cuánto juegas?`,
+          en: `What a rush, bro! Sports and games are lived with huge passion. What's your favorite team or how often do you play?`
+        };
+      }
+
+      // Dynamic rotating conversational follow-ups so it NEVER repeats the same reply
+      const followUps = [
+        {
+          es: `¡Te entendí perfecto, ${d.slangWord}! Eso que dices está ${d.coolWord}. Cuéntame un poco más, ¿por qué te llama la atención eso?`,
+          en: `I understood you perfectly, bro! What you're saying is super cool. Tell me a bit more, why does that catch your attention?`
+        },
+        {
+          es: `¡Mira qué interesante eso, ${d.slangWord}! Me gusta cómo lo explicaste en español. ¿Y qué piensas hacer este fin de semana?`,
+          en: `Look how interesting that is, bro! I like how you explained it in Spanish. And what are you thinking of doing this weekend?`
+        },
+        {
+          es: `¡Vas soltando la lengua cada vez mejor, ${d.slangWord}! Dime otra cosa, ¿qué es lo que más te gusta de aprender español?`,
+          en: `You're speaking more fluently every time, bro! Tell me something else, what do you like most about learning Spanish?`
+        }
+      ];
+      return followUps[turnHistoryCount % followUps.length];
+    }
+
+    // Complete Live Analyzer: Pronunciation (Green/Yellow/Red) + Grammar + Punctuation + Conversational AI Reply
+    async function analyzeFreeSpeechAndCorrect(spokenEs, confidence, dialectCode, turnCount = 0) {
       const cleanSpoken = (spokenEs || "").trim();
       const d = DIALECTS[dialectCode] || DIALECTS["es-CU"];
       let workingCorrected = cleanSpoken;
       const explanations = [];
 
+      // 1. Local Instant Grammar Rules
       GRAMMAR_RULES.forEach(rule => {
         const match = workingCorrected.match(rule.regex);
         if (match) {
@@ -539,15 +647,20 @@
         }
       });
 
+      // 2. Fast LanguageTool Grammar Check (1.5s timeout so it never hangs)
       try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 1500);
         const params = new URLSearchParams();
         params.append("text", workingCorrected);
         params.append("language", "es");
         const ltRes = await fetch("https://api.languagetool.org/v2/check", {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          signal: controller.signal,
           body: params.toString()
         });
+        clearTimeout(timer);
         if (ltRes.ok) {
           const ltData = await ltRes.json();
           if (ltData && Array.isArray(ltData.matches)) {
@@ -572,9 +685,14 @@
         }
       } catch (e) {}
 
+      // 3. Restore Spanish Punctuation & Accents
+      const punctuatedCorrected = restoreSpanishPunctuation(workingCorrected);
+      const punctuationChanged = punctuatedCorrected !== cleanSpoken;
+
+      // 4. English Translation + Conversational AI Reply in Parallel
       let englishMeaning = "";
       try {
-        const gtxUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=es&tl=en&dt=t&q=${encodeURIComponent(workingCorrected)}`;
+        const gtxUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=es&tl=en&dt=t&q=${encodeURIComponent(punctuatedCorrected)}`;
         const gtxRes = await fetch(gtxUrl);
         const gtxData = await gtxRes.json();
         if (gtxData && gtxData[0]) {
@@ -584,61 +702,23 @@
         englishMeaning = "Spoken Spanish phrase";
       }
 
-      if (workingCorrected.length > 0) {
-        workingCorrected = workingCorrected.charAt(0).toUpperCase() + workingCorrected.slice(1);
-      }
-
-      const wordBreakdown = gradeFreeSpeechWords(cleanSpoken, confidence, explanations);
+      const wordBreakdown = gradeFreeSpeechWords(cleanSpoken, punctuatedCorrected, confidence, explanations);
       const avgPronunciationScore = wordBreakdown.length
         ? Math.round(wordBreakdown.reduce((acc, w) => acc + w.score, 0) / wordBreakdown.length)
         : 0;
 
-      const dialectUpgrades = {
-        "es-CU": `Oye ${d.slangWord}, ${workingCorrected.charAt(0).toLowerCase() + workingCorrected.slice(1)}, ¿estás en talla?`,
-        "es-MX": `Mira ${d.slangWord}, ${workingCorrected.charAt(0).toLowerCase() + workingCorrected.slice(1)}, la neta.`,
-        "es-CO": `Mire ${d.slangWord}, ${workingCorrected.charAt(0).toLowerCase() + workingCorrected.slice(1)}, a lo bien.`,
-        "es-ES": `Oye ${d.slangWord}, ${workingCorrected.charAt(0).toLowerCase() + workingCorrected.slice(1)}, ¿sabes?`,
-        "es-AR": `Che ${d.slangWord}, ${workingCorrected.charAt(0).toLowerCase() + workingCorrected.slice(1)}, posta.`
-      };
-
-      const hasQuestion = cleanSpoken.includes("?") || /\b(que|como|donde|cuando|por que|quien|cual)\b/i.test(normalizeText(cleanSpoken));
-      const tutorReplies = {
-        "es-CU": {
-          es: hasQuestion
-            ? `¡Tremenda pregunta, asere! Sobre "${workingCorrected}", aquí en La Habana todo está en talla. ¿Y tú qué crees de eso?`
-            : `¡Te escuché clarito, asere! "${workingCorrected}" suena con tremendo swing. ¿Qué más me cuentas?`,
-          en: hasQuestion
-            ? `Great question, bro! About "${englishMeaning}", here in Havana everything's cool. What do you think?`
-            : `Heard you loud and clear, bro! "${englishMeaning}" sounds great. What else can you tell me?`
-        },
-        "es-MX": {
-          es: `¡Órale, carnal! Te entendí perfecto: "${workingCorrected}". ¿Qué otro plan traes en mente ahorita?`,
-          en: `Awesome, bro! I understood you perfectly: "${englishMeaning}". What other plan do you have in mind?`
-        },
-        "es-CO": {
-          es: `¡Qué chimba escucharte, parcero! Dijiste: "${workingCorrected}". ¿Y qué más me cuenta pues?`,
-          en: `So cool hearing you, bro! You said: "${englishMeaning}". What else can you tell me?`
-        },
-        "es-ES": {
-          es: `¡De puta madre, tío! Te he entendido genial: "${workingCorrected}". ¿Qué más me cuentas?`,
-          en: `Awesome, man! I understood you great: "${englishMeaning}". What else can you tell me?`
-        },
-        "es-AR": {
-          es: `¡Re bien, che! Se entendió clarito: "${workingCorrected}". Contame un poco más, ¿cómo sigue todo?`,
-          en: `Super good, mate! Understood clearly: "${englishMeaning}". Tell me a bit more, how's everything going?`
-        }
-      };
+      const aiReply = await generateContextualTutorReply(punctuatedCorrected, englishMeaning, dialectCode, turnCount);
 
       return {
         originalEs: cleanSpoken,
-        correctedEs: workingCorrected,
-        isGrammarPerfect: explanations.length === 0 && normalizeText(cleanSpoken) === normalizeText(workingCorrected),
+        correctedEs: punctuatedCorrected,
+        isGrammarPerfect: explanations.length === 0,
+        punctuationChanged,
         explanations,
         englishMeaning,
         wordBreakdown,
         avgPronunciationScore,
-        dialectUpgrade: dialectUpgrades[dialectCode] || workingCorrected,
-        aiReply: tutorReplies[dialectCode] || tutorReplies["es-CU"]
+        aiReply
       };
     }
 
@@ -650,18 +730,10 @@
         "el", "la", "los", "las", "un", "una", "yo", "tu", "usted", "que", "como", "donde",
         "cuando", "porque", "para", "por", "con", "sin", "hola", "gracias", "perro", "gato",
         "agua", "casa", "carro", "trabajo", "amigo", "dinero", "comida", "mierda", "puta",
-        "puto", "carajo", "coño", "cono", "pinga", "singar", "singao", "comemierda", "chingar",
-        "chingado", "chingon", "verga", "pendejo", "cabron", "culero", "pinche", "gonorrea",
-        "malparido", "hijueputa", "jueputa", "marica", "pirobo", "joder", "hostia", "gilipollas",
-        "capullo", "cojones", "polla", "boludo", "pelotudo", "concha", "quilombo", "forro",
-        "cagar", "asere", "parcero", "parce", "chido", "chimba", "bacano", "tio", "guita"
+        "carajo", "coño", "pinga", "singar", "comemierda", "chingar", "verga", "pendejo",
+        "cabron", "gonorrea", "joder", "hostia", "gilipollas", "boludo", "pelotudo", "asere"
       ]);
-      if (tokens.some(t => spanishMarkers.has(normalizeText(t)))) return true;
-      if (tokens.length === 1) {
-        const w = normalizeText(tokens[0]);
-        if (/(cion|siones|miento|dad|dades|ito|ita|ando|iendo|arse|erse|irse)$/.test(w)) return true;
-      }
-      return false;
+      return tokens.some(t => spanishMarkers.has(normalizeText(t)));
     }
 
     function buildDynamicDialectBreakdown(esText, enText) {
@@ -718,15 +790,7 @@
         const transUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(cleanInput)}`;
         const transRes = await fetch(transUrl);
         const transData = await transRes.json();
-        let translatedText = (transData && transData[0]) ? transData[0].map(seg => seg[0]).join("") : cleanInput;
-
-        if (normalizeText(translatedText) === normInput) {
-          const mmRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(cleanInput)}&langpair=${sourceLang}|${targetLang}`);
-          const mmData = await mmRes.json();
-          if (mmData && mmData.responseData && mmData.responseData.translatedText) {
-            translatedText = mmData.responseData.translatedText;
-          }
-        }
+        const translatedText = (transData && transData[0]) ? transData[0].map(seg => seg[0]).join("") : cleanInput;
 
         const finalEs = sourceLang === "es" ? cleanInput : translatedText;
         const finalEn = sourceLang === "en" ? cleanInput : translatedText;
@@ -752,19 +816,6 @@
       }
     }
 
-    function generateContextualExamples(esWord, enMeaning, dialectCode) {
-      const d = DIALECTS[dialectCode] || DIALECTS["es-CU"];
-      const cleanEs = esWord.split("/")[0].trim();
-      const cleanEn = enMeaning.split("/")[0].trim();
-      return [
-        { id: "street", label: `🌆 ${d.flag} Street & Casual`, es: `Oye ${d.slangWord}, hablar de "${cleanEs}" aquí siempre está ${d.coolWord}.`, en: `Hey bro, talking about "${cleanEn}" here is always super cool.` },
-        { id: "raw", label: "🤬 18+ Raw / Heated", es: `${d.curseExclaim} ¡No me jodas con "${cleanEs}" ahora mismo, ${d.slangWord}!`, en: `Damn it! Don't fuck with me about "${cleanEn}" right now, bro!` },
-        { id: "social", label: "🍽️ Social & Hangout", es: `Cuando nos veamos más tarde, tenemos que hablar sobre ${cleanEs}.`, en: `When we meet up later, we have to talk about ${cleanEn}.` },
-        { id: "work", label: "💼 Work & Daily Life", es: `Hoy todo el mundo me estaba preguntando por ${cleanEs}.`, en: `Today everyone was asking me about ${cleanEn}.` },
-        { id: "travel", label: "✈️ Travel & On the Go", es: `Disculpe, ¿me puede decir dónde encuentro ${cleanEs} por aquí cerca?`, en: `Excuse me, can you tell me where I can find ${cleanEn} near here?` }
-      ];
-    }
-
     function getLevelTitle(xp) {
       if (xp < 100) return { lvl: 1, title: "Novato" };
       if (xp < 250) return { lvl: 2, title: "Callejero" };
@@ -774,14 +825,15 @@
     }
 
     function App() {
-      const [activeTab, setActiveTab] = useState("drills");
+      const [activeTab, setActiveTab] = useState("freeai");
       const [dialect, setDialect] = useState("es-CU");
-      // 3-Stage Speed Ladder: 0.75 (Slow), 1.0 (Normal), 1.25 (Street Fast)
       const [speechRate, setSpeechRate] = useState(1.0);
       const [showPhonetics, setShowPhonetics] = useState(true);
+      const [handsFreeCallMode, setHandsFreeCallMode] = useState(false);
+      const [isAiSpeaking, setIsAiSpeaking] = useState(false);
 
       const [stats, setStats] = useState(() => {
-        const saved = localStorage.getItem("vozzy_stats_v5");
+        const saved = localStorage.getItem("vozzy_stats_v6");
         const today = new Date().toISOString().slice(0, 10);
         if (saved) {
           const parsed = JSON.parse(saved);
@@ -792,47 +844,36 @@
       });
 
       const [drills, setDrills] = useState(() => {
-        const saved = localStorage.getItem("vozzy_drills_v5");
+        const saved = localStorage.getItem("vozzy_drills_v6");
         return saved ? JSON.parse(saved) : INITIAL_DRILLS;
       });
 
       const [cards, setCards] = useState(() => {
-        const saved = localStorage.getItem("vozzy_cards_v5");
+        const saved = localStorage.getItem("vozzy_cards_v6");
         if (saved) {
           return JSON.parse(saved).map(c => ({ ...c, box: c.box || 1, nextReview: c.nextReview || 0, reps: c.reps || 0 }));
         }
         return INITIAL_CARDS;
       });
 
-      const [savedWords, setSavedWords] = useState(() => {
-        const saved = localStorage.getItem("vozzy_dict_history_v5");
-        return saved ? JSON.parse(saved) : [];
-      });
-
       const [voices, setVoices] = useState([]);
-      const [isOnline, setIsOnline] = useState(navigator.onLine);
 
-      // Drills + Hands-Free Auto-Loop + Voice Recording Comparison State
+      // Drills State
       const [activeDrillIdx, setActiveDrillIdx] = useState(0);
       const [varIdx, setVarIdx] = useState(0);
       const [stage, setStage] = useState(1);
       const [isRecording, setIsRecording] = useState(false);
       const [autoCoachLoop, setAutoCoachLoop] = useState(false);
-      const [myAudioUrl, setMyAudioUrl] = useState(null);
       const [liveInterimText, setLiveInterimText] = useState("");
       const [spokenText, setSpokenText] = useState("");
       const [evalResult, setEvalResult] = useState(null);
       const [toast, setToast] = useState("");
 
-      // Tap-Any-Word Instant X-Ray Modal State
+      // Tap-Any-Word X-Ray Modal State
       const [xrayWord, setXrayWord] = useState(null);
       const [xrayLoading, setXrayLoading] = useState(false);
 
-      // Backup / Restore Modal State
-      const [showBackupModal, setShowBackupModal] = useState(false);
-      const [backupJsonText, setBackupJsonText] = useState("");
-
-      // Free Speaking AI + Guided Scenario Missions State
+      // Free Speaking AI State
       const [activeMissionId, setActiveMissionId] = useState("free");
       const [completedGoals, setCompletedGoals] = useState({});
       const [freeAiAnalyzing, setFreeAiAnalyzing] = useState(false);
@@ -843,7 +884,7 @@
           id: "welcome",
           role: "ai",
           es: DIALECTS["es-CU"].greeting,
-          en: "What's up, bro! Tap any word to see its X-Ray or pick a mission below to practice real-world Spanish."
+          en: "What's up, bro! I'm Yordanis. Introduce yourself or tell me how your day is going to start chatting."
         }
       ]);
 
@@ -857,28 +898,22 @@
       const [searchQuery, setSearchQuery] = useState("");
       const [isTranslating, setIsTranslating] = useState(false);
       const [dictResult, setDictResult] = useState(null);
-      const [activeContextIdx, setActiveContextIdx] = useState(0);
       const [slangFilter, setSlangFilter] = useState("ALL");
-      const [vaultTypeFilter, setVaultTypeFilter] = useState("ALL");
 
-      const mediaRecorderRef = useRef(null);
-      const audioChunksRef = useRef([]);
+      const activeRecognitionRef = useRef(null);
+      const chatBottomRef = useRef(null);
 
       useEffect(() => {
-        localStorage.setItem("vozzy_stats_v5", JSON.stringify(stats));
+        localStorage.setItem("vozzy_stats_v6", JSON.stringify(stats));
       }, [stats]);
 
       useEffect(() => {
-        localStorage.setItem("vozzy_drills_v5", JSON.stringify(drills));
+        localStorage.setItem("vozzy_drills_v6", JSON.stringify(drills));
       }, [drills]);
 
       useEffect(() => {
-        localStorage.setItem("vozzy_cards_v5", JSON.stringify(cards));
+        localStorage.setItem("vozzy_cards_v6", JSON.stringify(cards));
       }, [cards]);
-
-      useEffect(() => {
-        localStorage.setItem("vozzy_dict_history_v5", JSON.stringify(savedWords));
-      }, [savedWords]);
 
       useEffect(() => {
         const loadVoices = () => {
@@ -891,15 +926,13 @@
         if ("speechSynthesis" in window) {
           window.speechSynthesis.onvoiceschanged = loadVoices;
         }
-        const handleOnline = () => setIsOnline(true);
-        const handleOffline = () => setIsOnline(false);
-        window.addEventListener("online", handleOnline);
-        window.addEventListener("offline", handleOffline);
-        return () => {
-          window.removeEventListener("online", handleOnline);
-          window.removeEventListener("offline", handleOffline);
-        };
       }, []);
+
+      useEffect(() => {
+        if (chatBottomRef.current) {
+          chatBottomRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+      }, [freeSessionTurns, isRecording, freeAiAnalyzing]);
 
       const showToast = (msg) => {
         setToast(msg);
@@ -927,31 +960,48 @@
         else setSpeechRate(1.0);
       };
 
+      // Reliable Mobile Text-to-Speech (Waits for mic release so Android never mutes the reply!)
       const speakSpanish = (text, targetLangCode = null, onEndCallback = null) => {
-        if (!("speechSynthesis" in window)) {
+        if (!("speechSynthesis" in window) || !text) {
           if (onEndCallback) onEndCallback();
           return;
         }
-        window.speechSynthesis.cancel();
-        const langToUse = targetLangCode || dialect;
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = langToUse;
-        u.rate = speechRate;
+        try {
+          window.speechSynthesis.cancel();
+          window.speechSynthesis.resume();
+        } catch (e) {}
 
-        const exactVoice = voices.find(v => v.lang.replace("_", "-").toLowerCase() === langToUse.toLowerCase());
-        const localSpanish = voices.find(v => v.lang.toLowerCase().startsWith("es") && v.localService);
-        const anySpanish = voices.find(v => v.lang.toLowerCase().startsWith("es"));
-        if (exactVoice) u.voice = exactVoice;
-        else if (localSpanish) u.voice = localSpanish;
-        else if (anySpanish) u.voice = anySpanish;
+        setTimeout(() => {
+          const langToUse = targetLangCode || dialect;
+          const u = new SpeechSynthesisUtterance(text);
+          u.lang = langToUse;
+          u.rate = speechRate;
 
-        if (onEndCallback) {
-          u.onend = () => onEndCallback();
-        }
-        window.speechSynthesis.speak(u);
+          const currentVoices = window.speechSynthesis.getVoices();
+          const pool = currentVoices.length ? currentVoices : voices;
+          const exactVoice = pool.find(v => v.lang.replace("_", "-").toLowerCase() === langToUse.toLowerCase());
+          const localSpanish = pool.find(v => v.lang.toLowerCase().startsWith("es") && v.localService);
+          const anySpanish = pool.find(v => v.lang.toLowerCase().startsWith("es"));
+
+          if (exactVoice) u.voice = exactVoice;
+          else if (localSpanish) u.voice = localSpanish;
+          else if (anySpanish) u.voice = anySpanish;
+
+          u.onstart = () => setIsAiSpeaking(true);
+          u.onend = () => {
+            setIsAiSpeaking(false);
+            if (onEndCallback) onEndCallback();
+          };
+          u.onerror = () => {
+            setIsAiSpeaking(false);
+            if (onEndCallback) onEndCallback();
+          };
+
+          window.speechSynthesis.speak(u);
+        }, 280);
       };
 
-      // Tap-Any-Word Instant X-Ray Inspector
+      // Tap-Any-Word Instant X-Ray
       const inspectWordXray = async (rawToken) => {
         const cleaned = (rawToken || "").replace(/[¿?¡!.,;:"()]/g, "").trim();
         if (!cleaned) return;
@@ -971,19 +1021,17 @@
           word: cleaned,
           phonetic: generatePhoneticGuide(cleaned, dialect),
           en: res.en,
-          dialectNote: dEntry ? dEntry.term : `${cleaned} (${DIALECTS[dialect].short})`,
           exEs: dEntry ? dEntry.exEs : `Quiero usar "${cleaned}" en una oración.`,
           exEn: dEntry ? dEntry.exEn : `I want to use "${res.en}" in a sentence.`
         });
         setXrayLoading(false);
       };
 
-      // Render Clickable Spanish Sentence where EVERY word opens the Instant X-Ray Sheet
       const renderClickableSpanish = (sentence, textClass = "text-lg font-bold text-emerald-400") => {
         const tokens = (sentence || "").split(/\s+/).filter(Boolean);
         return (
           <div className="space-y-1">
-            <div className="flex flex-wrap justify-center gap-x-1.5 gap-y-1">
+            <div className="flex flex-wrap gap-x-1.5 gap-y-1">
               {tokens.map((tok, i) => (
                 <span
                   key={i}
@@ -991,104 +1039,104 @@
                     e.stopPropagation();
                     inspectWordXray(tok);
                   }}
-                  className={`${textClass} underline decoration-dotted decoration-purple-400/60 underline-offset-4 cursor-pointer hover:text-purple-300 active:scale-95 transition`}
-                  title="Tap for Instant Word X-Ray"
+                  className={`${textClass} underline decoration-dotted decoration-purple-400/60 underline-offset-4 cursor-pointer hover:text-purple-300`}
                 >
                   {tok}
                 </span>
               ))}
             </div>
             {showPhonetics && (
-              <p className="text-[11px] font-mono text-amber-300/90 tracking-wide">
-                🗣️ Sounds like: [{generatePhoneticGuide(sentence, dialect)}]
+              <p className="text-[11px] font-mono text-amber-300/90">
+                🗣️ [{generatePhoneticGuide(sentence, dialect)}]
               </p>
             )}
           </div>
         );
       };
 
-      // Optional Parallel Voice Audio Recorder for "Hear My Voice vs Native"
-      const startParallelAudioCapture = async () => {
-        try {
-          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          audioChunksRef.current = [];
-          const mr = new MediaRecorder(stream);
-          mr.ondataavailable = (ev) => {
-            if (ev.data && ev.data.size > 0) audioChunksRef.current.push(ev.data);
-          };
-          mr.onstop = () => {
-            const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-            const url = URL.createObjectURL(blob);
-            setMyAudioUrl(url);
-            stream.getTracks().forEach(t => t.stop());
-          };
-          mediaRecorderRef.current = mr;
-          mr.start();
-        } catch (e) {
-          // Gracefully ignore if Android locks mic exclusively for SpeechRecognition
-        }
-      };
-
-      const stopParallelAudioCapture = () => {
-        try {
-          if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
-            mediaRecorderRef.current.stop();
-          }
-        } catch (e) {}
-      };
-
-      // Real-Time Streaming Voice Listener
+      // FIXED Real-Time Voice Listener (Uses mutable ref-safe variables so interim speech is NEVER lost!)
       const listenVoiceRealtime = (onFinalTranscript) => {
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRec) {
           alert("Speech recognition requires Chrome, Samsung Internet, Edge, or Safari.");
           return;
         }
+
+        // If already recording, stopping it will trigger onend and submit what was spoken!
+        if (isRecording && activeRecognitionRef.current) {
+          try {
+            activeRecognitionRef.current.stop();
+          } catch (e) {}
+          return;
+        }
+
+        // Unlock mobile audio synthesis during user tap gesture
+        try {
+          if ("speechSynthesis" in window) {
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.resume();
+          }
+        } catch (e) {}
+
         const rec = new SpeechRec();
+        activeRecognitionRef.current = rec;
         rec.lang = dialect;
         rec.interimResults = true;
+        rec.continuous = false;
         rec.maxAlternatives = 1;
 
         setIsRecording(true);
         setLiveInterimText("");
-        startParallelAudioCapture();
 
-        let finalTranscript = "";
-        let finalConfidence = 0.88;
+        let capturedFinal = "";
+        let capturedInterim = "";
+        let bestConfidence = 0.88;
+        let hasSubmitted = false;
 
         rec.onresult = (e) => {
-          let interim = "";
+          let currentInterim = "";
           for (let i = e.resultIndex; i < e.results.length; i++) {
             const seg = e.results[i][0].transcript;
             if (e.results[i].isFinal) {
-              finalTranscript += seg + " ";
+              capturedFinal += seg + " ";
               if (e.results[i][0].confidence) {
-                finalConfidence = e.results[i][0].confidence;
+                bestConfidence = e.results[i][0].confidence;
               }
             } else {
-              interim += seg;
+              currentInterim += seg;
             }
           }
-          setLiveInterimText((finalTranscript + interim).trim());
+          capturedInterim = currentInterim;
+          const combined = (capturedFinal + currentInterim).trim();
+          setLiveInterimText(combined);
         };
 
         rec.onerror = () => {
           setIsRecording(false);
-          stopParallelAudioCapture();
+          const fallbackText = (capturedFinal + " " + capturedInterim).trim();
+          if (fallbackText && !hasSubmitted) {
+            hasSubmitted = true;
+            setLiveInterimText("");
+            onFinalTranscript(fallbackText, bestConfidence);
+          }
         };
 
         rec.onend = () => {
           setIsRecording(false);
-          stopParallelAudioCapture();
-          const completedText = (finalTranscript || liveInterimText).trim();
+          activeRecognitionRef.current = null;
+          const completedText = (capturedFinal + " " + capturedInterim).trim();
           setLiveInterimText("");
-          if (completedText) {
-            onFinalTranscript(completedText, finalConfidence);
+          if (completedText && !hasSubmitted) {
+            hasSubmitted = true;
+            onFinalTranscript(completedText, bestConfidence);
           }
         };
 
-        rec.start();
+        try {
+          rec.start();
+        } catch (err) {
+          setIsRecording(false);
+        }
       };
 
       const currentDrill = drills[activeDrillIdx] || drills[0];
@@ -1097,14 +1145,11 @@
       const advanceDrill = (fromAutoLoop = false) => {
         setEvalResult(null);
         setSpokenText("");
-        let nextStage = stage;
         let nextVarIdx = varIdx;
 
         if (stage < 3) {
-          nextStage = stage + 1;
-          setStage(nextStage);
+          setStage(stage + 1);
         } else {
-          nextStage = 1;
           setStage(1);
           if (varIdx + 1 < currentDrill.variations.length) {
             nextVarIdx = varIdx + 1;
@@ -1120,7 +1165,7 @@
           const nextVariation = currentDrill.variations[nextVarIdx] || currentDrill.variations[0];
           setTimeout(() => {
             speakSpanish(nextVariation.es, dialect, () => {
-              setTimeout(() => handleDrillMic(nextVariation.es), 350);
+              setTimeout(() => handleDrillMic(nextVariation.es), 400);
             });
           }, 500);
         }
@@ -1135,9 +1180,7 @@
           if (res.score >= 85) {
             awardXp(25, "Passed Pronunciation Gate!");
             if (autoCoachLoop) {
-              speakSpanish("¡Excelente! Seguimos.", dialect, () => {
-                advanceDrill(true);
-              });
+              speakSpanish("¡Excelente! Seguimos.", dialect, () => advanceDrill(true));
             } else {
               speakSpanish("¡Excelente!");
             }
@@ -1160,13 +1203,13 @@
         speakSpanish(mission.starterEs, dialect);
       };
 
+      // Process Free Speaking Turn -> Show Green/Yellow/Red Pills + Grammar/Punctuation Fix + Speak AI Reply Out Loud!
       const processFreeSpeechTurn = async (rawSpokenText, confidenceScore = 0.9) => {
         const text = (rawSpokenText || "").trim();
         if (!text) return;
         setFreeAiAnalyzing(true);
         setSelectedFreeWord(null);
 
-        // Check if any mission goals were completed by this spoken sentence!
         const newlyChecked = { ...completedGoals };
         let goalJustHit = false;
         currentMission.goals.forEach(g => {
@@ -1176,21 +1219,37 @@
             goalJustHit = true;
           }
         });
-        if (goalJustHit) {
-          setCompletedGoals(newlyChecked);
-        }
+        if (goalJustHit) setCompletedGoals(newlyChecked);
 
-        const analysis = await analyzeFreeSpeechAndCorrect(text, confidenceScore, dialect);
+        const analysis = await analyzeFreeSpeechAndCorrect(
+          text,
+          confidenceScore,
+          dialect,
+          freeSessionTurns.length
+        );
 
         const userTurn = { id: "u_" + Date.now(), role: "user", analysis };
-        const aiTurn = { id: "ai_" + (Date.now() + 1), role: "ai", es: analysis.aiReply.es, en: analysis.aiReply.en };
+        const aiTurn = {
+          id: "ai_" + (Date.now() + 1),
+          role: "ai",
+          es: analysis.aiReply.es,
+          en: analysis.aiReply.en
+        };
 
         setFreeSessionTurns(prev => [...prev, userTurn, aiTurn]);
         setFreeAiInput("");
         setFreeAiAnalyzing(false);
 
-        speakSpanish(analysis.aiReply.es, dialect);
-        awardXp(goalJustHit ? 35 : 20, goalJustHit ? "Mission Goal Completed! 🎯" : "Speech Graded & Corrected!");
+        awardXp(goalJustHit ? 35 : 20, goalJustHit ? "Mission Goal Completed! 🎯" : "Graded & Replied!");
+
+        // Speak the AI Tutor's reply out loud automatically!
+        speakSpanish(analysis.aiReply.es, dialect, () => {
+          if (handsFreeCallMode) {
+            setTimeout(() => {
+              listenVoiceRealtime((nextText, nextConf) => processFreeSpeechTurn(nextText, nextConf));
+            }, 450);
+          }
+        });
       };
 
       const now = Date.now();
@@ -1220,11 +1279,7 @@
         const cleanQ = rawQuery.trim();
         if (!cleanQ) return;
         setIsTranslating(true);
-        setActiveContextIdx(0);
-
         const translated = await autoTranslateWordOrPhrase(cleanQ, forcedSourceLang);
-        const contexts = generateContextualExamples(translated.es, translated.en, dialect);
-
         const resultObj = {
           query: cleanQ,
           sourceLang: translated.sourceLang,
@@ -1232,21 +1287,12 @@
           isCurse: translated.isCurse,
           es: translated.es,
           en: translated.en,
-          exEs: translated.exEs || contexts[0].es,
-          exEn: translated.exEn || contexts[0].en,
-          contexts,
           byDialect: translated.byDialect || buildDynamicDialectBreakdown(translated.es, translated.en)
         };
-
         setDictResult(resultObj);
         setIsTranslating(false);
-
-        setSavedWords(prev => {
-          const filtered = prev.filter(item => normalizeText(item.query) !== normalizeText(resultObj.query));
-          return [resultObj, ...filtered].slice(0, 30);
-        });
-
-        awardXp(10, translated.sourceLang === "es" ? "Translated ES → EN!" : "Translated EN → ES!");
+        speakSpanish(resultObj.es, dialect);
+        awardXp(10, "Translated & Spoken!");
       };
 
       const handleSearch = (e) => {
@@ -1291,28 +1337,6 @@
         awardXp(15, "Added to Speaking Drills!");
       };
 
-      // Open Backup & Restore Modal
-      const openBackup = () => {
-        const payload = { stats, drills, cards, savedWords };
-        setBackupJsonText(JSON.stringify(payload));
-        setShowBackupModal(true);
-      };
-
-      const restoreBackup = () => {
-        try {
-          const parsed = JSON.parse(backupJsonText);
-          if (parsed.stats) setStats(parsed.stats);
-          if (parsed.drills) setDrills(parsed.drills);
-          if (parsed.cards) setCards(parsed.cards);
-          if (parsed.savedWords) setSavedWords(parsed.savedWords);
-          setShowBackupModal(false);
-          showToast("✅ Backup Restored Successfully!");
-        } catch (e) {
-          alert("Invalid backup code. Make sure you pasted the exact JSON text.");
-        }
-      };
-
-      // Center Floating Mic Quick-Action
       const triggerGlobalQuickMic = () => {
         if (activeTab === "drills") {
           handleDrillMic();
@@ -1344,14 +1368,13 @@
 
       return (
         <div className="min-h-screen bg-[#090d16] text-slate-100 pb-28 max-w-md mx-auto px-3.5 pt-3 select-none">
-          {/* Toast Notification */}
           {toast && (
             <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-emerald-600 text-white px-4 py-2 rounded-full shadow-xl text-xs font-extrabold flex items-center gap-2 animate-bounce">
               {toast}
             </div>
           )}
 
-          {/* TAP-ANY-WORD INSTANT X-RAY BOTTOM DRAWER */}
+          {/* TAP-ANY-WORD INSTANT X-RAY MODAL */}
           {xrayWord && (
             <div
               onClick={() => setXrayWord(null)}
@@ -1424,52 +1447,8 @@
             </div>
           )}
 
-          {/* BACKUP & RESTORE MODAL */}
-          {showBackupModal && (
-            <div
-              onClick={() => setShowBackupModal(false)}
-              className="fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4"
-            >
-              <div
-                onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-md bg-slate-900 border border-slate-700 rounded-3xl p-4 space-y-3"
-              >
-                <div className="flex justify-between items-center">
-                  <h3 className="font-extrabold text-sm text-white">💾 Backup & Restore Progress</h3>
-                  <button onClick={() => setShowBackupModal(false)} className="text-xs text-slate-400">✕</button>
-                </div>
-                <p className="text-xs text-slate-400">
-                  Copy this code to save your XP, custom drills, and SRS cards—or paste a saved code below to restore.
-                </p>
-                <textarea
-                  value={backupJsonText}
-                  onChange={(e) => setBackupJsonText(e.target.value)}
-                  rows={4}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-[11px] font-mono text-slate-300 outline-none"
-                />
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(backupJsonText);
-                      showToast("📋 Backup copied to clipboard!");
-                    }}
-                    className="flex-1 py-2.5 bg-purple-600 rounded-xl text-xs font-extrabold text-white"
-                  >
-                    📋 Copy Backup
-                  </button>
-                  <button
-                    onClick={restoreBackup}
-                    className="flex-1 py-2.5 bg-emerald-600 rounded-xl text-xs font-extrabold text-white"
-                  >
-                    📥 Restore Code
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Header + Speed Ladder + Phonetic Toggle */}
-          <div className="bg-slate-900/95 border border-slate-800 rounded-2xl p-3 mb-3 space-y-2.5 shadow-lg">
+          {/* Header */}
+          <div className="bg-slate-900/95 border border-slate-800 rounded-2xl p-3 mb-3 space-y-2 shadow-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 rounded-xl bg-purple-600 flex items-center justify-center text-xl shadow-lg shadow-purple-600/30">
@@ -1482,45 +1461,27 @@
                       🔥 {stats.streak}d
                     </span>
                     <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-700/50">
-                      Lvl {levelInfo.lvl} • {levelInfo.title}
+                      Lvl {levelInfo.lvl}
                     </span>
                   </div>
                   <p className="text-[10px] text-slate-400 mt-0.5">
-                    Tap any Spanish word for Instant X-Ray 🔍
+                    {isAiSpeaking ? "🔊 Tutor Speaking Out Loud..." : "🟢 Perfect • 🟡 Medium • 🔴 Bad"}
                   </p>
                 </div>
               </div>
 
               <div className="flex flex-col items-end gap-1">
-                <div className="flex items-center gap-1">
-                  <select
-                    value={dialect}
-                    onChange={(e) => {
-                      const newD = e.target.value;
-                      setDialect(newD);
-                      if (dictResult) {
-                        setDictResult({
-                          ...dictResult,
-                          contexts: generateContextualExamples(dictResult.es, dictResult.en, newD)
-                        });
-                      }
-                    }}
-                    className="bg-slate-800 text-[11px] font-bold rounded-xl px-2 py-1.5 border border-slate-700 text-slate-200 outline-none"
-                  >
-                    {Object.entries(DIALECTS).map(([code, d]) => (
-                      <option key={code} value={code}>
-                        {d.flag} {d.short}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    onClick={openBackup}
-                    className="px-2 py-1.5 bg-slate-800 border border-slate-700 rounded-xl text-xs"
-                    title="Backup & Restore"
-                  >
-                    💾
-                  </button>
-                </div>
+                <select
+                  value={dialect}
+                  onChange={(e) => setDialect(e.target.value)}
+                  className="bg-slate-800 text-[11px] font-bold rounded-xl px-2 py-1.5 border border-slate-700 text-slate-200 outline-none"
+                >
+                  {Object.entries(DIALECTS).map(([code, d]) => (
+                    <option key={code} value={code}>
+                      {d.flag} {d.short} ({d.tutor})
+                    </option>
+                  ))}
+                </select>
 
                 <div className="flex items-center gap-1">
                   <button
@@ -1541,13 +1502,12 @@
                         : "bg-slate-800 border-slate-700 text-slate-300"
                     }`}
                   >
-                    {speechRate === 0.75 ? "🐢 0.75x" : speechRate === 1.25 ? "🔥 1.25x Street" : "⚡ 1.0x"}
+                    {speechRate === 0.75 ? "🐢 0.75x" : speechRate === 1.25 ? "🔥 1.25x" : "⚡ 1.0x"}
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Daily XP Goal Bar */}
             <div className="bg-slate-950 rounded-xl p-2 border border-slate-800/80">
               <div className="flex justify-between text-[11px] font-bold mb-1">
                 <span className="text-slate-300">🎯 Daily Goal: {stats.dailyXp} / 100 XP</span>
@@ -1562,7 +1522,7 @@
             </div>
           </div>
 
-          {/* TAB 1: SPEAKING DRILLS WITH AUTO-LOOP, PHONETICS & VOICE REPLAY */}
+          {/* TAB 1: SPEAKING DRILLS */}
           {activeTab === "drills" && (
             <div className="space-y-3.5">
               <div className="flex items-center justify-between gap-2">
@@ -1580,25 +1540,22 @@
                   ))}
                 </div>
 
-                {/* Hands-Free Auto-Coach Loop Toggle */}
                 <button
                   onClick={() => {
                     const nextState = !autoCoachLoop;
                     setAutoCoachLoop(nextState);
                     if (nextState) {
-                      showToast("🔄 Auto-Loop ON: Listen, then speak hands-free!");
+                      showToast("🔄 Auto-Loop ON!");
                       speakSpanish(currentVar.es, dialect, () => {
                         setTimeout(() => handleDrillMic(currentVar.es), 350);
                       });
                     }
                   }}
                   className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-extrabold border ${
-                    autoCoachLoop
-                      ? "bg-emerald-600 text-white border-emerald-400 animate-pulse"
-                      : "bg-slate-900 border-slate-800 text-slate-400"
+                    autoCoachLoop ? "bg-emerald-600 text-white border-emerald-400 animate-pulse" : "bg-slate-900 border-slate-800 text-slate-400"
                   }`}
                 >
-                  {autoCoachLoop ? "🔄 Auto-Loop ON" : "🔄 Auto-Loop"}
+                  {autoCoachLoop ? "🔄 Loop ON" : "🔄 Auto-Loop"}
                 </button>
               </div>
 
@@ -1620,87 +1577,50 @@
 
               <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 text-center space-y-4 shadow-xl">
                 <p className="text-[11px] uppercase tracking-wider text-purple-400 font-bold">
-                  Variation {varIdx + 1} of {currentDrill.variations.length} • Tap any word for X-Ray 🔍
+                  Variation {varIdx + 1} of {currentDrill.variations.length}
                 </p>
                 <h2 className="text-xl font-extrabold text-white">"{currentVar.en}"</h2>
 
                 <div className="bg-slate-950/90 border border-slate-800 rounded-2xl p-4 my-2">
-                  {stage === 1 && (
-                    <div className="space-y-1.5">
-                      {renderClickableSpanish(currentVar.es)}
-                      <p className="text-[11px] text-slate-400 pt-1">
-                        {DIALECTS[dialect].flag} {DIALECTS[dialect].phoneticNote}
-                      </p>
-                    </div>
-                  )}
-                  {stage === 2 && (
-                    <div className="space-y-1">
-                      <p className="text-lg font-bold text-amber-300">{currentVar.cloze}</p>
-                      <p className="text-xs text-slate-400">Fill in the missing blanks from memory!</p>
-                    </div>
-                  )}
-                  {stage === 3 && (
-                    <div>
-                      <p className="text-sm font-bold text-amber-400">🙈 BLIND REFLEX MODE</p>
-                      <p className="text-xs text-slate-400 mt-1">Spanish text hidden. Speak 100% from memory!</p>
-                    </div>
-                  )}
+                  {stage === 1 && renderClickableSpanish(currentVar.es)}
+                  {stage === 2 && <p className="text-lg font-bold text-amber-300">{currentVar.cloze}</p>}
+                  {stage === 3 && <p className="text-sm font-bold text-amber-400">🙈 BLIND REFLEX MODE — Speak from memory!</p>}
                 </div>
 
                 {isRecording && (
                   <div className="bg-purple-950/40 border border-purple-500/60 rounded-2xl p-3 text-left animate-pulse">
                     <span className="text-[10px] font-extrabold uppercase text-purple-300 block mb-1">
-                      🎙️ Live Real-Time Stream:
+                      🎙️ Hearing You Live:
                     </span>
-                    <p className="text-sm font-extrabold text-white">
-                      {liveInterimText || "Speak now..."}
-                    </p>
+                    <p className="text-sm font-extrabold text-white">{liveInterimText || "Speak now..."}</p>
                   </div>
                 )}
 
-                <div className="flex flex-wrap justify-center gap-2.5 pt-1">
+                <div className="flex justify-center gap-2.5 pt-1">
                   <button
                     onClick={() => speakSpanish(currentVar.es)}
-                    className="px-4 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-xs font-extrabold flex items-center gap-1.5"
+                    className="px-4 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-xs font-extrabold"
                   >
-                    🔊 Native
+                    🔊 Hear Native
                   </button>
                   <button
                     onClick={() => handleDrillMic()}
-                    className={`px-5 py-3 rounded-2xl text-xs font-extrabold flex items-center gap-1.5 shadow-lg ${
-                      isRecording ? "bg-rose-600 animate-pulse text-white" : "bg-purple-600 hover:bg-purple-500 text-white"
+                    className={`px-5 py-3 rounded-2xl text-xs font-extrabold shadow-lg ${
+                      isRecording ? "bg-emerald-600 text-white" : "bg-purple-600 text-white"
                     }`}
                   >
-                    🎤 {isRecording ? "Listening..." : "Tap & Speak"}
+                    {isRecording ? "✅ Done / Grade" : "🎤 Tap & Speak"}
                   </button>
-                  {myAudioUrl && (
-                    <button
-                      onClick={() => {
-                        const a = new Audio(myAudioUrl);
-                        a.play();
-                      }}
-                      className="px-3.5 py-3 rounded-2xl bg-blue-600/25 border border-blue-500/50 text-blue-200 text-xs font-extrabold"
-                    >
-                      ▶️ My Voice
-                    </button>
-                  )}
                 </div>
 
                 {evalResult && (
                   <div className="mt-4 pt-4 border-t border-slate-800 text-left space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-slate-400">Heard: "{spokenText}"</span>
-                      <span className={`text-xs font-extrabold px-2.5 py-1 rounded-full ${
-                        evalResult.score >= 85
-                          ? "bg-emerald-500/20 text-emerald-300"
-                          : evalResult.score >= 65
-                          ? "bg-amber-500/20 text-amber-300"
-                          : "bg-rose-500/20 text-rose-300"
-                      }`}>
+                      <span className="text-xs font-extrabold px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300">
                         {evalResult.score}% Score
                       </span>
                     </div>
-
                     <div className="flex flex-wrap gap-1.5">
                       {evalResult.breakdown.map((b, i) => (
                         <button
@@ -1708,22 +1628,17 @@
                           onClick={() => inspectWordXray(b.word)}
                           className={`px-2.5 py-1.5 rounded-xl text-xs font-extrabold border ${getPillColorClasses(b.status)}`}
                         >
-                          {b.status === "green" ? "🟢" : b.status === "yellow" ? "🟡" : "🔴"} {b.word} ({b.sim}%)
+                          {b.status === "green" ? "🟢" : b.status === "yellow" ? "🟡" : "🔴"} {b.word}
                         </button>
                       ))}
                     </div>
-
-                    {evalResult.score >= 85 ? (
+                    {evalResult.score >= 85 && (
                       <button
                         onClick={() => advanceDrill(false)}
-                        className="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm"
+                        className="w-full py-3 rounded-2xl bg-emerald-600 text-white font-extrabold text-sm"
                       >
-                        ✅ Passed Pronunciation Gate! Continue →
+                        ✅ Passed Gate! Continue →
                       </button>
-                    ) : (
-                      <p className="text-xs text-amber-300 font-semibold">
-                        Tap any 🟡 Yellow or 🔴 Red word to open its X-Ray & audio, then try again!
-                      </p>
                     )}
                   </div>
                 )}
@@ -1731,68 +1646,60 @@
             </div>
           )}
 
-          {/* TAB 2: FREE SPEAKING AI + GUIDED SCENARIO MISSIONS */}
+          {/* TAB 2: LIVE CONVERSATIONAL FREE AI (SPEAKS BACK + GREEN/YELLOW/RED + GRAMMAR & PUNCTUATION) */}
           {activeTab === "freeai" && (
-            <div className="space-y-3">
-              {/* Guided Scenario Mission Selector */}
-              <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                {SCENARIO_MISSIONS.map((m) => (
-                  <button
-                    key={m.id}
-                    onClick={() => selectMission(m)}
-                    className={`whitespace-nowrap px-3 py-2 rounded-2xl text-xs font-extrabold border transition ${
-                      activeMissionId === m.id
-                        ? "bg-purple-600 text-white border-purple-400 shadow-lg"
-                        : "bg-slate-900 border-slate-800 text-slate-400"
-                    }`}
-                  >
-                    {m.title}
-                  </button>
-                ))}
+            <div className="space-y-2.5">
+              {/* Top Mission Row + Hands-Free Call Mode Toggle */}
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
+                  {SCENARIO_MISSIONS.map((m) => (
+                    <button
+                      key={m.id}
+                      onClick={() => selectMission(m)}
+                      className={`whitespace-nowrap px-3 py-1.5 rounded-xl text-xs font-extrabold border transition ${
+                        activeMissionId === m.id
+                          ? "bg-purple-600 text-white border-purple-400 shadow"
+                          : "bg-slate-900 border-slate-800 text-slate-400"
+                      }`}
+                    >
+                      {m.title}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => {
+                    const next = !handsFreeCallMode;
+                    setHandsFreeCallMode(next);
+                    showToast(next ? "📞 Hands-Free Call Mode ON!" : "📞 Manual Mic Mode");
+                  }}
+                  className={`shrink-0 px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold border ${
+                    handsFreeCallMode
+                      ? "bg-emerald-600 text-white border-emerald-400"
+                      : "bg-slate-900 border-slate-800 text-slate-400"
+                  }`}
+                >
+                  {handsFreeCallMode ? "📞 Auto-Mic ON" : "📞 Auto-Mic"}
+                </button>
               </div>
 
-              {/* Active Mission Checklist Card */}
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-extrabold text-purple-300">{currentMission.title}</span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-amber-300">
-                    {currentMission.badge}
-                  </span>
-                </div>
-                <div className="space-y-1">
-                  {currentMission.goals.map((g) => {
-                    const done = !!completedGoals[`${currentMission.id}_${g.id}`];
-                    return (
-                      <div key={g.id} className="flex items-center gap-2 text-[11px]">
-                        <span className={done ? "text-emerald-400 font-extrabold" : "text-slate-500"}>
-                          {done ? "✅" : "⬜"}
-                        </span>
-                        <span className={done ? "line-through text-slate-400" : "text-slate-200 font-semibold"}>
-                          {g.label}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Conversation & Real-Time Feedback Feed */}
-              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-3.5 flex flex-col h-[54vh]">
+              {/* Conversation & Real-Time Grading Feed */}
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-3.5 flex flex-col h-[62vh]">
                 <div className="flex-1 overflow-y-auto space-y-3.5 pr-1">
                   {freeSessionTurns.map((turn) => {
                     if (turn.role === "ai") {
                       return (
                         <div key={turn.id} className="flex justify-start">
-                          <div className="max-w-[90%] bg-slate-800/90 border border-slate-700 rounded-2xl p-3.5 space-y-1.5">
+                          <div className="max-w-[92%] bg-slate-800/95 border border-purple-500/40 rounded-2xl p-3.5 space-y-1.5 shadow-md">
                             <div className="flex items-center justify-between">
                               <span className="text-[10px] font-extrabold text-purple-300 uppercase">
-                                {DIALECTS[dialect].flag} {DIALECTS[dialect].tutor}
+                                {DIALECTS[dialect].flag} {DIALECTS[dialect].tutor} • Live Tutor
                               </span>
                               <button
                                 onClick={() => speakSpanish(turn.es, dialect)}
-                                className="text-[10px] font-extrabold px-2 py-0.5 bg-slate-900 rounded-lg text-emerald-300"
+                                className="text-[11px] font-extrabold px-2.5 py-1 bg-purple-600 text-white rounded-lg"
                               >
-                                🔊 Hear All
+                                🔊 Speak Again
                               </button>
                             </div>
                             {renderClickableSpanish(turn.es, "text-sm font-bold text-white")}
@@ -1805,37 +1712,31 @@
                     const a = turn.analysis;
                     return (
                       <div key={turn.id} className="space-y-2">
-                        <div className="bg-slate-950 border border-purple-500/40 rounded-2xl p-3.5 space-y-2.5">
+                        <div className="bg-slate-950 border border-emerald-500/40 rounded-2xl p-3.5 space-y-2.5">
                           <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-extrabold uppercase text-purple-300">
-                              🎤 Your Graded Speech (Tap any word for X-Ray)
+                            <span className="text-[10px] font-extrabold uppercase text-slate-300">
+                              🎤 Your Speech (🟢 Perfect • 🟡 Medium • 🔴 Bad)
                             </span>
-                            <div className="flex items-center gap-1.5">
-                              {myAudioUrl && (
-                                <button
-                                  onClick={() => new Audio(myAudioUrl).play()}
-                                  className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-blue-600/20 text-blue-300 border border-blue-500/40"
-                                >
-                                  ▶️ My Voice
-                                </button>
-                              )}
-                              <span className={`text-[11px] font-extrabold px-2 py-0.5 rounded-full ${
-                                a.avgPronunciationScore >= 85
-                                  ? "bg-emerald-500/20 text-emerald-300"
-                                  : a.avgPronunciationScore >= 65
-                                  ? "bg-amber-500/20 text-amber-300"
-                                  : "bg-rose-500/20 text-rose-300"
-                              }`}>
-                                {a.avgPronunciationScore}%
-                              </span>
-                            </div>
+                            <span className={`text-[11px] font-extrabold px-2 py-0.5 rounded-full ${
+                              a.avgPronunciationScore >= 85
+                                ? "bg-emerald-500/20 text-emerald-300"
+                                : a.avgPronunciationScore >= 65
+                                ? "bg-amber-500/20 text-amber-300"
+                                : "bg-rose-500/20 text-rose-300"
+                            }`}>
+                              {a.avgPronunciationScore}% Score
+                            </span>
                           </div>
 
+                          {/* Color-Coded Word Pills */}
                           <div className="flex flex-wrap gap-1.5">
                             {a.wordBreakdown.map((wObj, idx) => (
                               <button
                                 key={idx}
-                                onClick={() => inspectWordXray(wObj.word)}
+                                onClick={() => {
+                                  speakSpanish(wObj.word, dialect);
+                                  setSelectedFreeWord(wObj);
+                                }}
                                 className={`px-2.5 py-1 rounded-xl text-xs font-extrabold border transition ${getPillColorClasses(wObj.status)}`}
                               >
                                 {wObj.status === "green" ? "🟢" : wObj.status === "yellow" ? "🟡" : "🔴"} {wObj.word}
@@ -1843,72 +1744,73 @@
                             ))}
                           </div>
 
-                          <p className="text-xs text-slate-400">
-                            🇺🇸 Meaning: <i>"{a.englishMeaning}"</i>
-                          </p>
+                          {selectedFreeWord && (
+                            <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-[11px] text-slate-300">
+                              <b>"{selectedFreeWord.word}" ({selectedFreeWord.label}):</b> {selectedFreeWord.reason}
+                            </div>
+                          )}
 
-                          {/* Grammar Correction Box */}
+                          {/* Grammar & Punctuation Correction Box */}
                           <div className={`p-3 rounded-xl border text-xs space-y-1.5 ${
                             a.isGrammarPerfect
                               ? "bg-emerald-950/30 border-emerald-700/50"
                               : "bg-amber-950/30 border-amber-600/60"
                           }`}>
                             <div className="flex items-center justify-between">
-                              <span className="font-extrabold text-[11px] uppercase">
-                                {a.isGrammarPerfect ? "✅ Grammar: 100% Natural!" : "🛠️ Grammar Correction:"}
+                              <span className="font-extrabold text-[11px] uppercase text-emerald-300">
+                                {a.isGrammarPerfect
+                                  ? "✅ Grammar & Punctuation:"
+                                  : "🛠️ Grammar & Punctuation Correction:"}
                               </span>
                               <button
                                 onClick={() => speakSpanish(a.correctedEs, dialect)}
                                 className="text-[11px] font-extrabold text-emerald-300 bg-slate-900 px-2 py-0.5 rounded-lg"
                               >
-                                🔊 Hear Fix
+                                🔊 Hear Correct
                               </button>
                             </div>
 
-                            {!a.isGrammarPerfect && (
-                              <div className="text-left">
-                                {renderClickableSpanish(a.correctedEs, "text-sm font-extrabold text-emerald-300")}
-                              </div>
-                            )}
+                            <p className="text-sm font-extrabold text-white">
+                              "{a.correctedEs}"
+                            </p>
+                            <p className="text-[11px] text-slate-400">
+                              🇺🇸 <i>"{a.englishMeaning}"</i>
+                            </p>
 
                             {a.explanations.map((exp, i) => (
                               <div key={i} className="text-[11px] text-amber-200">
                                 • <span className="line-through text-rose-400">{exp.wrong}</span> → <b className="text-emerald-300">{exp.right}</b> ({exp.reason})
                               </div>
                             ))}
-
-                            <div className="pt-1.5 border-t border-slate-800/80 flex items-center justify-between gap-2">
-                              <div>
-                                <span className="text-[10px] font-bold text-purple-300 block">
-                                  {DIALECTS[dialect].flag} Street Upgrade:
-                                </span>
-                                <p className="text-xs font-bold text-white">"{a.dialectUpgrade}"</p>
-                              </div>
-                              <button
-                                onClick={() => speakSpanish(a.dialectUpgrade, dialect)}
-                                className="px-2 py-1 bg-slate-900 rounded-lg text-[11px] font-bold shrink-0"
-                              >
-                                🔊
-                              </button>
-                            </div>
                           </div>
                         </div>
                       </div>
                     );
                   })}
 
+                  {/* LIVE REAL-TIME STREAMING BUBBLE WHILE USER IS SPEAKING */}
                   {isRecording && (
-                    <div className="bg-purple-950/60 border-2 border-purple-500 rounded-2xl p-3.5 animate-pulse space-y-2">
-                      <span className="text-[10px] font-extrabold uppercase text-purple-300 block">
-                        🔴 Listening Live in Real Time...
-                      </span>
+                    <div className="bg-purple-950/70 border-2 border-purple-400 rounded-2xl p-3.5 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-extrabold uppercase text-purple-200 animate-pulse">
+                          🔴 Listening Live... (Pause or tap "✅ Done" to send)
+                        </span>
+                        <button
+                          onClick={() => {
+                            if (activeRecognitionRef.current) activeRecognitionRef.current.stop();
+                          }}
+                          className="px-3 py-1 bg-emerald-600 text-white rounded-lg text-xs font-extrabold"
+                        >
+                          ✅ Done / Send
+                        </button>
+                      </div>
                       <div className="flex flex-wrap gap-1.5">
                         {(liveInterimText ? liveInterimText.split(/\s+/) : ["Speak", "now..."]).map((w, idx) => (
                           <span
                             key={idx}
-                            className="px-2.5 py-1 rounded-xl text-xs font-extrabold bg-emerald-950/90 text-emerald-300 border border-emerald-500/60"
+                            className="px-2.5 py-1 rounded-xl text-xs font-extrabold bg-emerald-950 text-emerald-300 border border-emerald-500/60"
                           >
-                            {w}
+                            🟢 {w}
                           </span>
                         ))}
                       </div>
@@ -1917,9 +1819,10 @@
 
                   {freeAiAnalyzing && (
                     <div className="text-xs text-purple-300 font-bold animate-pulse px-2">
-                      ⚡ Grading pronunciation & checking Spanish grammar...
+                      ⚡ Grading pronunciation, fixing punctuation & generating {DIALECTS[dialect].tutor}'s voice reply...
                     </div>
                   )}
+                  <div ref={chatBottomRef} />
                 </div>
 
                 {/* Bottom Voice & Text Bar */}
@@ -1927,152 +1830,102 @@
                   <div className="flex gap-2">
                     <button
                       onClick={() => listenVoiceRealtime((text, conf) => processFreeSpeechTurn(text, conf))}
-                      className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs flex items-center gap-1.5 shadow-lg shrink-0 ${
-                        isRecording ? "bg-rose-600 animate-pulse text-white" : "bg-purple-600 hover:bg-purple-500 text-white"
+                      className={`px-4 py-3 rounded-2xl font-extrabold text-xs flex items-center gap-1.5 shadow-lg shrink-0 ${
+                        isRecording ? "bg-emerald-600 text-white" : "bg-purple-600 hover:bg-purple-500 text-white"
                       }`}
                     >
-                      🎤 {isRecording ? "Listening..." : "Speak"}
+                      {isRecording ? "✅ Done / Send" : "🎤 Speak"}
                     </button>
                     <input
                       value={freeAiInput}
                       onChange={(e) => setFreeAiInput(e.target.value)}
-                      placeholder="Or type Spanish to test grammar..."
+                      placeholder="Or type (e.g. Hola me llamo Armando)..."
                       className="flex-1 bg-slate-950 border border-slate-800 rounded-2xl px-3 text-xs outline-none text-white"
                     />
                     <button
                       onClick={() => processFreeSpeechTurn(freeAiInput, 0.92)}
-                      className="px-3.5 py-2.5 bg-emerald-600 rounded-2xl font-extrabold text-xs shrink-0"
+                      className="px-3.5 py-3 bg-emerald-600 rounded-2xl font-extrabold text-xs shrink-0"
                     >
                       Send
                     </button>
                   </div>
+
+                  {/* Quick 1-Tap Conversation Starters */}
+                  <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                    <span className="text-[10px] text-slate-400 font-bold shrink-0">Try saying:</span>
+                    {[
+                      "Hola me llamo Armando cómo estás",
+                      "Yo gusto la comida cubana mucho",
+                      "Hoy tuve mucho trabajo pero estoy en talla",
+                      "Yo sabo que tenemos un problema buena"
+                    ].map((sample, i) => (
+                      <button
+                        key={i}
+                        onClick={() => processFreeSpeechTurn(sample, 0.90)}
+                        className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-950 hover:bg-purple-950 text-slate-300 border border-slate-800 whitespace-nowrap shrink-0"
+                      >
+                        "{sample}"
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* TAB 3: SPACED REPETITION (SRS) 3D FLASHCARDS */}
-          {activeTab === "cards" && (
-            <div className="space-y-4">
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3 space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-xs font-extrabold text-purple-300">🧠 SRS Leitner Mastery Boxes</span>
-                  <button
-                    onClick={() => { setSrsFilterDue(!srsFilterDue); setCardIdx(0); }}
-                    className={`text-[11px] font-bold px-2.5 py-1 rounded-xl border ${
-                      srsFilterDue ? "bg-emerald-600/20 border-emerald-500 text-emerald-300" : "bg-slate-800 border-slate-700 text-slate-300"
-                    }`}
-                  >
-                    {srsFilterDue ? `Showing Due (${dueCards.length})` : `All Cards (${cards.length})`}
-                  </button>
-                </div>
-                <div className="grid grid-cols-5 gap-1.5 text-center text-[10px] font-bold">
-                  {[1, 2, 3, 4, 5].map(b => {
-                    const count = cards.filter(c => (c.box || 1) === b).length;
-                    return (
-                      <div key={b} className="bg-slate-950 border border-slate-800 rounded-xl py-1.5">
-                        <div className="text-slate-400">Box {b}</div>
-                        <div className="text-sm font-extrabold text-white">{count}</div>
-                      </div>
-                    );
-                  })}
-                </div>
+          {/* TAB 3: SRS FLASHCARDS */}
+          {activeTab === "cards" && currentCard && (
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 text-center space-y-4 shadow-xl">
+              <div className="flex justify-between items-center text-xs text-slate-400">
+                <span className="px-2.5 py-1 rounded-full bg-slate-800 text-purple-300 font-bold">
+                  {currentCard.tag}
+                </span>
+                <span className="px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-300 font-bold border border-amber-500/30">
+                  SRS Box {currentCard.box || 1} / 5
+                </span>
               </div>
 
-              {currentCard && (
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 text-center space-y-4 shadow-xl">
-                  <div className="flex justify-between items-center text-xs text-slate-400">
-                    <span className="px-2.5 py-1 rounded-full bg-slate-800 text-purple-300 font-bold">
-                      {currentCard.tag}
-                    </span>
-                    <span className="px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-300 font-bold border border-amber-500/30">
-                      SRS Box {currentCard.box || 1} / 5
-                    </span>
+              <div
+                onClick={() => { setFlipped(!flipped); setCardEval(null); }}
+                className="min-h-[180px] flex flex-col items-center justify-center bg-slate-950 border border-slate-800 rounded-2xl p-5 cursor-pointer"
+              >
+                {!flipped ? (
+                  <>
+                    <p className="text-xs uppercase text-slate-400 mb-2">Tap Card to Flip</p>
+                    <h2 className="text-2xl font-extrabold text-white">{currentCard.en}</h2>
+                  </>
+                ) : (
+                  <div className="space-y-2">
+                    {renderClickableSpanish(currentCard.es, "text-2xl font-extrabold text-emerald-400")}
+                    <p className="text-sm text-slate-200 pt-2 font-semibold">"{currentCard.exEs}"</p>
+                    <p className="text-xs text-slate-400">"{currentCard.exEn}"</p>
                   </div>
+                )}
+              </div>
 
-                  <div
-                    onClick={() => { setFlipped(!flipped); setCardEval(null); }}
-                    className="min-h-[180px] flex flex-col items-center justify-center bg-slate-950 border border-slate-800 rounded-2xl p-5 cursor-pointer transition hover:border-purple-500"
-                  >
-                    {!flipped ? (
-                      <>
-                        <p className="text-xs uppercase text-slate-400 mb-2">Tap Card to Flip</p>
-                        <h2 className="text-2xl font-extrabold text-white">{currentCard.en}</h2>
-                        <p className="text-xs text-purple-400 mt-3">Recall & speak the Spanish phrase!</p>
-                      </>
-                    ) : (
-                      <div className="space-y-2">
-                        {renderClickableSpanish(currentCard.es, "text-2xl font-extrabold text-emerald-400")}
-                        <p className="text-sm text-slate-200 pt-2 font-semibold">"{currentCard.exEs}"</p>
-                        <p className="text-xs text-slate-400">"{currentCard.exEn}"</p>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex justify-center gap-2">
-                    <button
-                      onClick={() => speakSpanish(currentCard.es)}
-                      className="px-3.5 py-2.5 bg-slate-800 rounded-xl text-xs font-bold"
-                    >
-                      🔊 Word
-                    </button>
-                    <button
-                      onClick={() => speakSpanish(currentCard.exEs)}
-                      className="px-3.5 py-2.5 bg-slate-800 rounded-xl text-xs font-bold"
-                    >
-                      🔊 Sentence
-                    </button>
-                    <button
-                      onClick={() =>
-                        listenVoiceRealtime((t) => {
-                          const res = scorePronunciation(currentCard.es, t);
-                          setCardEval({ spoken: t, score: res.score, breakdown: res.breakdown });
-                          setFlipped(true);
-                          if (res.score >= 85) rateCardSRS(currentCard.id, "good");
-                        })
-                      }
-                      className="px-4 py-2.5 bg-purple-600 rounded-xl text-xs font-bold"
-                    >
-                      🎤 Speak to Grade
-                    </button>
-                  </div>
-
-                  <div className="pt-2 border-t border-slate-800">
-                    <div className="grid grid-cols-3 gap-2 text-xs font-extrabold">
-                      <button
-                        onClick={() => rateCardSRS(currentCard.id, "hard")}
-                        className="py-2.5 rounded-xl bg-rose-950/80 border border-rose-700 text-rose-300"
-                      >
-                        🔴 Hard (Box 1)
-                      </button>
-                      <button
-                        onClick={() => rateCardSRS(currentCard.id, "good")}
-                        className="py-2.5 rounded-xl bg-amber-950/80 border border-amber-700 text-amber-300"
-                      >
-                        🟡 Good (+1 Box)
-                      </button>
-                      <button
-                        onClick={() => rateCardSRS(currentCard.id, "easy")}
-                        className="py-2.5 rounded-xl bg-emerald-950/80 border border-emerald-700 text-emerald-300"
-                      >
-                        🟢 Easy (+2 Box)
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
+              <div className="grid grid-cols-3 gap-2 text-xs font-extrabold">
+                <button onClick={() => rateCardSRS(currentCard.id, "hard")} className="py-2.5 rounded-xl bg-rose-950 border border-rose-700 text-rose-300">
+                  🔴 Hard
+                </button>
+                <button onClick={() => rateCardSRS(currentCard.id, "good")} className="py-2.5 rounded-xl bg-amber-950 border border-amber-700 text-amber-300">
+                  🟡 Good
+                </button>
+                <button onClick={() => rateCardSRS(currentCard.id, "easy")} className="py-2.5 rounded-xl bg-emerald-950 border border-emerald-700 text-emerald-300">
+                  🟢 Easy
+                </button>
+              </div>
             </div>
           )}
 
-          {/* TAB 4: ALL-DIALECTS UNCENSORED TRANSLATOR & SLANG/CURSE VAULT */}
+          {/* TAB 4: ALL-DIALECTS UNCENSORED TRANSLATOR */}
           {activeTab === "dict" && (
             <div className="space-y-4">
               <form onSubmit={handleSearch} className="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-purple-300 uppercase tracking-wider">
-                    🌍 All-Dialects Translator (ES ↔ EN)
+                  <label className="text-xs font-bold text-purple-300 uppercase">
+                    🌍 All-Dialects Translator (Speaks Back 🔊)
                   </label>
-                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300">
                     🤬 18+ Uncensored
                   </span>
                 </div>
@@ -2080,173 +1933,45 @@
                   <input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Type ANY word, slang, or curse word..."
+                    placeholder="Type or speak ANY word or curse word..."
                     className="flex-1 bg-slate-950 border border-slate-800 rounded-2xl px-3.5 py-2.5 text-sm outline-none text-white"
                   />
                   <button
                     type="submit"
                     disabled={isTranslating}
-                    className="bg-purple-600 hover:bg-purple-500 disabled:opacity-50 px-4 py-2.5 rounded-2xl font-extrabold text-sm shrink-0"
+                    className="bg-purple-600 px-4 py-2.5 rounded-2xl font-extrabold text-sm shrink-0"
                   >
                     {isTranslating ? "..." : "Translate"}
                   </button>
                 </div>
-
-                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-0.5">
-                  <span className="text-[10px] text-slate-400 font-bold shrink-0">Try:</span>
-                  {["fuck", "shit", "asshole", "no mames", "comemierda", "boludo", "gonorrea", "cool", "money"].map(sample => (
-                    <button
-                      type="button"
-                      key={sample}
-                      onClick={() => {
-                        setSearchQuery(sample);
-                        runTranslation(sample, null);
-                      }}
-                      className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-slate-950 hover:bg-purple-950 text-slate-300 border border-slate-800 shrink-0"
-                    >
-                      {sample}
-                    </button>
-                  ))}
-                </div>
               </form>
 
               {dictResult && (
-                <div className="bg-slate-900 border border-purple-500/40 rounded-3xl p-4 space-y-3.5 shadow-xl">
-                  <div className="space-y-2">
-                    <div className="bg-slate-950 border border-emerald-500/30 rounded-2xl p-3.5 flex justify-between items-center">
-                      <div>
-                        <span className="text-[10px] uppercase font-extrabold text-emerald-400 block">
-                          🌎 Spanish + Street Phonetics
-                        </span>
-                        <h3 className="text-xl font-extrabold text-white mt-0.5">{dictResult.es}</h3>
-                        <p className="text-[11px] font-mono text-amber-300 mt-0.5">
-                          🗣️ [{generatePhoneticGuide(dictResult.es, dialect)}]
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => speakSpanish(dictResult.es)}
-                        className="px-3.5 py-2 bg-emerald-600/20 border border-emerald-500/50 text-emerald-300 rounded-xl text-xs font-extrabold shrink-0"
-                      >
-                        🔊 Hear
-                      </button>
+                <div className="bg-slate-900 border border-purple-500/40 rounded-3xl p-4 space-y-3 shadow-xl">
+                  <div className="bg-slate-950 border border-emerald-500/30 rounded-2xl p-3.5 flex justify-between items-center">
+                    <div>
+                      <span className="text-[10px] uppercase font-extrabold text-emerald-400 block">Spanish</span>
+                      <h3 className="text-xl font-extrabold text-white">{dictResult.es}</h3>
+                      <p className="text-xs text-blue-300 mt-1">🇺🇸 {dictResult.en}</p>
                     </div>
-
-                    <div className="bg-slate-950 border border-slate-800 rounded-2xl p-3.5">
-                      <span className="text-[10px] uppercase font-extrabold text-blue-400 block">
-                        🇺🇸 English Meaning
-                      </span>
-                      <h4 className="text-lg font-bold text-slate-200 mt-0.5">{dictResult.en}</h4>
-                    </div>
+                    <button
+                      onClick={() => speakSpanish(dictResult.es)}
+                      className="px-3.5 py-2 bg-emerald-600/20 border border-emerald-500/50 text-emerald-300 rounded-xl text-xs font-extrabold"
+                    >
+                      🔊 Hear
+                    </button>
                   </div>
-
-                  {dictResult.byDialect && (
-                    <div className="pt-2 border-t border-slate-800 space-y-2">
-                      <p className="text-xs font-extrabold text-amber-400">
-                        🌎 All 5 Dialects Breakdown:
-                      </p>
-                      <div className="space-y-2">
-                        {Object.entries(DIALECTS).map(([code, dInfo]) => {
-                          const dItem = dictResult.byDialect[code];
-                          if (!dItem) return null;
-                          return (
-                            <div
-                              key={code}
-                              className={`bg-slate-950 p-3 rounded-2xl border text-xs space-y-1.5 ${
-                                code === dialect ? "border-purple-500/60" : "border-slate-800"
-                              }`}
-                            >
-                              <div className="flex justify-between items-center">
-                                <span className="font-extrabold text-white">
-                                  {dInfo.flag} {dInfo.short}: <span className="text-emerald-400">{dItem.term}</span>
-                                </span>
-                                <button
-                                  onClick={() => speakSpanish(dItem.exEs, code)}
-                                  className="px-2 py-1 bg-slate-800 rounded-lg text-purple-300 font-bold"
-                                >
-                                  🔊 Audio
-                                </button>
-                              </div>
-                              <p className="text-slate-200 font-semibold">"{dItem.exEs}"</p>
-                              <p className="text-[10px] font-mono text-amber-300/80">
-                                🗣️ [{generatePhoneticGuide(dItem.exEs, code)}]
-                              </p>
-                              <p className="text-slate-400">"{dItem.exEn}"</p>
-                              <div className="flex gap-2 pt-1">
-                                <button
-                                  onClick={() => addWordToDrills(dItem.term, `${dictResult.en} (${dInfo.short})`, dItem.exEs, dItem.exEn)}
-                                  className="px-2.5 py-1 bg-purple-950/80 border border-purple-700/50 text-purple-300 rounded-lg font-bold text-[11px]"
-                                >
-                                  + Drill ({dInfo.flag})
-                                </button>
-                                <button
-                                  onClick={() => addWordToFlashcards(dItem.term, `${dictResult.en} (${dInfo.short})`, dItem.exEs, dItem.exEn, `${dInfo.flag} ${dInfo.short}`)}
-                                  className="px-2.5 py-1 bg-blue-950/80 border border-blue-700/50 text-blue-300 rounded-lg font-bold text-[11px]"
-                                >
-                                  + SRS Card ({dInfo.flag})
-                                </button>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
-
-              {/* Regional Slang & 18+ Curse Vault */}
-              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-4 space-y-3">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-extrabold text-sm text-amber-400">🌶️ Slang & 18+ Curse Vault</h3>
-                  <select
-                    value={slangFilter}
-                    onChange={(e) => setSlangFilter(e.target.value)}
-                    className="bg-slate-800 text-xs font-bold px-2.5 py-1.5 rounded-xl border border-slate-700"
-                  >
-                    <option value="ALL">🌎 All 5 Dialects</option>
-                    <option value="es-CU">🇨🇺 Cuba</option>
-                    <option value="es-MX">🇲🇽 Mexico</option>
-                    <option value="es-CO">🇨🇴 Colombia</option>
-                    <option value="es-ES">🇪🇸 Spain</option>
-                    <option value="es-AR">🇦🇷 Argentina</option>
-                  </select>
-                </div>
-
-                <div className="space-y-2.5">
-                  {SLANG_VAULT.filter(s => slangFilter === "ALL" || s.dialect === slangFilter).map((item) => (
-                    <div key={item.id} className="bg-slate-950 border border-slate-800 rounded-2xl p-3.5 space-y-1.5">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-950 text-rose-300 border border-rose-700/50">
-                            {item.badge}
-                          </span>
-                          <h4 className="font-extrabold text-base text-white mt-1">{item.phrase}</h4>
-                        </div>
-                        <button
-                          onClick={() => speakSpanish(item.exEs, item.dialect)}
-                          className="px-2.5 py-1.5 bg-slate-800 rounded-xl text-xs font-bold"
-                        >
-                          🔊 Audio
-                        </button>
-                      </div>
-                      <p className="text-xs text-slate-400"><b>Literal:</b> "{item.literal}" • <b>Meaning:</b> {item.meaning}</p>
-                      {renderClickableSpanish(item.exEs, "text-xs text-emerald-300 font-semibold")}
-                      <p className="text-xs text-slate-500">"{item.exEn}"</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
           )}
 
-          {/* THUMB-ZONE FIXED BOTTOM NAVIGATION DOCK + FLOATING CENTER MIC */}
+          {/* THUMB-ZONE FIXED BOTTOM NAVIGATION DOCK */}
           <div className="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur-md border-t border-slate-800 px-3 py-2">
             <div className="max-w-md mx-auto grid grid-cols-5 items-center gap-1 text-[11px] font-extrabold">
               <button
                 onClick={() => setActiveTab("drills")}
-                className={`flex flex-col items-center py-1.5 rounded-xl transition ${
-                  activeTab === "drills" ? "text-purple-400" : "text-slate-400"
-                }`}
+                className={`flex flex-col items-center py-1.5 rounded-xl ${activeTab === "drills" ? "text-purple-400" : "text-slate-400"}`}
               >
                 <span className="text-base">🎯</span>
                 <span>Drills</span>
@@ -2254,34 +1979,28 @@
 
               <button
                 onClick={() => setActiveTab("freeai")}
-                className={`flex flex-col items-center py-1.5 rounded-xl transition ${
-                  activeTab === "freeai" ? "text-purple-400" : "text-slate-400"
-                }`}
+                className={`flex flex-col items-center py-1.5 rounded-xl ${activeTab === "freeai" ? "text-purple-400" : "text-slate-400"}`}
               >
                 <span className="text-base">💬</span>
                 <span>Free AI</span>
               </button>
 
-              {/* Floating Center Quick-Speak Mic Button */}
               <div className="flex justify-center -mt-6">
                 <button
                   onClick={triggerGlobalQuickMic}
                   className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-xl border-4 border-[#090d16] transition active:scale-95 ${
                     isRecording
-                      ? "bg-rose-600 animate-pulse text-white shadow-rose-600/50"
+                      ? "bg-emerald-600 text-white shadow-emerald-600/50"
                       : "bg-gradient-to-tr from-purple-600 to-emerald-500 text-white shadow-purple-600/40"
                   }`}
-                  title="Tap to Speak"
                 >
-                  🎤
+                  {isRecording ? "✅" : "🎤"}
                 </button>
               </div>
 
               <button
                 onClick={() => setActiveTab("cards")}
-                className={`flex flex-col items-center py-1.5 rounded-xl transition ${
-                  activeTab === "cards" ? "text-purple-400" : "text-slate-400"
-                }`}
+                className={`flex flex-col items-center py-1.5 rounded-xl ${activeTab === "cards" ? "text-purple-400" : "text-slate-400"}`}
               >
                 <span className="text-base">🧠</span>
                 <span>SRS ({dueCards.length})</span>
@@ -2289,9 +2008,7 @@
 
               <button
                 onClick={() => setActiveTab("dict")}
-                className={`flex flex-col items-center py-1.5 rounded-xl transition ${
-                  activeTab === "dict" ? "text-purple-400" : "text-slate-400"
-                }`}
+                className={`flex flex-col items-center py-1.5 rounded-xl ${activeTab === "dict" ? "text-purple-400" : "text-slate-400"}`}
               >
                 <span className="text-base">🌍</span>
                 <span>Translator</span>
