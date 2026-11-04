@@ -367,16 +367,17 @@
     .input-row {
       display: flex;
       gap: 8px;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      align-items: center;
     }
 
     .text-input {
       flex: 1;
-      min-width: 170px;
+      min-width: 0;
       background: var(--bg-card);
       border: 1px solid #1f2937;
       color: #ffffff;
-      padding: 14px 14px;
+      padding: 13px 12px;
       border-radius: 12px;
       font-size: 14px;
       outline: none;
@@ -390,27 +391,29 @@
       background: var(--accent-teal);
       border: 1px solid #14b8a6;
       color: #ffffff;
-      padding: 0 16px;
-      min-height: 46px;
+      padding: 0 13px;
+      height: 46px;
       border-radius: 12px;
       font-size: 13px;
       font-weight: 700;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
+      flex-shrink: 0;
     }
 
     .send-btn {
       background: #4f46e5;
       border: none;
       color: #ffffff;
-      padding: 0 18px;
-      min-height: 46px;
+      padding: 0 15px;
+      height: 46px;
       border-radius: 12px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
+      flex-shrink: 0;
     }
 
     /* =========================================================
@@ -870,14 +873,14 @@
       <div class="tutor-card">
         <div class="section-title">🔎 Instant Phrase / Slang Translator & Analyzer</div>
         <p class="english-subtext" style="text-align:left; margin-bottom:10px;">
-          Type any English word (like "White" or "It's fine") or Spanish slang phrase to get the instant translation, pronunciation, and breakdown right here.
+          Type any English word (like "Please stop", "White", or "It's fine") or Spanish slang phrase to get the instant translation, pronunciation, and breakdown right here.
         </p>
         <div class="input-row">
           <input
             type="text"
             id="lens-input"
             class="text-input"
-            placeholder="e.g., White / It's fine / ¿Qué onda güey?"
+            placeholder="e.g., Please stop / White / ¿Qué onda?"
             onkeydown="if(event.key === 'Enter') analyzeSlangPhrase(false)"
           />
           <button class="translate-btn" onclick="analyzeSlangPhrase(false)">🌐 Translate</button>
@@ -1086,7 +1089,7 @@
         </button>
       </div>
 
-      <!-- Quick input inside live call with both Translate & Send -->
+      <!-- Quick input inside live call with both Translate & Send on one row -->
       <div class="input-row">
         <input
           type="text"
@@ -1164,6 +1167,36 @@
 
     // --- BUILT-IN BILINGUAL DICTIONARY FOR INSTANT ZERO-LATENCY LOOKUPS ---
     const INSTANT_DICTIONARY = {
+      "please stop": {
+        es: "¡Por favor, para! / ¡Detente, por favor!",
+        fluent: "¡Para ya, por favor! / ¡Basta, por favor!",
+        en: "Please stop! / Stop right now, please!",
+        tip: "Use '¡Para, por favor!' (from parar) or '¡Detente!' when telling someone to stop doing something. ('Deja de...' is only used right before a verb, like 'Deja de hablar')."
+      },
+      "stop": {
+        es: "¡Para! / ¡Detente! / ¡Basta!",
+        fluent: "¡Para un momento, por favor!",
+        en: "Stop! / Hold on a moment!",
+        tip: "'¡Para!' is the most common everyday command for 'Stop!', while '¡Basta!' means 'Enough!'"
+      },
+      "save": {
+        es: "Guardar (files/data) / Salvar (rescue) / Ahorrar (money)",
+        fluent: "¿Cómo puedo guardar esto?",
+        en: "How can I save this?",
+        tip: "Use 'guardar' for saving on a phone/computer, 'ahorrar' for saving money, and 'salvar' for saving a life."
+      },
+      "wait": {
+        es: "¡Espera! / ¡Espérate un momento!",
+        fluent: "¡Aguanta un segundo, ya voy!",
+        en: "Wait! / Hold on a second, I'm coming!",
+        tip: "'¡Espérate!' is much more common in spoken Latin American Spanish than just 'Espera'."
+      },
+      "hold on": {
+        es: "¡Espera un momento! / ¡Aguanta!",
+        fluent: "¡Dame un segundito!",
+        en: "Hold on! / Give me a quick second!",
+        tip: "Saying '¡Dame un segundito!' (Give me a little second) sounds 100% native."
+      },
       "it's fine": {
         es: "Está bien / No pasa nada",
         fluent: "¡Está bien, tranquilo! No pasa nada.",
@@ -1292,6 +1325,58 @@
       }
     };
 
+    // --- ANDROID CHROME SPEECH DEDUPLICATOR (FIXES "How How do How do I..." & "Hola Hola") ---
+    function collapseImmediateWordStutters(text) {
+      if (!text) return "";
+      const words = text.trim().split(/\s+/);
+      const out = [];
+      for (let i = 0; i < words.length; i++) {
+        // Skip immediate duplicate words caused by mobile STT restarts (e.g. "Hola Hola")
+        if (i > 0 && words[i].toLowerCase() === words[i - 1].toLowerCase()) {
+          continue;
+        }
+        out.push(words[i]);
+      }
+      // Also collapse repeated 2-to-4 word phrases (e.g., "Hola qué tal Hola qué tal")
+      let result = out.join(" ");
+      result = result.replace(/\b(\w+(?:\s+\w+){1,3})\s+\1\b/gi, "$1");
+      return result.trim();
+    }
+
+    function mergeSpeechSegments(existingText, incomingChunk) {
+      const a = String(existingText || "").trim();
+      const b = String(incomingChunk || "").trim();
+      if (!a) return collapseImmediateWordStutters(b);
+      if (!b) return collapseImmediateWordStutters(a);
+
+      const aLower = a.toLowerCase();
+      const bLower = b.toLowerCase();
+
+      // If Android Chrome sends the cumulative transcript in the new chunk (b starts with a), replace with b!
+      if (bLower.startsWith(aLower)) {
+        return collapseImmediateWordStutters(b);
+      }
+      // If b is already contained at the end of a, ignore b
+      if (aLower.endsWith(bLower) || aLower === bLower) {
+        return collapseImmediateWordStutters(a);
+      }
+
+      // Check word-level overlap between the end of `a` and start of `b`
+      const aWords = a.split(/\s+/);
+      const bWords = b.split(/\s+/);
+      const maxOverlap = Math.min(aWords.length, bWords.length);
+      for (let len = maxOverlap; len >= 1; len--) {
+        const aSuffix = aWords.slice(aWords.length - len).join(" ").toLowerCase();
+        const bPrefix = bWords.slice(0, len).join(" ").toLowerCase();
+        if (aSuffix === bPrefix) {
+          const combined = aWords.concat(bWords.slice(len)).join(" ");
+          return collapseImmediateWordStutters(combined);
+        }
+      }
+
+      return collapseImmediateWordStutters(a + " " + b);
+    }
+
     // --- AUTOMATIC SPANISH PHONETIC GENERATOR ---
     function generateSpanishPhonetics(spanishStr) {
       if (!spanishStr) return "";
@@ -1316,6 +1401,9 @@
         if (w === "hola") return "oh-lah";
         if (w === "blanco") return "blahn-koh";
         if (w === "blanca") return "blahn-kah";
+        if (w === "para") return "pah-rah";
+        if (w === "detente") return "deh-tehn-teh";
+        if (w === "basta") return "bahs-tah";
         if (w === "todo") return "toh-doh";
         if (w === "nada") return "nah-dah";
         if (w === "pasa") return "pah-sah";
@@ -1364,23 +1452,26 @@
 
     // --- DETECT IF USER INPUT IS ENGLISH OR A TRANSLATION REQUEST ---
     function detectTranslationIntent(rawText, currentMode) {
-      const text = String(rawText || "").trim();
+      const text = collapseImmediateWordStutters(String(rawText || "").trim());
       const lower = text.toLowerCase();
 
-      // Explicit patterns like "How do I say...", "Translate...", "What does X mean"
-      const howToSayMatch = lower.match(/(?:how do (?:i|you) say|how to say|what is|how do you translate|translate|como se dice|cómo se dice)\s+["']?(.+?)["']?\s*(?:in spanish|en español|\?)?$/i);
+      // Match even if the user had repeated "how do I" prefixes before the actual phrase
+      const howToSayMatch = lower.match(/(?:how\s+do\s+(?:i|you)\s+say|how\s+to\s+say|what\s+is|how\s+do\s+you\s+translate|translate|como\s+se\s+dice|cómo\s+se\s+dice)\s+["']?(.+?)["']?\s*(?:in\s+spanish|en\s+español|\?)?$/i);
       if (howToSayMatch && howToSayMatch[1]) {
-        return { isTranslation: true, targetPhrase: howToSayMatch[1].replace(/\?+$/, "").trim() };
+        // Strip any leftover repeated "how do I say" inside group 1
+        const cleanedTarget = howToSayMatch[1]
+          .replace(/^(?:how\s+do\s+(?:i|you)\s+say\s+)+/i, "")
+          .replace(/\?+$/, "")
+          .trim();
+        return { isTranslation: true, targetPhrase: cleanedTarget };
       }
 
-      // Check if exact phrase is in our English dictionary
       const stripped = lower.replace(/[?.!,]/g, "").trim();
       if (INSTANT_DICTIONARY[stripped]) {
         return { isTranslation: true, targetPhrase: stripped };
       }
 
-      // Check for common English words when user speaks English even in Spanish mode
-      const englishSignalWords = /\b(it's|its|the|what|where|when|why|how|fine|white|black|red|blue|green|yellow|please|thank|thanks|water|food|bathroom|check|money|good|bad|morning|night|today|tomorrow|understand|know|want|need|can|could|would|should|sorry|excuse|help)\b/i;
+      const englishSignalWords = /\b(it's|its|the|what|where|when|why|how|fine|white|black|red|blue|green|yellow|please|stop|wait|save|thank|thanks|water|food|bathroom|check|money|good|bad|morning|night|today|tomorrow|understand|know|want|need|can|could|would|should|sorry|excuse|help)\b/i;
       if (currentMode === "en" || englishSignalWords.test(lower)) {
         return { isTranslation: true, targetPhrase: text.replace(/\?+$/, "").trim() };
       }
@@ -1388,14 +1479,18 @@
       return { isTranslation: false, targetPhrase: text };
     }
 
-    // --- FREE CLOUD TRANSLATION FALLBACK (WORKS WITHOUT AN API KEY) ---
+    // --- FREE CLOUD TRANSLATION FALLBACK (CLEANED UP FOR COMPLETE SPANISH PHRASES) ---
     async function fetchFreeTranslation(phrase, sourceLang, targetLang) {
       try {
         const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(phrase)}&langpair=${sourceLang}|${targetLang}`;
         const res = await fetch(url);
         if (res.ok) {
           const data = await res.json();
-          const translated = data?.responseData?.translatedText;
+          let translated = (data?.responseData?.translatedText || "").trim();
+          // Fix incomplete trailing "deja de" if translating "stop"
+          if (/deja de$/i.test(translated)) {
+            translated = translated.replace(/deja de$/i, "¡para!");
+          }
           if (translated && translated.toLowerCase() !== phrase.toLowerCase()) {
             return translated;
           }
@@ -1418,8 +1513,8 @@
 
     function loadSrsDeck() {
       const defaultDeck = [
-        { id: 1, es: "Está bien / No pasa nada", en: "It's fine / No worries", phonetic: "[ehs-tah · byehn]" },
-        { id: 2, es: "¿Cómo se dice...?", en: "How do you say...?", phonetic: "[koh-moh · seh · dee-seh]" },
+        { id: 1, es: "¡Por favor, para! / ¡Detente!", en: "Please stop!", phonetic: "[pohr · fah-bohr · pah-rah]" },
+        { id: 2, es: "Está bien / No pasa nada", en: "It's fine / No worries", phonetic: "[ehs-tah · byehn]" },
         { id: 3, es: "Compartir", en: "To share", phonetic: "[kohm-pahr-teer]" },
         { id: 4, es: "Ahorita vengo", en: "I'll be right back", phonetic: "[ah-oh-ree-tah · behn-goh]" }
       ];
@@ -1501,7 +1596,6 @@
         document.getElementById("live-ai-es-text").textContent = currentTutorState.replySpanish;
       }
 
-      // Update Live Grammar, Translation & Fluency Coach Card
       const badgeTitle = document.getElementById("coach-badge-title");
       const fixLabel = document.getElementById("coach-fix-label");
       const corrRow = document.getElementById("coach-correction-row");
@@ -1563,7 +1657,6 @@
       document.getElementById(prefix + "-en").textContent = "Meaning: " + result.englishMeaning;
       document.getElementById(prefix + "-notes").textContent = "💡 " + result.tip;
 
-      // Also update Yordanis main card & speak the Spanish translation aloud
       currentTutorState = result.tutorState;
       syncTutorDisplay(false);
       speakSpanishText(result.spanishMain, 0.9);
@@ -1587,7 +1680,7 @@
           phonetic: phon,
           tip: entry.tip,
           tutorState: {
-            userOriginal: rawQuery,
+            userOriginal: cleanPhrase,
             isNatural: true,
             isTranslationResponse: true,
             correction: entry.es,
@@ -1609,7 +1702,7 @@
       if (apiKey) {
         try {
           const tutorObj = await callGeminiTutorAPI(
-            `Translate and explain how to say "${cleanPhrase}" in natural Spanish.`,
+            `Translate and explain how to say "${cleanPhrase}" in natural, complete Spanish.`,
             "en",
             apiKey
           );
@@ -1625,11 +1718,10 @@
         } catch (e) {}
       }
 
-      // 3. Free Cloud Translation API (Translates ANY English or Spanish phrase without a key)
+      // 3. Free Cloud Translation API
       let translatedEs = await fetchFreeTranslation(cleanPhrase, "en", "es");
       let translatedEn = cleanPhrase;
 
-      // If the input was already Spanish, translate ES -> EN too
       if (!translatedEs || translatedEs.toLowerCase() === cleanPhrase.toLowerCase()) {
         const maybeEnglish = await fetchFreeTranslation(cleanPhrase, "es", "en");
         if (maybeEnglish && maybeEnglish.toLowerCase() !== cleanPhrase.toLowerCase()) {
@@ -1648,7 +1740,7 @@
         phonetic: phonetic,
         tip: `Tap 🔊 Hear to listen to "${finalEs}" or +SRS to save it to your flashcards.`,
         tutorState: {
-          userOriginal: rawQuery,
+          userOriginal: cleanPhrase,
           isNatural: true,
           isTranslationResponse: true,
           correction: finalEs,
@@ -1701,7 +1793,7 @@
       if (liveMicLang === "en") {
         userHeader.textContent = "🇺🇸 YOU (ASKING IN ENGLISH)";
         toggleLabel.textContent = "🇪🇸 Speak Spanish";
-        placeholder.textContent = 'Ask in English (e.g., "How do I say it\'s fine?")...';
+        placeholder.textContent = 'Ask in English (e.g., "How do I say please stop?")...';
       } else {
         userHeader.textContent = "🎙️ YOU (" + studentLevel + " SPANISH)";
         toggleLabel.textContent = "🇺🇸 Ask English";
@@ -1791,9 +1883,13 @@
         return;
       }
 
+      const isAndroidMobile = /Android/i.test(navigator.userAgent || "");
+
       const rec = new SpeechRec();
       rec.lang = liveMicLang === "en" ? "en-US" : "es-MX";
-      rec.continuous = true;
+      // On Android Chrome, continuous=true causes cumulative duplicate final chunks ("How How do How do I").
+      // Setting continuous = !isAndroidMobile + overlap deduplication eliminates the stutter completely.
+      rec.continuous = !isAndroidMobile;
       rec.interimResults = true;
 
       rec.onstart = function () {
@@ -1801,40 +1897,63 @@
       };
 
       rec.onresult = function (event) {
-        let interim = "";
-        let finalChunk = "";
+        let latestFinal = "";
+        let latestInterim = "";
 
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const t = event.results[i][0].transcript;
+        for (let i = 0; i < event.results.length; i++) {
+          const piece = (event.results[i][0].transcript || "").trim();
+          if (!piece) continue;
           if (event.results[i].isFinal) {
-            finalChunk += t + " ";
+            latestFinal = mergeSpeechSegments(latestFinal, piece);
           } else {
-            interim += t;
+            latestInterim = mergeSpeechSegments(latestInterim, piece);
           }
         }
 
-        if (finalChunk) {
-          accumulatedTranscript = (accumulatedTranscript + " " + finalChunk).trim();
+        if (latestFinal) {
+          accumulatedTranscript = mergeSpeechSegments(accumulatedTranscript, latestFinal);
         }
-        currentInterimTranscript = interim;
 
-        const combined = (accumulatedTranscript + " " + currentInterimTranscript).trim();
+        // Prevent interim from repeating words already in accumulatedTranscript
+        if (
+          latestInterim &&
+          accumulatedTranscript &&
+          latestInterim.toLowerCase().startsWith(accumulatedTranscript.toLowerCase())
+        ) {
+          currentInterimTranscript = latestInterim.slice(accumulatedTranscript.length).trim();
+        } else {
+          currentInterimTranscript = latestInterim;
+        }
+
+        const combined = mergeSpeechSegments(accumulatedTranscript, currentInterimTranscript);
         if (combined.length > 0) {
           document.getElementById("live-placeholder-span").style.display = "none";
         }
-        document.getElementById("live-final-span").textContent = accumulatedTranscript + " ";
+
+        document.getElementById("live-final-span").textContent = accumulatedTranscript
+          ? accumulatedTranscript + " "
+          : "";
         document.getElementById("live-interim-span").textContent = currentInterimTranscript;
 
         if (silenceTimer) clearTimeout(silenceTimer);
         if (combined.length > 1) {
           silenceTimer = setTimeout(function () {
             finalizeUserSpeechAndReply(combined, false);
-          }, 1800);
+          }, 1650);
+        }
+      };
+
+      rec.onend = function () {
+        // If Android stopped single-utterance recognition and we already captured speech, reply immediately
+        const captured = mergeSpeechSegments(accumulatedTranscript, currentInterimTranscript);
+        if (callPhase === "listening" && captured.length > 1) {
+          if (silenceTimer) clearTimeout(silenceTimer);
+          finalizeUserSpeechAndReply(captured, false);
         }
       };
 
       rec.onerror = function (e) {
-        if (e.error !== "aborted") {
+        if (e.error !== "aborted" && e.error !== "no-speech") {
           setLivePhaseUI("paused");
         }
       };
@@ -1854,10 +1973,8 @@
         try { recognitionInstance.stop(); } catch (e) {}
       }
 
-      const finalSpoken = (
-        explicitText ||
-        (accumulatedTranscript + " " + currentInterimTranscript)
-      ).trim();
+      const rawSpoken = explicitText || mergeSpeechSegments(accumulatedTranscript, currentInterimTranscript);
+      const finalSpoken = collapseImmediateWordStutters(rawSpoken);
 
       if (!finalSpoken) {
         setLivePhaseUI("paused");
@@ -1970,19 +2087,19 @@
       const prompt = `
 You are Yordanis, an intuitive, street-smart Spanish tutor in a live voice session.
 Student CEFR Level: ${studentLevel}.
-If the user says an English word/phrase (like "It's fine" or "White") or asks "How do I say...", you MUST provide the exact Spanish translation in "correction", a natural full sentence using it in "moreFluentWay", and explain it clearly in "replySpanish" and "replyEnglish".
-NEVER insert untranslated English words into Spanish sentences.
+If the user says an English word/phrase (like "Please stop", "It's fine", or "White") or asks "How do I say...", you MUST provide the complete, natural Spanish translation in "correction", a natural full sentence using it in "moreFluentWay", and explain it clearly in "replySpanish" and "replyEnglish".
+NEVER return incomplete Spanish fragments like "Por favor deja de", and NEVER insert untranslated English words into Spanish sentences.
 
 Return ONLY valid JSON with this exact schema:
 {
   "userOriginal": "what the user said",
   "isNatural": false,
   "isTranslationResponse": true,
-  "correction": "Direct Spanish translation or corrected Spanish sentence",
+  "correction": "Direct, complete Spanish translation or corrected Spanish sentence",
   "moreFluentWay": "A natural, native Spanish sentence using the translation or expressing the user's idea",
   "coachingTip": "1 brief sentence in English explaining the translation or grammar nuance",
   "replySpanish": "Your conversational response in Spanish teaching the phrase or continuing the chat (1-2 sentences)",
-  "replyPhonetic": "Syllable-by-syllable phonetic pronunciation guide in brackets, e.g. [ehs-tah · byehn]",
+  "replyPhonetic": "Syllable-by-syllable phonetic pronunciation guide in brackets, e.g. [pohr · fah-bohr · pah-rah]",
   "replyEnglish": "English translation of your replySpanish",
   "wordBreakdown": [
     { "es": "Spanish word/phrase", "en": "English meaning" }
@@ -2019,7 +2136,6 @@ Return ONLY valid JSON with this exact schema:
 
     // --- MASTER TUTOR RESPONSE GENERATOR ---
     async function generateTutorResponse(userText, mode, forceTranslate) {
-      // 1. Check if the user is asking for a translation or speaking English (e.g., "It's fine", "White", "How do I say...")
       const intent = detectTranslationIntent(userText, mode);
       if (forceTranslate || intent.isTranslation) {
         const transResult = await translateAndExplainPhrase(intent.targetPhrase);
@@ -2028,7 +2144,6 @@ Return ONLY valid JSON with this exact schema:
         return transResult.tutorState;
       }
 
-      // 2. If user has a Gemini API key, use full AI conversation
       const apiKey = getSavedApiKey();
       if (apiKey) {
         try {
@@ -2039,7 +2154,6 @@ Return ONLY valid JSON with this exact schema:
         }
       }
 
-      // 3. Built-in Spanish Coaching & Conversation Engine
       return buildSpanishConversationCoaching(userText);
     }
 
@@ -2084,7 +2198,6 @@ Return ONLY valid JSON with this exact schema:
         };
       }
 
-      // Translate the user's Spanish sentence to English so we can show its meaning accurately
       const englishMeaning = (await fetchFreeTranslation(userText, "es", "en")) || "Spanish practice phrase";
 
       return {
@@ -2168,7 +2281,6 @@ Return ONLY valid JSON with this exact schema:
     }
 
     async function analyzeSlangPhrase() {
-      // Runs the in-place translator & analyzer right inside the Lens tab
       await handleDirectTranslation("lens");
     }
 
