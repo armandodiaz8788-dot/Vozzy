@@ -4,11 +4,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Yordanis — Live Spanish Tutor</title>
-  <!-- React & Babel CDNs for Single-File Browser Execution -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
+    :root {
+      --bg-main: #090d16;
+      --bg-nav: #0d1322;
+      --bg-card: #111827;
+      --bg-card-alt: #0f172a;
+      --bg-input: #131c31;
+      --border-color: #1e293b;
+      --border-highlight: #3b82f6;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-phonetic: #fb923c;
+      --accent-blue: #2563eb;
+      --accent-purple: #6366f1;
+      --accent-green: #22c55e;
+      --accent-amber: #f59e0b;
+      --accent-red: #ef4444;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -17,26 +31,26 @@
     }
 
     body {
-      background-color: #090d16;
-      color: #f8fafc;
+      background-color: var(--bg-main);
+      color: var(--text-main);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      overflow-x: hidden;
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    /* Top Navigation Bar */
+    /* TOP NAVIGATION BAR */
     .top-nav {
       display: flex;
       align-items: center;
       gap: 8px;
       padding: 10px 12px;
-      background: #0d1322;
-      border-bottom: 1px solid #1e293b;
+      background: var(--bg-nav);
+      border-bottom: 1px solid var(--border-color);
       overflow-x: auto;
       scrollbar-width: none;
       position: sticky;
       top: 0;
-      z-index: 50;
+      z-index: 100;
     }
     .top-nav::-webkit-scrollbar {
       display: none;
@@ -44,25 +58,25 @@
 
     .nav-tab {
       display: flex;
-       flex-direction: column;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       min-width: 68px;
       padding: 8px 10px;
       border-radius: 12px;
       background: #131c31;
-      border: 1px solid #1e293b;
-      color: #94a3b8;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
       font-size: 11px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s ease;
       flex-shrink: 0;
+      transition: all 0.18s ease;
     }
 
     .nav-tab.active {
       background: #172554;
-      border-color: #3b82f6;
+      border-color: var(--border-highlight);
       color: #ffffff;
       box-shadow: 0 0 12px rgba(59, 130, 246, 0.35);
     }
@@ -83,29 +97,39 @@
       border: 1px solid #334155;
       color: #e2e8f0;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       flex-shrink: 0;
     }
 
-    /* Main Container */
+    /* MAIN VIEW CONTAINER */
     .main-container {
-      max-width: 600px;
+      max-width: 620px;
       margin: 0 auto;
       padding: 14px;
       display: flex;
       flex-direction: column;
       gap: 14px;
-      padding-bottom: 40px;
+      padding-bottom: 48px;
     }
 
-    /* Yordanis Response Card */
+    .tab-panel {
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .tab-panel.active {
+      display: flex;
+    }
+
+    /* TUTOR MESSAGE CARD */
     .tutor-card {
-      background: #111827;
+      background: var(--bg-card);
       border: 1px solid #1f2937;
       border-radius: 16px;
       padding: 18px 16px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
     }
 
     .spanish-main-text {
@@ -121,8 +145,8 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      background: rgba(245, 158, 11, 0.15);
-      border: 1px solid rgba(245, 158, 11, 0.4);
+      background: rgba(245, 158, 11, 0.16);
+      border: 1px solid rgba(245, 158, 11, 0.45);
       color: #fbbf24;
       font-size: 12px;
       font-weight: 700;
@@ -137,38 +161,90 @@
       font-family: "Courier New", Courier, monospace;
       font-size: 14px;
       line-height: 1.6;
-      color: #fb923c;
+      color: var(--text-phonetic);
       text-align: center;
-      margin: 12px 0;
-      padding: 8px;
-      background: rgba(15, 23, 42, 0.6);
+      margin: 10px 0;
+      padding: 10px;
+      background: rgba(15, 23, 42, 0.65);
       border-radius: 10px;
+      cursor: pointer;
     }
 
     .english-subtext {
       font-size: 14px;
       line-height: 1.45;
-      color: #94a3b8;
+      color: var(--text-muted);
       text-align: center;
       margin-top: 8px;
     }
 
-    /* Orb Card Area */
+    /* WORD BREAKDOWN DRAWER */
+    .breakdown-grid {
+      display: none;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 8px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .breakdown-grid.open {
+      display: grid;
+    }
+
+    .word-chip {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 9px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .word-chip-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      font-size: 14px;
+      color: #ffffff;
+    }
+
+    .word-chip-en {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .mini-btn {
+      background: var(--accent-blue);
+      border: none;
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 5px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* ORB STAGE */
     .orb-stage {
-      background: #0f172a;
-      border: 1px solid #1e293b;
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border-color);
       border-radius: 18px;
-      padding: 32px 20px;
+      padding: 34px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      position: relative;
+      gap: 12px;
     }
 
     .orb-btn {
-      width: 126px;
-      height: 126px;
+      width: 128px;
+      height: 128px;
       border-radius: 50%;
       border: none;
       background: radial-gradient(circle at 35% 35%, #3b82f6, #1d4ed8 70%, #1e3a8a 100%);
@@ -189,13 +265,13 @@
 
     .orb-btn.listening {
       background: radial-gradient(circle at 35% 35%, #22c55e, #15803d 70%, #14532d 100%);
-      box-shadow: 0 0 40px rgba(34, 197, 94, 0.65), inset 0 2px 6px rgba(255, 255, 255, 0.35);
-      animation: pulseOrb 1.6s infinite ease-in-out;
+      box-shadow: 0 0 42px rgba(34, 197, 94, 0.7), inset 0 2px 6px rgba(255, 255, 255, 0.35);
+      animation: pulseOrb 1.5s infinite ease-in-out;
     }
 
     .orb-btn.speaking {
       background: radial-gradient(circle at 35% 35%, #8b5cf6, #6d28d9 70%, #4c1d95 100%);
-      box-shadow: 0 0 40px rgba(139, 92, 246, 0.65);
+      box-shadow: 0 0 42px rgba(139, 92, 246, 0.7);
     }
 
     @keyframes pulseOrb {
@@ -216,7 +292,7 @@
       padding: 0 8px;
     }
 
-    /* Ask in English & Text Input Bar */
+    /* ACTION & INPUT ROWS */
     .action-row {
       display: flex;
       gap: 10px;
@@ -239,6 +315,20 @@
       gap: 8px;
     }
 
+    .stop-audio-btn {
+      background: #991b1b;
+      border: 1px solid #ef4444;
+      color: #ffffff;
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     .input-row {
       display: flex;
       gap: 10px;
@@ -246,7 +336,7 @@
 
     .text-input {
       flex: 1;
-      background: #111827;
+      background: var(--bg-card);
       border: 1px solid #1f2937;
       color: #ffffff;
       padding: 14px 16px;
@@ -256,7 +346,7 @@
     }
 
     .text-input:focus {
-      border-color: #3b82f6;
+      border-color: var(--border-highlight);
     }
 
     .send-btn {
@@ -270,23 +360,27 @@
       cursor: pointer;
     }
 
-    /* =====================================================
-       LIVE TUTOR CALL MODE OVERLAY (Full-Screen Interface)
-       ===================================================== */
+    /* =========================================================
+       FULL-SCREEN LIVE TUTOR CALL OVERLAY (GEMINI LIVE STYLE)
+       ========================================================= */
     .live-overlay {
       position: fixed;
       inset: 0;
       background: #070b14;
       z-index: 9999;
-      display: flex;
+      display: none;
       flex-direction: column;
       justify-content: space-between;
       padding: 14px;
-      animation: fadeIn 0.2s ease-out;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
+    .live-overlay.open {
+      display: flex;
+      animation: fadeSlideUp 0.2s ease-out;
+    }
+
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
@@ -294,16 +388,17 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-bottom: 12px;
-      border-bottom: 1px solid #1e293b;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
       gap: 8px;
+      flex-wrap: wrap;
     }
 
     .status-pill {
       display: flex;
       align-items: center;
       gap: 8px;
-      background: #111827;
+      background: var(--bg-card);
       border: 1px solid #1f2937;
       padding: 6px 12px;
       border-radius: 20px;
@@ -316,12 +411,13 @@
       width: 9px;
       height: 9px;
       border-radius: 50%;
+      background: var(--accent-green);
     }
 
     .level-selector {
       display: flex;
-      background: #111827;
-      border: 1px solid #1e293b;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
       border-radius: 10px;
       overflow: hidden;
     }
@@ -337,13 +433,13 @@
     }
 
     .level-btn.active {
-      background: #2563eb;
+      background: var(--accent-blue);
       color: #ffffff;
     }
 
     .end-call-btn {
-      background: rgba(239, 68, 68, 0.15);
-      border: 1px solid rgba(239, 68, 68, 0.4);
+      background: rgba(239, 68, 68, 0.16);
+      border: 1px solid rgba(239, 68, 68, 0.45);
       color: #fca5a5;
       padding: 7px 12px;
       border-radius: 10px;
@@ -352,21 +448,51 @@
       cursor: pointer;
     }
 
-    /* Live Stream Body */
+    /* AUDIO WAVEFORM BAR */
+    .wave-bar-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      height: 26px;
+      margin: 6px 0;
+    }
+
+    .wave-bar {
+      width: 4px;
+      height: 8px;
+      border-radius: 4px;
+      background: #3b82f6;
+      transition: height 0.15s ease;
+    }
+
+    .wave-bar-container.active .wave-bar:nth-child(1) { animation: waveAnim 0.7s infinite 0.0s; }
+    .wave-bar-container.active .wave-bar:nth-child(2) { animation: waveAnim 0.7s infinite 0.15s; }
+    .wave-bar-container.active .wave-bar:nth-child(3) { animation: waveAnim 0.7s infinite 0.3s; }
+    .wave-bar-container.active .wave-bar:nth-child(4) { animation: waveAnim 0.7s infinite 0.1s; }
+    .wave-bar-container.active .wave-bar:nth-child(5) { animation: waveAnim 0.7s infinite 0.25s; }
+    .wave-bar-container.active .wave-bar:nth-child(6) { animation: waveAnim 0.7s infinite 0.05s; }
+
+    @keyframes waveAnim {
+      0%, 100% { height: 6px; }
+      50% { height: 24px; }
+    }
+
+    /* LIVE STREAM BODY */
     .live-stream-body {
       flex: 1;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      padding: 14px 2px;
+      gap: 12px;
+      padding: 8px 2px;
     }
 
     .stream-box {
       border-radius: 16px;
-      padding: 15px;
-      border: 1px solid #1e293b;
-      background: #0f172a;
+      padding: 14px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card-alt);
     }
 
     .stream-box.user-box {
@@ -375,7 +501,7 @@
     }
 
     .stream-box.ai-box {
-      background: #111827;
+      background: var(--bg-card);
       border-color: #334155;
     }
 
@@ -385,14 +511,14 @@
       align-items: center;
       font-size: 11px;
       font-weight: 800;
-      letter-spacing: 0.8px;
+      letter-spacing: 0.7px;
       color: #64748b;
       margin-bottom: 8px;
       text-transform: uppercase;
     }
 
     .live-user-transcript {
-      font-size: 20px;
+      font-size: 19px;
       font-weight: 600;
       line-height: 1.4;
       color: #f8fafc;
@@ -404,12 +530,19 @@
       font-style: italic;
     }
 
-    /* Grammar & Fluency Coach Card */
+    /* LIVE FLUENCY & GRAMMAR COACH CARD */
     .coach-card {
       background: linear-gradient(135deg, #172554 0%, #1e1b4b 100%);
       border: 1px solid #3b82f6;
       border-radius: 14px;
       padding: 14px;
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .coach-card.visible {
+      display: flex;
     }
 
     .coach-title {
@@ -417,17 +550,16 @@
       font-weight: 800;
       color: #93c5fd;
       text-transform: uppercase;
-      letter-spacing: 0.6px;
-      margin-bottom: 8px;
+      letter-spacing: 0.5px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 8px;
     }
 
-    .coach-item {
+    .coach-row {
       font-size: 14px;
       line-height: 1.45;
-      margin-bottom: 6px;
     }
 
     .tag-fix {
@@ -446,63 +578,17 @@
       font-size: 12px;
       color: #cbd5e1;
       font-style: italic;
-      margin-top: 6px;
+      margin-top: 4px;
       padding-top: 6px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
     }
 
-    /* Word-by-Word Breakdown Drawer */
-    .breakdown-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
-      gap: 8px;
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid #1e293b;
-    }
-
-    .word-chip {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 10px;
-      padding: 8px 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .word-chip-es {
-      font-weight: 700;
-      color: #ffffff;
-      font-size: 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .word-chip-en {
-      font-size: 12px;
-      color: #94a3b8;
-    }
-
-    .srs-add-mini {
-      background: #2563eb;
-      border: none;
-      color: #fff;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    /* Live Footer Controls */
+    /* LIVE FOOTER */
     .live-footer {
-      border-top: 1px solid #1e293b;
-      padding-top: 12px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 10px;
       display: flex;
       flex-direction: column;
-      align-items: center;
       gap: 10px;
     }
 
@@ -510,43 +596,105 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 16px;
-      width: 100%;
+      gap: 14px;
     }
 
-    .secondary-circle-btn {
+    .secondary-btn {
       background: #1e293b;
       border: 1px solid #334155;
       color: #e2e8f0;
-      padding: 10px 14px;
+      padding: 10px 13px;
       border-radius: 12px;
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
     }
 
-    /* Modal for API Key / Settings */
+    /* CARDS & GRIDS FOR OTHER TABS */
+    .section-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .pill-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .filter-pill {
+      background: #131c31;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 7px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .filter-pill.active {
+      background: var(--accent-blue);
+      border-color: #60a5fa;
+      color: #ffffff;
+    }
+
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    .matrix-table th,
+    .matrix-table td {
+      border: 1px solid var(--border-color);
+      padding: 9px 10px;
+      text-align: left;
+    }
+
+    .matrix-table th {
+      background: #172036;
+      color: #93c5fd;
+      font-weight: 700;
+    }
+
+    .matrix-table td {
+      background: #0f172a;
+    }
+
+    /* MODAL */
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(0, 0, 0, 0.78);
       z-index: 10000;
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
       padding: 16px;
     }
 
+    .modal-backdrop.open {
+      display: flex;
+    }
+
     .modal-card {
-      background: #111827;
+      background: var(--bg-card);
       border: 1px solid #334155;
       border-radius: 16px;
       padding: 20px;
       width: 100%;
-      max-width: 420px;
+      max-width: 440px;
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -554,810 +702,1193 @@
   </style>
 </head>
 <body>
-  <div id="root"></div>
 
-  <script type="text/babel">
-    const { useState, useEffect, useRef } = React;
+  <!-- TOP NAVIGATION BAR -->
+  <nav class="top-nav">
+    <button class="nav-tab" data-tab="lens" onclick="switchTab('lens')">
+      <span class="nav-tab-icon">📸</span>
+      <span>Lens/Sl...</span>
+    </button>
 
-    // Default initial greeting matching your exact UI
-    const INITIAL_YORDANIS_MESSAGE = {
+    <button class="nav-tab active" data-tab="free_ai" onclick="switchTab('free_ai')">
+      <span class="nav-tab-icon">🎙️</span>
+      <span>Free AI</span>
+    </button>
+
+    <button class="nav-tab" data-tab="media" onclick="switchTab('media')">
+      <span class="nav-tab-icon">🎧</span>
+      <span>Media/...</span>
+    </button>
+
+    <button class="nav-tab" data-tab="srs" onclick="switchTab('srs')">
+      <span class="nav-tab-icon">🧠</span>
+      <span id="srs-nav-label">SRS (4)</span>
+    </button>
+
+    <button class="nav-tab" data-tab="drills" onclick="switchTab('drills')">
+      <span class="nav-tab-icon">🎯</span>
+      <span>Drills</span>
+    </button>
+
+    <button class="tabs-pill-btn" onclick="openSettingsModal()">
+      <span>⚙️</span>
+      <span>Tabs</span>
+    </button>
+  </nav>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="main-container">
+
+    <!-- =======================================================
+         TAB 1: FREE AI (MAIN YORDANIS INTERFACE)
+         ======================================================= -->
+    <section id="tab-free_ai" class="tab-panel active">
+      <div class="tutor-card">
+        <div class="spanish-main-text">
+          <span id="main-es-text">¡Qué bola, asere! Soy Yordanis. Toca el círculo para hablar en español, o usa el botón en inglés abajo si quieres saber cómo se dice una palabra.</span>
+          <button class="breakdown-btn" onclick="toggleBreakdown('main-breakdown')">🔍 Breakdown</button>
+        </div>
+
+        <div class="phonetic-box" id="main-phonetic-text" onclick="speakSpanishText(currentTutorState.replySpanish)" title="Tap to hear pronunciation">
+          🔊 [keh · boh-lah · ah-seh-reh · sohy · yohr-dah-neh · toh-kah · ehl · keer-koo-loh · pah-rah · ah-blahr · ehn · ehs-pah-nyohl · oh · oo-sah · ehl · boh-tohn · ehn · eeng-lehs · ah-bah-hoh · see · keh-rehs · sah-behr · koh-moh · seh · dee-seh · oo-nah · pah-lah-brah]
+        </div>
+
+        <div class="english-subtext" id="main-en-text">
+          What's up, bro! I'm Yordanis. Tap the orb to speak Spanish, or use the English button below to ask how to say any English word.
+        </div>
+
+        <div id="main-breakdown" class="breakdown-grid"></div>
+      </div>
+
+      <!-- BIG BLUE SPEAK SPANISH ORB -->
+      <div class="orb-stage">
+        <button class="orb-btn" onclick="openLiveTutorCall('es')">
+          <span class="orb-icon">🎙️</span>
+          <span class="orb-label">SPEAK SPANISH</span>
+        </button>
+      </div>
+
+      <!-- ASK IN ENGLISH & STOP ROW -->
+      <div class="action-row">
+        <button class="english-ask-btn" onclick="openLiveTutorCall('en')">
+          <span>🇺🇸</span>
+          <span>Ask in English ("How do I say...")</span>
+        </button>
+        <button class="stop-audio-btn" onclick="stopAllVoiceAndMic()">
+          <span>⏹️</span>
+          <span>Stop</span>
+        </button>
+      </div>
+
+      <!-- TEXT INPUT ROW -->
+      <div class="input-row">
+        <input
+          type="text"
+          id="main-text-input"
+          class="text-input"
+          placeholder="Or type Spanish / English question here"
+          onkeydown="if(event.key === 'Enter') handleMainTextSubmit()"
+        />
+        <button class="send-btn" onclick="handleMainTextSubmit()">Send</button>
+      </div>
+    </section>
+
+    <!-- =======================================================
+         TAB 2: LENS & STREET SLANG
+         ======================================================= -->
+    <section id="tab-lens" class="tab-panel">
+      <div class="tutor-card">
+        <div class="section-title">
+          <span>📸 Street Slang & Regional Expressions</span>
+        </div>
+        <div class="pill-row" id="slang-region-pills">
+          <button class="filter-pill active" onclick="renderSlangList('cuba', this)">🇨🇺 Cuba (Yordanis)</button>
+          <button class="filter-pill" onclick="renderSlangList('mexico', this)">🇲🇽 México</button>
+          <button class="filter-pill" onclick="renderSlangList('pr', this)">🇵🇷 Puerto Rico</button>
+          <button class="filter-pill" onclick="renderSlangList('colombia', this)">🇨🇴 Colombia</button>
+        </div>
+        <div id="slang-list-container" style="display:flex; flex-direction:column; gap:10px;"></div>
+      </div>
+
+      <div class="tutor-card">
+        <div class="section-title">🔎 Instant Phrase / Slang Analyzer</div>
+        <p class="english-subtext" style="text-align:left; margin-bottom:10px;">
+          Paste or type any Spanish sign, menu item, or street phrase for an instant phonetic & literal breakdown.
+        </p>
+        <div class="input-row">
+          <input type="text" id="lens-input" class="text-input" placeholder="e.g., ¿Qué onda güey? / No manches" />
+          <button class="send-btn" onclick="analyzeSlangPhrase()">Analyze</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================
+         TAB 3: MEDIA & SONG / ANIME TRANSLATOR
+         ======================================================= -->
+    <section id="tab-media" class="tab-panel">
+      <div class="tutor-card">
+        <div class="section-title">🎧 Song Lyrics & Anime Line Breakdown</div>
+        <p class="english-subtext" style="text-align:left; margin-bottom:12px;">
+          Tap any line to hear it spoken at natural or slow speed, or paste lyrics/dialogue below.
+        </p>
+        <div id="media-lines-container" style="display:flex; flex-direction:column; gap:10px;"></div>
+        <div class="input-row" style="margin-top:12px;">
+          <input type="text" id="media-custom-input" class="text-input" placeholder="Paste a Spanish lyric or anime quote..." />
+          <button class="send-btn" onclick="addCustomMediaLine()">Break Down</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================
+         TAB 4: SRS FLASHCARDS
+         ======================================================= -->
+    <section id="tab-srs" class="tab-panel">
+      <div class="tutor-card">
+        <div class="section-title">
+          <span>🧠 Spaced Repetition Deck</span>
+          <button class="mini-btn" onclick="speakAllSrsCards()">🔊 Play All</button>
+        </div>
+        <div class="input-row" style="margin: 10px 0;">
+          <input type="text" id="new-srs-es" class="text-input" placeholder="Spanish word/phrase..." />
+          <input type="text" id="new-srs-en" class="text-input" placeholder="English meaning..." />
+          <button class="send-btn" onclick="handleManualAddSrs()">+ Add</button>
+        </div>
+        <div id="srs-deck-container" style="display:flex; flex-direction:column; gap:10px; margin-top:10px;"></div>
+      </div>
+    </section>
+
+    <!-- =======================================================
+         TAB 5: DRILLS & TONY MARSH VERB MATRIX
+         ======================================================= -->
+    <section id="tab-drills" class="tab-panel">
+      <div class="tutor-card">
+        <div class="section-title">
+          <span>🎯 Verb Matrix & Conjugation Drills</span>
+          <button class="mini-btn" onclick="openLiveTutorCall('es')">🎙️ Drill Live</button>
+        </div>
+        <div class="pill-row" id="verb-selector-pills"></div>
+        <div id="verb-matrix-container"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================
+       FULL-SCREEN LIVE TUTOR CALL OVERLAY
+       ========================================================= -->
+  <div id="live-call-modal" class="live-overlay">
+    <!-- Top Header -->
+    <div class="live-header">
+      <div class="status-pill">
+        <span id="live-status-dot" class="status-dot"></span>
+        <span id="live-status-text">Listening Live...</span>
+      </div>
+
+      <div class="level-selector">
+        <button class="level-btn" data-lvl="A1" onclick="setStudentLevel('A1')">A1</button>
+        <button class="level-btn active" data-lvl="A2" onclick="setStudentLevel('A2')">A2</button>
+        <button class="level-btn" data-lvl="B1" onclick="setStudentLevel('B1')">B1</button>
+        <button class="level-btn" data-lvl="B2" onclick="setStudentLevel('B2')">B2</button>
+      </div>
+
+      <button class="end-call-btn" onclick="closeLiveTutorCall()">✕ End Call</button>
+    </div>
+
+    <!-- Animated Waveform -->
+    <div id="live-waveform" class="wave-bar-container active">
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+    </div>
+
+    <!-- Live Transcript & Coaching Stream -->
+    <div class="live-stream-body">
+
+      <!-- 1. User's Real-Time Speech Stream -->
+      <div class="stream-box user-box">
+        <div class="box-header">
+          <span id="live-user-header">🎙️ YOU (SPEAKING SPANISH)</span>
+          <span id="live-mic-badge" style="color:#22c55e;">● MIC LIVE</span>
+        </div>
+        <div class="live-user-transcript">
+          <span id="live-final-span"></span>
+          <span id="live-interim-span" class="interim-words"></span>
+          <span id="live-placeholder-span" style="color:#64748b; font-style:italic; font-size:15px;">
+            Start speaking... your words appear here live as you talk.
+          </span>
+        </div>
+      </div>
+
+      <!-- 2. Real-Time Fluency & Grammar Coach Card -->
+      <div id="live-coach-card" class="coach-card">
+        <div class="coach-title">
+          <span id="coach-badge-title">💡 Live Grammar & Fluency Coach</span>
+          <div style="display:flex; gap:6px;">
+            <button class="mini-btn" onclick="speakNativeSuggestion()">🔊 Hear Native</button>
+            <button class="mini-btn" style="background:#15803d;" onclick="saveNativeSuggestionToSrs()">+SRS</button>
+          </div>
+        </div>
+
+        <div id="coach-correction-row" class="coach-row">
+          <span class="tag-fix">Correction:</span>
+          <span id="coach-correction-text"></span>
+        </div>
+
+        <div id="coach-fluent-row" class="coach-row">
+          <span class="tag-fluent">More Fluent Way:</span>
+          <strong id="coach-fluent-text" style="color:#ffffff;"></strong>
+        </div>
+
+        <div id="coach-tip-text" class="coach-tip"></div>
+      </div>
+
+      <!-- 3. Yordanis Live Word-by-Word Response Stream -->
+      <div class="stream-box ai-box">
+        <div class="box-header">
+          <span>🧑‍🏫 YORDANIS (LIVE TUTOR)</span>
+          <button class="breakdown-btn" onclick="toggleBreakdown('live-breakdown')">🔍 Breakdown</button>
+        </div>
+
+        <div id="live-ai-es-text" class="spanish-main-text" style="text-align:left; margin-bottom:10px;">
+          ¡Qué bola! Estoy escuchando. Habla tranquilo y yo te ayudo a sonar más natural.
+        </div>
+
+        <div id="live-ai-phonetic" class="phonetic-box" style="text-align:left;" onclick="speakSpanishText(currentTutorState.replySpanish)">
+          🔊 [keh · boh-lah · ehs-tohy · ehs-koo-chahn-doh]
+        </div>
+
+        <div id="live-ai-en-text" class="english-subtext" style="text-align:left;">
+          What's up! I'm listening. Speak comfortably and I'll help you sound more natural.
+        </div>
+
+        <div id="live-breakdown" class="breakdown-grid"></div>
+      </div>
+    </div>
+
+    <!-- Bottom Live Call Controls -->
+    <div class="live-footer">
+      <div class="live-controls-row">
+        <button class="secondary-btn" onclick="speakSpanishText(currentTutorState.replySpanish, 0.75)">
+          🐢 Slow (0.75x)
+        </button>
+
+        <button id="live-orb-btn" class="orb-btn listening" style="width:102px; height:102px;" onclick="handleLiveOrbTap()">
+          <span class="orb-icon">🎙️</span>
+          <span id="live-orb-label" class="orb-label">TAP IF DONE</span>
+        </button>
+
+        <button class="secondary-btn" onclick="switchLiveMicLanguage()">
+          <span id="live-lang-toggle-label">🇺🇸 Ask English</span>
+        </button>
+      </div>
+
+      <!-- Quick fallback input inside live call -->
+      <div class="input-row">
+        <input
+          type="text"
+          id="live-text-input"
+          class="text-input"
+          placeholder="Or type here during the live call..."
+          onkeydown="if(event.key === 'Enter') handleLiveTextSubmit()"
+        />
+        <button class="send-btn" onclick="handleLiveTextSubmit()">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       SETTINGS / API KEY MODAL (⚙️ Tabs)
+       ========================================================= -->
+  <div id="settings-modal" class="modal-backdrop" onclick="closeSettingsModal()">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <div class="section-title">
+        <span>⚙️ Tutor Settings & API Key</span>
+      </div>
+      <p style="font-size:13px; color:#94a3b8; line-height:1.4;">
+        Enter your Gemini API key below for unlimited dynamic AI responses. (Even without a key, Yordanis's built-in smart coaching engine works offline!)
+      </p>
+      <input
+        type="password"
+        id="api-key-input"
+        class="text-input"
+        placeholder="Paste Gemini API Key (AIzaSy...)"
+      />
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:6px;">
+        <button class="secondary-btn" onclick="closeSettingsModal()">Cancel</button>
+        <button class="send-btn" style="padding:10px 18px;" onclick="saveSettingsApiKey()">Save Key</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       APPLICATION JAVASCRIPT (ZERO EXTERNAL DEPENDENCIES)
+       ========================================================= -->
+  <script>
+    // --- STATE ---
+    let studentLevel = "A2";
+    let isLiveModalOpen = false;
+    let liveMicLang = "es"; // "es" or "en"
+    let callPhase = "idle"; // "listening" | "thinking" | "speaking" | "paused"
+    let recognitionInstance = null;
+    let silenceTimer = null;
+    let wordStreamTimer = null;
+    let accumulatedTranscript = "";
+    let currentInterimTranscript = "";
+
+    let currentTutorState = {
+      userOriginal: "",
+      isNatural: true,
+      correction: "",
+      moreFluentWay: "¡Qué bola, asere! Vamos a practicar español.",
+      coachingTip: "Use natural greetings to jump right into conversation.",
       replySpanish: "¡Qué bola, asere! Soy Yordanis. Toca el círculo para hablar en español, o usa el botón en inglés abajo si quieres saber cómo se dice una palabra.",
       replyPhonetic: "[keh · boh-lah · ah-seh-reh · sohy · yohr-dah-neh · toh-kah · ehl · keer-koo-loh · pah-rah · ah-blahr · ehn · ehs-pah-nyohl · oh · oo-sah · ehl · boh-tohn · ehn · eeng-lehs · ah-bah-hoh · see · keh-rehs · sah-behr · koh-moh · seh · dee-seh · oo-nah · pah-lah-brah]",
       replyEnglish: "What's up, bro! I'm Yordanis. Tap the orb to speak Spanish, or use the English button below to ask how to say any English word.",
-      isNatural: true,
-      correction: "",
-      moreFluentWay: "",
-      coachingTip: "",
       wordBreakdown: [
-        { es: "¡Qué bola, asere!", en: "What's up, bro! (Cuban/street greeting)" },
-        { es: "Toca el círculo", en: "Tap the circle/orb" },
+        { es: "¡Qué bola, asere!", en: "What's up, bro! (Cuban greeting)" },
+        { es: "Toca el círculo", en: "Tap the orb/circle" },
         { es: "para hablar", en: "in order to speak" },
         { es: "si quieres saber", en: "if you want to know" },
-        { es: "cómo se dice", en: "how one says / how to say" }
+        { es: "cómo se dice", en: "how to say" }
       ]
     };
 
-    // Helper to read any existing API key stored in browser localStorage
-    function getStoredApiKey() {
-      const possibleKeys = [
-        "gemini_api_key",
-        "GEMINI_API_KEY",
-        "apiKey",
-        "vozzy_api_key",
-        "spanish_api_key"
-      ];
-      for (const k of possibleKeys) {
-        const val = localStorage.getItem(k);
-        if (val && val.trim().length > 10) return val.trim();
-      }
+    // --- SAFE LOCALSTORAGE HELPERS ---
+    function getSavedApiKey() {
+      try {
+        const keys = ["gemini_api_key", "GEMINI_API_KEY", "apiKey", "vozzy_api_key", "spanish_api_key"];
+        for (let i = 0; i < keys.length; i++) {
+          const val = localStorage.getItem(keys[i]);
+          if (val && val.trim().length > 10) return val.trim();
+        }
+      } catch (e) {}
       return "";
     }
 
-    function App() {
-      const [activeTab, setActiveTab] = useState("free_ai");
-      const [apiKey, setApiKey] = useState(getStoredApiKey);
-      const [showSettings, setShowSettings] = useState(false);
+    function loadSrsDeck() {
+      const defaultDeck = [
+        { id: 1, es: "¿Cómo se dice...?", en: "How do you say...?", phonetic: "[koh-moh · seh · dee-seh]" },
+        { id: 2, es: "Compartir", en: "To share", phonetic: "[kohm-pahr-teer]" },
+        { id: 3, es: "Hasta luego", en: "See you later", phonetic: "[ahs-tah · lweh-goh]" },
+        { id: 4, es: "Ahorita vengo", en: "I'll be right back", phonetic: "[ah-oh-ree-tah · behn-goh]" }
+      ];
+      try {
+        const raw = localStorage.getItem("yordanis_srs_cards");
+        if (!raw) return defaultDeck;
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) && parsed.length > 0 ? parsed : defaultDeck;
+      } catch (e) {
+        return defaultDeck;
+      }
+    }
 
-      // Main Free AI State
-      const [currentMessage, setCurrentMessage] = useState(INITIAL_YORDANIS_MESSAGE);
-      const [showBreakdown, setShowBreakdown] = useState(false);
-      const [inputText, setInputText] = useState("");
-      const [cefrLevel, setCefrLevel] = useState("A2"); // A1, A2, B1, B2
+    let srsDeck = loadSrsDeck();
 
-      // Live Call Interface State
-      const [isLiveCallOpen, setIsLiveCallOpen] = useState(false);
-      const [liveModeType, setLiveModeType] = useState("es"); // "es" (Speak Spanish) or "en" (Ask in English)
-      const [callStatus, setCallStatus] = useState("listening"); // "listening" | "thinking" | "speaking" | "paused"
-      const [liveFinalText, setLiveFinalText] = useState("");
-      const [liveInterimText, setLiveInterimText] = useState("");
-      const [streamedAiWords, setStreamedAiWords] = useState(INITIAL_YORDANIS_MESSAGE.replySpanish);
+    function saveSrsDeck() {
+      try {
+        localStorage.setItem("yordanis_srs_cards", JSON.stringify(srsDeck));
+      } catch (e) {}
+      const label = document.getElementById("srs-nav-label");
+      if (label) label.textContent = "SRS (" + srsDeck.length + ")";
+      renderSrsDeck();
+    }
 
-      // SRS Flashcards State
-      const [srsCards, setSrsCards] = useState(() => {
-        const saved = localStorage.getItem("yordanis_srs_cards");
-        return saved ? JSON.parse(saved) : [
-          { id: 1, es: "¿Cómo se dice...?", en: "How do you say...?", phonetic: "[koh-moh · seh · dee-seh]" },
-          { id: 2, es: "Compartir", en: "To share", phonetic: "[kohm-pahr-teer]" },
-          { id: 3, es: "Hasta luego", en: "See you later", phonetic: "[ahs-tah · lweh-goh]" },
-          { id: 4, es: "Ahorita vengo", en: "I'll be right back", phonetic: "[ah-oh-ree-tah · behn-goh]" }
-        ];
+    // --- TAB NAVIGATION ---
+    function switchTab(tabId) {
+      const tabs = document.querySelectorAll(".nav-tab");
+      tabs.forEach((btn) => {
+        btn.classList.toggle("active", btn.getAttribute("data-tab") === tabId);
       });
+      const panels = document.querySelectorAll(".tab-panel");
+      panels.forEach((panel) => {
+        panel.classList.toggle("active", panel.id === "tab-" + tabId);
+      });
+    }
 
-      // Refs for Speech Recognition & Timers
-      const recognitionRef = useRef(null);
-      const silenceTimerRef = useRef(null);
-      const wordStreamTimerRef = useRef(null);
-      const accumulatedSpeechRef = useRef("");
+    function toggleBreakdown(containerId) {
+      const el = document.getElementById(containerId);
+      if (el) el.classList.toggle("open");
+    }
 
-      useEffect(() => {
-        localStorage.setItem("yordanis_srs_cards", JSON.stringify(srsCards));
-      }, [srsCards]);
+    function renderBreakdowns() {
+      const items = currentTutorState.wordBreakdown || [];
+      const html = items.map((item) => {
+        const safeEs = escapeHtml(item.es || "");
+        const safeEn = escapeHtml(item.en || "");
+        return `
+          <div class="word-chip">
+            <div class="word-chip-top">
+              <span>${safeEs}</span>
+              <button class="mini-btn" onclick="addSrsCard('${safeEs.replace(/'/g, "\\'")}', '${safeEn.replace(/'/g, "\\'")}')">+SRS</button>
+            </div>
+            <div class="word-chip-en">${safeEn}</div>
+          </div>
+        `;
+      }).join("");
 
-      const saveApiKey = (newKey) => {
-        const cleaned = newKey.trim();
-        setApiKey(cleaned);
-        localStorage.setItem("gemini_api_key", cleaned);
-        setShowSettings(false);
+      const mainBd = document.getElementById("main-breakdown");
+      const liveBd = document.getElementById("live-breakdown");
+      if (mainBd) mainBd.innerHTML = html;
+      if (liveBd) liveBd.innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    // --- UPDATE MAIN & LIVE UI CARDS ---
+    function syncTutorDisplay(streamWords = false) {
+      document.getElementById("main-es-text").textContent = currentTutorState.replySpanish;
+      document.getElementById("main-phonetic-text").textContent = "🔊 " + (currentTutorState.replyPhonetic || "");
+      document.getElementById("main-en-text").textContent = currentTutorState.replyEnglish || "";
+
+      document.getElementById("live-ai-phonetic").textContent = "🔊 " + (currentTutorState.replyPhonetic || "");
+      document.getElementById("live-ai-en-text").textContent = currentTutorState.replyEnglish || "";
+      if (!streamWords) {
+        document.getElementById("live-ai-es-text").textContent = currentTutorState.replySpanish;
+      }
+
+      // Update Live Grammar & Fluency Coach Card
+      const coachCard = document.getElementById("live-coach-card");
+      if (currentTutorState.correction || currentTutorState.moreFluentWay) {
+        coachCard.classList.add("visible");
+        document.getElementById("coach-badge-title").textContent = currentTutorState.isNatural
+          ? "✅ Sounds Native! (+ Fluent Alternative)"
+          : "💡 Live Grammar & Fluency Coach";
+
+        const corrRow = document.getElementById("coach-correction-row");
+        if (currentTutorState.correction && !currentTutorState.isNatural) {
+          corrRow.style.display = "block";
+          document.getElementById("coach-correction-text").textContent = currentTutorState.correction;
+        } else {
+          corrRow.style.display = "none";
+        }
+
+        const fluentRow = document.getElementById("coach-fluent-row");
+        if (currentTutorState.moreFluentWay) {
+          fluentRow.style.display = "block";
+          document.getElementById("coach-fluent-text").textContent = '"' + currentTutorState.moreFluentWay + '"';
+        } else {
+          fluentRow.style.display = "none";
+        }
+
+        document.getElementById("coach-tip-text").textContent = currentTutorState.coachingTip || "";
+      }
+
+      renderBreakdowns();
+    }
+
+    // --- LIVE TUTOR CALL INTERFACE ---
+    function openLiveTutorCall(mode) {
+      liveMicLang = mode || "es";
+      isLiveModalOpen = true;
+      document.getElementById("live-call-modal").classList.add("open");
+      updateLiveLangUI();
+      startLiveSpeechRecognition();
+    }
+
+    function closeLiveTutorCall() {
+      isLiveModalOpen = false;
+      stopAllVoiceAndMic();
+      document.getElementById("live-call-modal").classList.remove("open");
+    }
+
+    function setStudentLevel(lvl) {
+      studentLevel = lvl;
+      document.querySelectorAll(".level-btn").forEach((b) => {
+        b.classList.toggle("active", b.getAttribute("data-lvl") === lvl);
+      });
+    }
+
+    function switchLiveMicLanguage() {
+      liveMicLang = liveMicLang === "es" ? "en" : "es";
+      updateLiveLangUI();
+      startLiveSpeechRecognition();
+    }
+
+    function updateLiveLangUI() {
+      const userHeader = document.getElementById("live-user-header");
+      const toggleLabel = document.getElementById("live-lang-toggle-label");
+      const placeholder = document.getElementById("live-placeholder-span");
+
+      if (liveMicLang === "en") {
+        userHeader.textContent = "🇺🇸 YOU (ASKING IN ENGLISH)";
+        toggleLabel.textContent = "🇪🇸 Speak Spanish";
+        placeholder.textContent = 'Ask in English (e.g., "How do I ask for the check?")...';
+      } else {
+        userHeader.textContent = "🎙️ YOU (" + studentLevel + " SPANISH)";
+        toggleLabel.textContent = "🇺🇸 Ask English";
+        placeholder.textContent = "Habla en español... tus palabras aparecerán aquí en vivo.";
+      }
+    }
+
+    function setLivePhaseUI(phase) {
+      callPhase = phase;
+      const dot = document.getElementById("live-status-dot");
+      const text = document.getElementById("live-status-text");
+      const orb = document.getElementById("live-orb-btn");
+      const orbLabel = document.getElementById("live-orb-label");
+      const wave = document.getElementById("live-waveform");
+      const micBadge = document.getElementById("live-mic-badge");
+
+      orb.classList.remove("listening", "speaking");
+
+      if (phase === "listening") {
+        dot.style.background = "#22c55e";
+        text.textContent = liveMicLang === "en" ? "Listening (English)..." : "Listening (Español)...";
+        orb.classList.add("listening");
+        orbLabel.textContent = "TAP IF DONE";
+        wave.classList.add("active");
+        micBadge.textContent = "● MIC LIVE";
+        micBadge.style.color = "#22c55e";
+      } else if (phase === "thinking") {
+        dot.style.background = "#f59e0b";
+        text.textContent = "Yordanis is coaching...";
+        orbLabel.textContent = "THINKING...";
+        wave.classList.add("active");
+        micBadge.textContent = "ANALYZING";
+        micBadge.style.color = "#f59e0b";
+      } else if (phase === "speaking") {
+        dot.style.background = "#8b5cf6";
+        text.textContent = "Yordanis is speaking...";
+        orb.classList.add("speaking");
+        orbLabel.textContent = "INTERRUPT";
+        wave.classList.add("active");
+        micBadge.textContent = "TUTOR SPEAKING";
+        micBadge.style.color = "#a78bfa";
+      } else {
+        dot.style.background = "#64748b";
+        text.textContent = "Tap orb to talk";
+        orbLabel.textContent = "SPEAK SPANISH";
+        wave.classList.remove("active");
+        micBadge.textContent = "PAUSED";
+        micBadge.style.color = "#64748b";
+      }
+    }
+
+    function stopAllVoiceAndMic() {
+      if (silenceTimer) clearTimeout(silenceTimer);
+      if (wordStreamTimer) clearInterval(wordStreamTimer);
+      if (recognitionInstance) {
+        recognitionInstance.onend = null;
+        recognitionInstance.onerror = null;
+        try { recognitionInstance.stop(); } catch (e) {}
+      }
+      if (window.speechSynthesis) {
+        try { window.speechSynthesis.cancel(); } catch (e) {}
+      }
+      setLivePhaseUI("paused");
+    }
+
+    function handleLiveOrbTap() {
+      if (callPhase === "listening") {
+        finalizeUserSpeechAndReply();
+      } else {
+        startLiveSpeechRecognition();
+      }
+    }
+
+    function startLiveSpeechRecognition() {
+      stopAllVoiceAndMic();
+      accumulatedTranscript = "";
+      currentInterimTranscript = "";
+      document.getElementById("live-final-span").textContent = "";
+      document.getElementById("live-interim-span").textContent = "";
+      document.getElementById("live-placeholder-span").style.display = "inline";
+
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRec) {
+        setLivePhaseUI("paused");
+        document.getElementById("live-placeholder-span").textContent =
+          "Voice recognition requires Chrome/Edge. Type your message below!";
+        return;
+      }
+
+      const rec = new SpeechRec();
+      rec.lang = liveMicLang === "en" ? "en-US" : "es-MX";
+      rec.continuous = true;
+      rec.interimResults = true;
+
+      rec.onstart = function () {
+        setLivePhaseUI("listening");
       };
 
-      const addWordToSrs = (es, en) => {
-        if (srsCards.some((c) => c.es.toLowerCase() === es.toLowerCase())) return;
-        setSrsCards((prev) => [
-          ...prev,
-          { id: Date.now(), es, en, phonetic: "" }
-        ]);
+      rec.onresult = function (event) {
+        let interim = "";
+        let finalChunk = "";
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const t = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalChunk += t + " ";
+          } else {
+            interim += t;
+          }
+        }
+
+        if (finalChunk) {
+          accumulatedTranscript = (accumulatedTranscript + " " + finalChunk).trim();
+        }
+        currentInterimTranscript = interim;
+
+        const combined = (accumulatedTranscript + " " + currentInterimTranscript).trim();
+        if (combined.length > 0) {
+          document.getElementById("live-placeholder-span").style.display = "none";
+        }
+        document.getElementById("live-final-span").textContent = accumulatedTranscript + " ";
+        document.getElementById("live-interim-span").textContent = currentInterimTranscript;
+
+        if (silenceTimer) clearTimeout(silenceTimer);
+        if (combined.length > 1) {
+          silenceTimer = setTimeout(function () {
+            finalizeUserSpeechAndReply(combined);
+          }, 1850);
+        }
       };
 
-      // =====================================================
-      // CORE AI TUTOR CALL (Level-Adaptive + Live Coaching)
-      // =====================================================
-      const askYordanisAI = async (userSpokenOrTyped, mode = "es") => {
-        const levelDescriptions = {
-          A1: "Beginner (A1): Use very simple, short present-tense sentences, basic high-frequency words, and speak clearly.",
-          A2: "Elementary (A2): Use everyday conversational phrases, basic past/future tenses, and warm encouragement.",
-          B1: "Intermediate (B1): Use natural conversational speed, common idioms, and connected sentences.",
-          B2: "Upper-Intermediate (B2): Speak like a native friend using rich expressions, subjunctive where natural, and nuanced phrasing."
-        };
+      rec.onerror = function (e) {
+        if (e.error !== "aborted") {
+          setLivePhaseUI("paused");
+        }
+      };
 
-        const systemInstruction = `
-You are Yordanis, an intuitive, warm, street-smart personal Spanish tutor having a live real-time voice conversation with your student.
-Target Student Level: ${levelDescriptions[cefrLevel]}
-Input Mode: ${mode === "en" ? "The student is asking a question in English (e.g., how to say something in Spanish)." : "The student is practicing speaking Spanish with you."}
+      recognitionInstance = rec;
+      try {
+        rec.start();
+      } catch (e) {
+        setLivePhaseUI("paused");
+      }
+    }
 
-Respond ONLY in valid JSON matching this exact schema (no markdown backticks):
+    async function finalizeUserSpeechAndReply(explicitText) {
+      if (silenceTimer) clearTimeout(silenceTimer);
+      if (recognitionInstance) {
+        recognitionInstance.onend = null;
+        try { recognitionInstance.stop(); } catch (e) {}
+      }
+
+      const finalSpoken = (
+        explicitText ||
+        (accumulatedTranscript + " " + currentInterimTranscript)
+      ).trim();
+
+      if (!finalSpoken) {
+        setLivePhaseUI("paused");
+        return;
+      }
+
+      document.getElementById("live-placeholder-span").style.display = "none";
+      document.getElementById("live-final-span").textContent = finalSpoken;
+      document.getElementById("live-interim-span").textContent = "";
+      setLivePhaseUI("thinking");
+
+      const responseObj = await generateTutorResponse(finalSpoken, liveMicLang);
+      currentTutorState = responseObj;
+      syncTutorDisplay(true);
+      speakSpanishWithLiveWordStream(responseObj.replySpanish, true);
+    }
+
+    // --- REAL-TIME WORD-BY-WORD TTS STREAMING ---
+    function speakSpanishWithLiveWordStream(spanishText, autoResumeListening, customRate) {
+      if (wordStreamTimer) clearInterval(wordStreamTimer);
+      if (window.speechSynthesis) {
+        try { window.speechSynthesis.cancel(); } catch (e) {}
+      }
+
+      const words = String(spanishText || "").split(/\s+/);
+      let wordIdx = 0;
+      const aiTextEl = document.getElementById("live-ai-es-text");
+      aiTextEl.textContent = "";
+      setLivePhaseUI("speaking");
+
+      const levelRates = { A1: 0.85, A2: 0.92, B1: 0.98, B2: 1.03 };
+      const rate = customRate || levelRates[studentLevel] || 0.94;
+      const msPerWord = Math.round(300 / rate);
+
+      wordStreamTimer = setInterval(function () {
+        wordIdx++;
+        aiTextEl.textContent = words.slice(0, wordIdx).join(" ");
+        if (wordIdx >= words.length) {
+          clearInterval(wordStreamTimer);
+        }
+      }, msPerWord);
+
+      if (!window.speechSynthesis) {
+        setTimeout(function () {
+          aiTextEl.textContent = spanishText;
+          setLivePhaseUI("paused");
+        }, words.length * msPerWord + 300);
+        return;
+      }
+
+      const utter = new SpeechSynthesisUtterance(spanishText);
+      utter.lang = "es-MX";
+      utter.rate = rate;
+
+      utter.onend = function () {
+        if (wordStreamTimer) clearInterval(wordStreamTimer);
+        aiTextEl.textContent = spanishText;
+        if (autoResumeListening && isLiveModalOpen) {
+          liveMicLang = "es";
+          updateLiveLangUI();
+          setTimeout(function () {
+            startLiveSpeechRecognition();
+          }, 450);
+        } else {
+          setLivePhaseUI("paused");
+        }
+      };
+
+      utter.onerror = function () {
+        if (wordStreamTimer) clearInterval(wordStreamTimer);
+        aiTextEl.textContent = spanishText;
+        setLivePhaseUI("paused");
+      };
+
+      try {
+        window.speechSynthesis.speak(utter);
+      } catch (e) {
+        aiTextEl.textContent = spanishText;
+        setLivePhaseUI("paused");
+      }
+    }
+
+    function speakSpanishText(text, customRate) {
+      speakSpanishWithLiveWordStream(text, false, customRate || 0.92);
+    }
+
+    function speakNativeSuggestion() {
+      if (currentTutorState.moreFluentWay) {
+        speakSpanishWithLiveWordStream(currentTutorState.moreFluentWay, false, 0.88);
+      }
+    }
+
+    function saveNativeSuggestionToSrs() {
+      if (currentTutorState.moreFluentWay) {
+        addSrsCard(
+          currentTutorState.moreFluentWay,
+          currentTutorState.coachingTip || "Native fluency phrasing"
+        );
+      }
+    }
+
+    // --- AI TUTOR ENGINE (GEMINI API + BUILT-IN SMART OFFLINE ENGINE) ---
+    async function generateTutorResponse(userText, mode) {
+      const apiKey = getSavedApiKey();
+
+      if (apiKey) {
+        const prompt = `
+You are Yordanis, an intuitive, encouraging, street-smart Spanish tutor in a live voice session.
+Student CEFR Level: ${studentLevel}.
+Input Mode: ${mode === "en" ? "Student is asking a question in English." : "Student is speaking Spanish."}
+
+Analyze what the student said and return ONLY valid JSON with this exact schema:
 {
-  "userOriginal": "exact text the user said",
-  "isNatural": true,
-  "correction": "If the user made a grammar/vocab mistake in Spanish, write the corrected Spanish sentence here. Otherwise empty string.",
-  "moreFluentWay": "Show a natural, native way to say what the user wanted to say in Spanish.",
-  "coachingTip": "1 brief, friendly sentence in English explaining the correction or why the native phrase works well.",
-  "replySpanish": "Your direct conversational reply in Spanish keeping the back-and-forth tutor conversation flowing naturally (1-2 sentences).",
-  "replyPhonetic": "Syllable-by-syllable phonetic guide in brackets with middots, e.g. [keh · boh-lah · ah-seh-reh]",
-  "replyEnglish": "Natural English translation of your replySpanish.",
+  "userOriginal": "what the user said",
+  "isNatural": false,
+  "correction": "Corrected Spanish sentence if they made a grammar or word choice mistake (or empty string if already correct)",
+  "moreFluentWay": "A more natural, fluent, native Spanish way to say what the user meant",
+  "coachingTip": "Brief 1-sentence tip in English explaining why the fluent version sounds more natural",
+  "replySpanish": "Your natural conversational response in Spanish (1-2 sentences, keep the conversation going like a real tutor)",
+  "replyPhonetic": "Syllable-by-syllable phonetic pronunciation guide in brackets, e.g. [keh · boh-lah · ah-seh-reh]",
+  "replyEnglish": "English translation of your replySpanish",
   "wordBreakdown": [
-    { "es": "Spanish word/phrase from your reply", "en": "English meaning" }
+    { "es": "Spanish phrase", "en": "English meaning" }
   ]
 }`;
 
-        if (!apiKey) {
-          // Helpful fallback response if user hasn't entered their Gemini key yet
-          return {
-            userOriginal: userSpokenOrTyped,
-            isNatural: false,
-            correction: "¡Hola Yordanis! Quiero practicar español.",
-            moreFluentWay: "¡Qué tal, Yordanis! Vamos a practicar un rato.",
-            coachingTip: "Tap the ⚙️ Tabs / Key button in the top right to paste your Gemini API key for unlimited live AI responses!",
-            replySpanish: `¡Claro que sí! Escuché que dijiste: "${userSpokenOrTyped}". Agrega tu clave API arriba en ⚙️ Tabs para conversar sin límites.`,
-            replyPhonetic: "[klah-roh · keh · see · ehs-koo-cheh · keh · dee-hees-teh]",
-            replyEnglish: `Of course! I heard you say: "${userSpokenOrTyped}". Add your API key in ⚙️ Tabs above for unlimited live conversation.`,
-            wordBreakdown: [
-              { es: "¡Claro que sí!", en: "Of course!" },
-              { es: "Escuché", en: "I heard" },
-              { es: "Vamos a practicar", en: "Let's practice" }
-            ]
-          };
-        }
-
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-        const response = await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            systemInstruction: { parts: [{ text: systemInstruction }] },
-            contents: [{ role: "user", parts: [{ text: userSpokenOrTyped }] }],
-            generationConfig: {
-              temperature: 0.7,
-              responseMimeType: "application/json"
+        const models = ["gemini-2.5-flash", "gemini-2.0-flash"];
+        for (let m = 0; m < models.length; m++) {
+          try {
+            const res = await fetch(
+              "https://generativelanguage.googleapis.com/v1beta/models/" + models[m] + ":generateContent?key=" + apiKey,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  systemInstruction: { parts: [{ text: prompt }] },
+                  contents: [{ role: "user", parts: [{ text: userText }] }],
+                  generationConfig: {
+                    temperature: 0.7,
+                    responseMimeType: "application/json"
+                  }
+                })
+              }
+            );
+            if (res.ok) {
+              const data = await res.json();
+              const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+              const cleaned = raw.replace(/```json|```/g, "").trim();
+              const parsed = JSON.parse(cleaned);
+              if (parsed && parsed.replySpanish) return parsed;
             }
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
-        const cleanedJson = rawText.replace(/```json|```/g, "").trim();
-        return JSON.parse(cleanedJson);
-      };
-
-      // =====================================================
-      // REAL-TIME SPEECH RECOGNITION & LIVE CALL FLOW
-      // =====================================================
-      const stopEverything = () => {
-        if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
-        if (wordStreamTimerRef.current) clearInterval(wordStreamTimerRef.current);
-        if (recognitionRef.current) {
-          recognitionRef.current.onend = null;
-          recognitionRef.current.onerror = null;
-          try { recognitionRef.current.stop(); } catch (e) {}
-        }
-        if (window.speechSynthesis) {
-          window.speechSynthesis.cancel();
-        }
-      };
-
-      const launchLiveTutorCall = (mode = "es") => {
-        setLiveModeType(mode);
-        setIsLiveCallOpen(true);
-        startMicrophoneStream(mode);
-      };
-
-      const closeLiveTutorCall = () => {
-        stopEverything();
-        setIsLiveCallOpen(false);
-        setCallStatus("paused");
-      };
-
-      const startMicrophoneStream = (mode = liveModeType) => {
-        stopEverything();
-        setLiveFinalText("");
-        setLiveInterimText("");
-        accumulatedSpeechRef.current = "";
-
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) {
-          alert("Speech Recognition is not supported in this browser. Please use Chrome on Android or Desktop.");
-          setCallStatus("paused");
-          return;
-        }
-
-        const recognition = new SpeechRecognition();
-        recognition.lang = mode === "en" ? "en-US" : "es-MX";
-        recognition.continuous = true;
-        recognition.interimResults = true;
-
-        recognition.onstart = () => {
-          setCallStatus("listening");
-        };
-
-        recognition.onresult = (event) => {
-          let interim = "";
-          let finalChunk = "";
-
-          for (let i = event.resultIndex; i < event.results.length; i++) {
-            const transcript = event.results[i][0].transcript;
-            if (event.results[i].isFinal) {
-              finalChunk += transcript + " ";
-            } else {
-              interim += transcript;
-            }
+          } catch (err) {
+            console.warn("Model attempt failed:", models[m], err);
           }
-
-          if (finalChunk) {
-            accumulatedSpeechRef.current = (accumulatedSpeechRef.current + " " + finalChunk).trim();
-            setLiveFinalText(accumulatedSpeechRef.current);
-          }
-          setLiveInterimText(interim);
-
-          // Automatic turn-taking after 1.8 seconds of silence
-          if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
-          const combined = (accumulatedSpeechRef.current + " " + interim).trim();
-          if (combined.length > 1) {
-            silenceTimerRef.current = setTimeout(() => {
-              finishUserTurnAndRespond(combined, mode);
-            }, 1800);
-          }
-        };
-
-        recognition.onerror = (event) => {
-          if (event.error !== "aborted") {
-            setCallStatus("paused");
-          }
-        };
-
-        recognitionRef.current = recognition;
-        try {
-          recognition.start();
-        } catch (err) {
-          console.warn(err);
         }
-      };
+      }
 
-      const finishUserTurnAndRespond = async (overrideText, mode = liveModeType) => {
-        if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
-        if (recognitionRef.current) {
-          recognitionRef.current.onend = null;
-          try { recognitionRef.current.stop(); } catch (e) {}
-        }
-
-        const finalSpoken = (
-          overrideText ||
-          (accumulatedSpeechRef.current + " " + liveInterimText)
-        ).trim();
-
-        if (!finalSpoken) {
-          setCallStatus("paused");
-          return;
-        }
-
-        setLiveFinalText(finalSpoken);
-        setLiveInterimText("");
-        setCallStatus("thinking");
-
-        try {
-          const tutorReply = await askYordanisAI(finalSpoken, mode);
-          setCurrentMessage(tutorReply);
-          speakAndStreamWords(tutorReply.replySpanish, true);
-        } catch (err) {
-          console.error(err);
-          setCallStatus("paused");
-        }
-      };
-
-      // Speaks Spanish aloud and streams words onto the screen in real time
-      const speakAndStreamWords = (spanishText, autoResumeMic = false, customRate = null) => {
-        if (wordStreamTimerRef.current) clearInterval(wordStreamTimerRef.current);
-        if (window.speechSynthesis) window.speechSynthesis.cancel();
-
-        const words = spanishText.split(" ");
-        let index = 0;
-        setStreamedAiWords("");
-        setCallStatus("speaking");
-
-        const speedByLevel = { A1: 0.85, A2: 0.92, B1: 0.98, B2: 1.03 };
-        const chosenRate = customRate || speedByLevel[cefrLevel] || 0.95;
-
-        const utterance = new SpeechSynthesisUtterance(spanishText);
-        utterance.lang = "es-MX";
-        utterance.rate = chosenRate;
-
-        const startWordTicker = () => {
-          if (wordStreamTimerRef.current) clearInterval(wordStreamTimerRef.current);
-          const msPerWord = Math.round(310 / chosenRate);
-          wordStreamTimerRef.current = setInterval(() => {
-            index++;
-            setStreamedAiWords(words.slice(0, index).join(" "));
-            if (index >= words.length) {
-              clearInterval(wordStreamTimerRef.current);
-            }
-          }, msPerWord);
-        };
-
-        utterance.onstart = startWordTicker;
-
-        utterance.onend = () => {
-          if (wordStreamTimerRef.current) clearInterval(wordStreamTimerRef.current);
-          setStreamedAiWords(spanishText);
-          if (autoResumeMic && isLiveCallOpen) {
-            setTimeout(() => {
-              startMicrophoneStream("es");
-            }, 450);
-          } else {
-            setCallStatus("paused");
-          }
-        };
-
-        utterance.onerror = () => {
-          if (wordStreamTimerRef.current) clearInterval(wordStreamTimerRef.current);
-          setStreamedAiWords(spanishText);
-          setCallStatus("paused");
-        };
-
-        window.speechSynthesis.speak(utterance);
-        // Immediate fallback ticker in case mobile browser delays onstart
-        startWordTicker();
-      };
-
-      const handleManualTextSend = async () => {
-        if (!inputText.trim()) return;
-        const textToSend = inputText.trim();
-        setInputText("");
-        setIsLiveCallOpen(true);
-        setLiveFinalText(textToSend);
-        setLiveInterimText("");
-        setCallStatus("thinking");
-
-        try {
-          const tutorReply = await askYordanisAI(textToSend, "es");
-          setCurrentMessage(tutorReply);
-          speakAndStreamWords(tutorReply.replySpanish, false);
-        } catch (err) {
-          setCallStatus("paused");
-        }
-      };
-
-      return (
-        <div>
-          {/* TOP NAVIGATION BAR */}
-          <nav className="top-nav">
-            <button
-              className={`nav-tab ${activeTab === "lens" ? "active" : ""}`}
-              onClick={() => setActiveTab("lens")}
-            >
-              <span className="nav-tab-icon">📸</span>
-              <span>Lens/Sl...</span>
-            </button>
-
-            <button
-              className={`nav-tab ${activeTab === "free_ai" ? "active" : ""}`}
-              onClick={() => setActiveTab("free_ai")}
-            >
-              <span className="nav-tab-icon">🎙️</span>
-              <span>Free AI</span>
-            </button>
-
-            <button
-              className={`nav-tab ${activeTab === "media" ? "active" : ""}`}
-              onClick={() => setActiveTab("media")}
-            >
-              <span className="nav-tab-icon">🎧</span>
-              <span>Media/...</span>
-            </button>
-
-            <button
-              className={`nav-tab ${activeTab === "srs" ? "active" : ""}`}
-              onClick={() => setActiveTab("srs")}
-            >
-              <span className="nav-tab-icon">🧠</span>
-              <span>SRS ({srsCards.length})</span>
-            </button>
-
-            <button
-              className={`nav-tab ${activeTab === "drills" ? "active" : ""}`}
-              onClick={() => setActiveTab("drills")}
-            >
-              <span className="nav-tab-icon">🎯</span>
-              <span>Drills</span>
-            </button>
-
-            <button className="tabs-pill-btn" onClick={() => setShowSettings(true)}>
-              <span>⚙️</span>
-              <span>Tabs</span>
-            </button>
-          </nav>
-
-          {/* =====================================================
-              TAB 1: FREE AI HUB
-             ===================================================== */}
-          {activeTab === "free_ai" && (
-            <main className="main-container">
-              {/* Yordanis Latest Message Card */}
-              <section className="tutor-card">
-                <div className="spanish-main-text">
-                  {currentMessage.replySpanish}
-                  <button
-                    className="breakdown-btn"
-                    onClick={() => setShowBreakdown(!showBreakdown)}
-                  >
-                    🔍 Breakdown
-                  </button>
-                </div>
-
-                <div className="phonetic-box">
-                  🔊 {currentMessage.replyPhonetic}
-                </div>
-
-                <div className="english-subtext">
-                  {currentMessage.replyEnglish}
-                </div>
-
-                {/* Expandable Word Breakdown */}
-                {showBreakdown && currentMessage.wordBreakdown && (
-                  <div className="breakdown-grid">
-                    {currentMessage.wordBreakdown.map((item, idx) => (
-                      <div key={idx} className="word-chip">
-                        <div className="word-chip-es">
-                          <span>{item.es}</span>
-                          <button
-                            className="srs-add-mini"
-                            onClick={() => addWordToSrs(item.es, item.en)}
-                            title="Save to SRS"
-                          >
-                            +SRS
-                          </button>
-                        </div>
-                        <div className="word-chip-en">{item.en}</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </section>
-
-              {/* Center Orb Button — Immediately Opens Live Call Interface */}
-              <section className="orb-stage">
-                <button
-                  className="orb-btn"
-                  onClick={() => launchLiveTutorCall("es")}
-                >
-                  <span className="orb-icon">🎙️</span>
-                  <span className="orb-label">SPEAK SPANISH</span>
-                </button>
-              </section>
-
-              {/* Ask in English Button */}
-              <div className="action-row">
-                <button
-                  className="english-ask-btn"
-                  onClick={() => launchLiveTutorCall("en")}
-                >
-                  <span>🇺🇸</span>
-                  <span>Ask in English ("How do I say...")</span>
-                </button>
-              </div>
-
-              {/* Bottom Text Question Input */}
-              <div className="input-row">
-                <input
-                  type="text"
-                  className="text-input"
-                  placeholder="Or type Spanish / English question here"
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleManualTextSend()}
-                />
-                <button className="send-btn" onClick={handleManualTextSend}>
-                  Send
-                </button>
-              </div>
-            </main>
-          )}
-
-          {/* =====================================================
-              LIVE TUTOR CALL MODE OVERLAY (Triggered on Orb Tap)
-             ===================================================== */}
-          {isLiveCallOpen && (
-            <div className="live-overlay">
-              {/* Top Bar: Live Status + Level Selector + Close */}
-              <div className="live-header">
-                <div className="status-pill">
-                  <span
-                    className="status-dot"
-                    style={{
-                      backgroundColor:
-                        callStatus === "listening"
-                          ? "#22c55e"
-                          : callStatus === "speaking"
-                          ? "#8b5cf6"
-                          : callStatus === "thinking"
-                          ? "#f59e0b"
-                          : "#64748b"
-                    }}
-                  />
-                  <span>
-                    {callStatus === "listening" &&
-                      (liveModeType === "en" ? "Listening (English)..." : "Listening (Español)...")}
-                    {callStatus === "thinking" && "Yordanis is thinking..."}
-                    {callStatus === "speaking" && "Yordanis is speaking..."}
-                    {callStatus === "paused" && "Tap orb to talk"}
-                  </span>
-                </div>
-
-                {/* Adaptive Level Pills */}
-                <div className="level-selector">
-                  {["A1", "A2", "B1", "B2"].map((lvl) => (
-                    <button
-                      key={lvl}
-                      className={`level-btn ${cefrLevel === lvl ? "active" : ""}`}
-                      onClick={() => setCefrLevel(lvl)}
-                    >
-                      {lvl}
-                    </button>
-                  ))}
-                </div>
-
-                <button className="end-call-btn" onClick={closeLiveTutorCall}>
-                  ✕ End
-                </button>
-              </div>
-
-              {/* Center Live Conversation Transcript Stream */}
-              <div className="live-stream-body">
-                {/* 1. User's Live Speech-to-Text Stream */}
-                <div className="stream-box user-box">
-                  <div className="box-header">
-                    <span>🎙️ YOU ({cefrLevel} STUDENT)</span>
-                    <span>{callStatus === "listening" ? "LIVE MIC ON" : "TRANSCRIPT"}</span>
-                  </div>
-                  <div className="live-user-transcript">
-                    <span>{liveFinalText} </span>
-                    <span className="interim-words">{liveInterimText}</span>
-                    {!liveFinalText && !liveInterimText && (
-                      <span style={{ color: "#475569", fontStyle: "italic", fontSize: "16px" }}>
-                        {liveModeType === "en"
-                          ? 'Say what you want to translate (e.g. "How do I order tacos?")...'
-                          : "Empieza a hablar en español... tus palabras aparecerán aquí en vivo."}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* 2. Live Fluency & Grammar Coaching Box */}
-                {(currentMessage.correction || currentMessage.moreFluentWay) && (
-                  <div className="coach-card">
-                    <div className="coach-title">
-                      <span>
-                        {currentMessage.isNatural
-                          ? "✅ Native & Natural!"
-                          : "💡 Live Grammar & Fluency Coach"}
-                      </span>
-                      {currentMessage.moreFluentWay && (
-                        <button
-                          className="srs-add-mini"
-                          onClick={() =>
-                            speakAndStreamWords(currentMessage.moreFluentWay, false, 0.85)
-                          }
-                        >
-                          🔊 Hear Native
-                        </button>
-                      )}
-                    </div>
-
-                    {!currentMessage.isNatural && currentMessage.correction && (
-                      <div className="coach-item">
-                        <span className="tag-fix">Correction:</span>
-                        <span>{currentMessage.correction}</span>
-                      </div>
-                    )}
-
-                    {currentMessage.moreFluentWay && (
-                      <div className="coach-item">
-                        <span className="tag-fluent">More Fluent:</span>
-                        <strong style={{ color: "#ffffff" }}>
-                          "{currentMessage.moreFluentWay}"
-                        </strong>
-                      </div>
-                    )}
-
-                    {currentMessage.coachingTip && (
-                      <div className="coach-tip">{currentMessage.coachingTip}</div>
-                    )}
-                  </div>
-                )}
-
-                {/* 3. Yordanis Live Word-by-Word Response Stream */}
-                <div className="stream-box ai-box">
-                  <div className="box-header">
-                    <span>🧑‍🏫 YORDANIS (LIVE TUTOR)</span>
-                    <button
-                      className="breakdown-btn"
-                      onClick={() => setShowBreakdown(!showBreakdown)}
-                    >
-                      🔍 Breakdown
-                    </button>
-                  </div>
-
-                  <div
-                    className="spanish-main-text"
-                    style={{ textAlign: "left", marginBottom: "10px" }}
-                  >
-                    {streamedAiWords || currentMessage.replySpanish}
-                  </div>
-
-                  <div className="phonetic-box" style={{ textAlign: "left" }}>
-                    🔊 {currentMessage.replyPhonetic}
-                  </div>
-
-                  <div className="english-subtext" style={{ textAlign: "left" }}>
-                    {currentMessage.replyEnglish}
-                  </div>
-
-                  {showBreakdown && currentMessage.wordBreakdown && (
-                    <div className="breakdown-grid">
-                      {currentMessage.wordBreakdown.map((item, idx) => (
-                        <div key={idx} className="word-chip">
-                          <div className="word-chip-es">
-                            <span>{item.es}</span>
-                            <button
-                              className="srs-add-mini"
-                              onClick={() => addWordToSrs(item.es, item.en)}
-                            >
-                              +SRS
-                            </button>
-                          </div>
-                          <div className="word-chip-en">{item.en}</div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Bottom Interactive Call Controls */}
-              <div className="live-footer">
-                <div className="live-controls-row">
-                  <button
-                    className="secondary-circle-btn"
-                    onClick={() =>
-                      speakAndStreamWords(currentMessage.replySpanish, false, 0.75)
-                    }
-                  >
-                    🐢 Slow (0.75x)
-                  </button>
-
-                  <button
-                    className={`orb-btn ${
-                      callStatus === "listening"
-                        ? "listening"
-                        : callStatus === "speaking"
-                        ? "speaking"
-                        : ""
-                    }`}
-                    style={{ width: "104px", height: "104px" }}
-                    onClick={() => {
-                      if (callStatus === "listening") {
-                        finishUserTurnAndRespond();
-                      } else {
-                        startMicrophoneStream("es");
-                      }
-                    }}
-                  >
-                    <span className="orb-icon">🎙️</span>
-                    <span className="orb-label">
-                      {callStatus === "listening" ? "TAP IF DONE" : "SPEAK SPANISH"}
-                    </span>
-                  </button>
-
-                  <button
-                    className="secondary-circle-btn"
-                    onClick={() => startMicrophoneStream("en")}
-                  >
-                    🇺🇸 Ask English
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* =====================================================
-              OTHER TABS (SRS, DRILLS, MEDIA, LENS)
-             ===================================================== */}
-          {activeTab === "srs" && (
-            <main className="main-container">
-              <div className="tutor-card">
-                <h3 style={{ marginBottom: "12px" }}>🧠 Spaced Repetition Deck ({srsCards.length})</h3>
-                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                  {srsCards.map((card) => (
-                    <div key={card.id} className="word-chip" style={{ padding: "12px" }}>
-                      <div className="word-chip-es" style={{ fontSize: "17px" }}>
-                        <span>{card.es}</span>
-                        <button
-                          className="srs-add-mini"
-                          onClick={() => speakAndStreamWords(card.es, false)}
-                        >
-                          🔊 Play
-                        </button>
-                      </div>
-                      <div className="word-chip-en" style={{ fontSize: "14px", marginTop: "4px" }}>
-                        {card.en}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </main>
-          )}
-
-          {(activeTab === "lens" || activeTab === "media" || activeTab === "drills") && (
-            <main className="main-container">
-              <div className="tutor-card" style={{ textAlign: "center" }}>
-                <h3 style={{ marginBottom: "8px" }}>
-                  {activeTab === "lens" && "📸 Lens & Street Slang"}
-                  {activeTab === "media" && "🎧 Media & Song Translator"}
-                  {activeTab === "drills" && "🎯 Verb Matrix & Fluency Drills"}
-                </h3>
-                <p className="english-subtext" style={{ marginBottom: "16px" }}>
-                  Use the Free AI tab or launch Live Call Mode to practice these phrases aloud with Yordanis.
-                </p>
-                <button
-                  className="send-btn"
-                  style={{ padding: "12px 20px" }}
-                  onClick={() => {
-                    setActiveTab("free_ai");
-                    launchLiveTutorCall("es");
-                  }}
-                >
-                  🎙️ Practice Live with Yordanis
-                </button>
-              </div>
-            </main>
-          )}
-
-          {/* =====================================================
-              SETTINGS / API KEY MODAL (⚙️ Tabs Button)
-             ===================================================== */}
-          {showSettings && (
-            <div className="modal-backdrop" onClick={() => setShowSettings(false)}>
-              <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-                <h3>⚙️ Tutor Settings & Gemini API Key</h3>
-                <p style={{ fontSize: "13px", color: "#94a3b8" }}>
-                  Your API key is stored locally on your phone inside your browser (`localStorage`).
-                </p>
-                <input
-                  type="password"
-                  className="text-input"
-                  placeholder="Paste Gemini API Key (AIzaSy...)"
-                  defaultValue={apiKey}
-                  id="api-key-input"
-                />
-                <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
-                  <button
-                    className="secondary-circle-btn"
-                    onClick={() => setShowSettings(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    className="send-btn"
-                    style={{ padding: "10px 18px" }}
-                    onClick={() => {
-                      const val = document.getElementById("api-key-input").value;
-                      saveApiKey(val);
-                    }}
-                  >
-                    Save Key
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      );
+      // Smart Built-In Offline Coaching Engine (works immediately with zero setup)
+      return buildSmartOfflineCoaching(userText, mode);
     }
 
-    const root = ReactDOM.createRoot(document.getElementById("root"));
-    root.render(<App />);
+    function buildSmartOfflineCoaching(userText, mode) {
+      const lower = userText.toLowerCase().trim();
+
+      if (mode === "en" || lower.includes("how do i say") || lower.includes("how do you say")) {
+        const cleanedQuery = userText.replace(/how do (i|you) say/i, "").replace(/\?/g, "").trim() || "that";
+        return {
+          userOriginal: userText,
+          isNatural: true,
+          correction: "",
+          moreFluentWay: "¿Cómo se dice \"" + cleanedQuery + "\" en español?",
+          coachingTip: "Ask '¿Cómo se dice...?' whenever you want a native speaker to give you the right word.",
+          replySpanish: "¡Buena pregunta! Para decir eso de forma natural, úsalo en una frase corta y dilo con confianza. ¿Quieres intentarlo en voz alta?",
+          replyPhonetic: "[bweh-nah · preh-goon-tah · pah-rah · deh-seer · eh-soh · deh · fohr-mah · nah-too-rahl]",
+          replyEnglish: "Good question! To say that naturally, use it in a short phrase and say it with confidence. Want to try it out loud?",
+          wordBreakdown: [
+            { es: "¡Buena pregunta!", en: "Good question!" },
+            { es: "de forma natural", en: "in a natural way" },
+            { es: "en voz alta", en: "out loud" }
+          ]
+        };
+      }
+
+      // Common Spanish learner mistake detections
+      if (lower.includes("yo gusto") || lower.includes("yo gusta")) {
+        return {
+          userOriginal: userText,
+          isNatural: false,
+          correction: "Me gusta mucho practicar español.",
+          moreFluentWay: "¡Me encanta practicar español contigo!",
+          coachingTip: "With 'gustar', always use 'Me gusta' (it pleases me) instead of 'Yo gusto'.",
+          replySpanish: "¡Así mismo! Se dice «me gusta» o «me encanta». ¿Qué es lo que más te gusta hacer en tu tiempo libre?",
+          replyPhonetic: "[ah-see · mees-moh · seh · dee-seh · meh · goos-tah · oh · meh · ehn-kahn-tah]",
+          replyEnglish: "Just like that! You say 'me gusta' or 'me encanta'. What do you like doing most in your free time?",
+          wordBreakdown: [
+            { es: "¡Así mismo!", en: "Just like that! / Exactly!" },
+            { es: "Me encanta", en: "I love (it enchants me)" },
+            { es: "tiempo libre", en: "free time" }
+          ]
+        };
+      }
+
+      if (lower.includes("estoy bien") || lower.includes("hola") || lower.includes("buenos dias") || lower.includes("que tal")) {
+        return {
+          userOriginal: userText,
+          isNatural: true,
+          correction: "",
+          moreFluentWay: "¡Todo bien por aquí! ¿Y tú, qué cuentas?",
+          coachingTip: "Adding '¿Y tú, qué cuentas?' (And you, what's new?) makes your greeting sound 100% native.",
+          replySpanish: "¡Qué bueno escucharte! Hoy vamos a soltar la lengua. Cuéntame, ¿cómo va tu día hoy?",
+          replyPhonetic: "[keh · bweh-noh · ehs-koo-chahr-teh · ohy · bah-mohs · ah · sohl-tahr · lah · lehn-gwah · kwehn-tah-meh · koh-moh · bah · too · dee-ah · ohy]",
+          replyEnglish: "Great to hear you! Today we're going to loosen up your tongue. Tell me, how is your day going today?",
+          wordBreakdown: [
+            { es: "¡Qué bueno escucharte!", en: "So good to hear you!" },
+            { es: "soltar la lengua", en: "loosen up the tongue / speak fluently" },
+            { es: "¿Cómo va tu día?", en: "How is your day going?" }
+          ]
+        };
+      }
+
+      if (lower.includes("quiero") || lower.includes("necesito")) {
+        return {
+          userOriginal: userText,
+          isNatural: true,
+          correction: userText.charAt(0).toUpperCase() + userText.slice(1),
+          moreFluentWay: "Me gustaría " + lower.replace(/^(yo\s+)?(quiero|necesito)\s*/i, "") + ", por favor.",
+          coachingTip: "Using 'Me gustaría...' (I would like...) or 'Quisiera...' sounds smoother and more polite than 'Quiero'.",
+          replySpanish: "¡Perfecto! Te entendí clarito. Si quieres sonar aún más natural, puedes decir «me gustaría». ¿Seguimos practicando?",
+          replyPhonetic: "[pehr-fehk-toh · teh · ehn-tehn-dee · klah-ree-toh · see · keh-rehs · soh-nahr · ah-oon · mahs · nah-too-rahl]",
+          replyEnglish: "Perfect! I understood you clearly. If you want to sound even more natural, you can say 'me gustaría'. Shall we keep practicing?",
+          wordBreakdown: [
+            { es: "Te entendí clarito", en: "I understood you loud and clear" },
+            { es: "sonar más natural", en: "to sound more natural" },
+            { es: "Me gustaría", en: "I would like" }
+          ]
+        };
+      }
+
+      // Default encouraging coaching response
+      return {
+        userOriginal: userText,
+        isNatural: false,
+        correction: userText.charAt(0).toUpperCase() + userText.slice(1) + ".",
+        moreFluentWay: "La verdad es que " + lower + ", ¿sabes a qué me refiero?",
+        coachingTip: "Connecting your thought with 'La verdad es que...' (The truth is that...) gives you natural native rhythm.",
+        replySpanish: "¡Bien dicho! Me gusta cómo armaste la frase. Dime un poco más sobre eso en español para seguir practicando.",
+        replyPhonetic: "[byehn · dee-choh · meh · goos-tah · koh-moh · ahr-mahs-teh · lah · frah-seh · dee-meh · oon · poh-koh · mahs]",
+        replyEnglish: "Well said! I like how you put that sentence together. Tell me a bit more about that in Spanish to keep practicing.",
+        wordBreakdown: [
+          { es: "¡Bien dicho!", en: "Well said!" },
+          { es: "armaste la frase", en: "you put the sentence together" },
+          { es: "Dime un poco más", en: "Tell me a little more" }
+        ]
+      };
+    }
+
+    async function handleMainTextSubmit() {
+      const input = document.getElementById("main-text-input");
+      const val = input.value.trim();
+      if (!val) return;
+      input.value = "";
+      openLiveTutorCall("es");
+      finalizeUserSpeechAndReply(val);
+    }
+
+    async function handleLiveTextSubmit() {
+      const input = document.getElementById("live-text-input");
+      const val = input.value.trim();
+      if (!val) return;
+      input.value = "";
+      finalizeUserSpeechAndReply(val);
+    }
+
+    // --- TAB 2: SLANG DATA & RENDER ---
+    const SLANG_DATA = {
+      cuba: [
+        { es: "¡Qué bola, asere!", en: "What's up, bro/friend!", phonetic: "[keh · boh-lah · ah-seh-reh]" },
+        { es: "Al cantazo", en: "Right on the money / Excellent", phonetic: "[ahl · kahn-tah-soh]" },
+        { es: "Echar un patín", en: "To hurry up / get going", phonetic: "[eh-chahr · oon · pah-teen]" }
+      ],
+      mexico: [
+        { es: "¿Qué onda, güey?", en: "What's up, dude?", phonetic: "[keh · ohn-dah · gwey]" },
+        { es: "¡No manches!", en: "No way! / You're kidding!", phonetic: "[noh · mahn-chehs]" },
+        { es: "Ahorita vengo", en: "I'll be right back (in a bit)", phonetic: "[ah-oh-ree-tah · behn-goh]" }
+      ],
+      pr: [
+        { es: "Wepa / Dímelo", en: "Hey! / Tell me what's up", phonetic: "[dee-meh-loh]" },
+        { es: "Un chin", en: "A little bit", phonetic: "[oon · cheen]" },
+        { es: "Brutal", en: "Awesome / Amazing", phonetic: "[broo-tahl]" }
+      ],
+      colombia: [
+        { es: "¡Qué más, parcero!", en: "What's up, bro!", phonetic: "[keh · mahs · pahr-seh-roh]" },
+        { es: "De una", en: "Right away / Let's do it", phonetic: "[deh · oo-nah]" },
+        { es: "Qué chimba", en: "How cool / awesome", phonetic: "[keh · cheem-bah]" }
+      ]
+    };
+
+    function renderSlangList(region, btnEl) {
+      if (btnEl) {
+        document.querySelectorAll("#slang-region-pills .filter-pill").forEach((b) => b.classList.remove("active"));
+        btnEl.classList.add("active");
+      }
+      const list = SLANG_DATA[region] || SLANG_DATA.cuba;
+      const container = document.getElementById("slang-list-container");
+      container.innerHTML = list.map((item) => `
+        <div class="word-chip" style="padding:12px;">
+          <div class="word-chip-top" style="font-size:16px;">
+            <span>${escapeHtml(item.es)}</span>
+            <div style="display:flex; gap:6px;">
+              <button class="mini-btn" onclick="speakSpanishText('${item.es.replace(/'/g, "\\'")}')">🔊 Hear</button>
+              <button class="mini-btn" style="background:#15803d;" onclick="addSrsCard('${item.es.replace(/'/g, "\\'")}', '${item.en.replace(/'/g, "\\'")}')">+SRS</button>
+            </div>
+          </div>
+          <div style="color:#fb923c; font-family:monospace; font-size:13px; margin:4px 0;">${escapeHtml(item.phonetic)}</div>
+          <div class="word-chip-en" style="font-size:14px;">${escapeHtml(item.en)}</div>
+        </div>
+      `).join("");
+    }
+
+    function analyzeSlangPhrase() {
+      const input = document.getElementById("lens-input");
+      const val = input.value.trim();
+      if (!val) return;
+      input.value = "";
+      openLiveTutorCall("es");
+      finalizeUserSpeechAndReply(val);
+    }
+
+    // --- TAB 3: MEDIA & SONG / ANIME LINES ---
+    let mediaLines = [
+      { es: "El que no arriesga, no gana.", phonetic: "[ehl · keh · noh · ah-ryehs-gah · noh · gah-nah]", en: "He who doesn't take risks, doesn't win." },
+      { es: "Todavía no he terminado de pelear.", phonetic: "[toh-dah-bee-ah · noh · eh · tehr-mee-nah-doh · deh · peh-leh-ahr]", en: "I still haven't finished fighting." },
+      { es: "Bailando toda la noche hasta el amanecer.", phonetic: "[bahy-lahn-doh · toh-dah · lah · noh-cheh · ahs-tah · ehl · ah-mah-neh-sehr]", en: "Dancing all night until dawn." }
+    ];
+
+    function renderMediaLines() {
+      const container = document.getElementById("media-lines-container");
+      container.innerHTML = mediaLines.map((line) => `
+        <div class="word-chip" style="padding:12px;">
+          <div class="word-chip-top" style="font-size:16px;">
+            <span>${escapeHtml(line.es)}</span>
+            <div style="display:flex; gap:6px;">
+              <button class="mini-btn" onclick="speakSpanishText('${line.es.replace(/'/g, "\\'")}', 0.95)">🔊 1x</button>
+              <button class="mini-btn" style="background:#4f46e5;" onclick="speakSpanishText('${line.es.replace(/'/g, "\\'")}', 0.72)">🐢 0.7x</button>
+            </div>
+          </div>
+          <div style="color:#fb923c; font-family:monospace; font-size:13px; margin:4px 0;">${escapeHtml(line.phonetic)}</div>
+          <div class="word-chip-en" style="font-size:14px;">${escapeHtml(line.en)}</div>
+        </div>
+      `).join("");
+    }
+
+    function addCustomMediaLine() {
+      const input = document.getElementById("media-custom-input");
+      const val = input.value.trim();
+      if (!val) return;
+      input.value = "";
+      openLiveTutorCall("es");
+      finalizeUserSpeechAndReply(val);
+    }
+
+    // --- TAB 4: SRS FLASHCARDS ---
+    function addSrsCard(es, en) {
+      if (!es) return;
+      const exists = srsDeck.some((c) => c.es.toLowerCase() === es.toLowerCase());
+      if (!exists) {
+        srsDeck.unshift({ id: Date.now(), es: es, en: en || "", phonetic: "" });
+        saveSrsDeck();
+      }
+    }
+
+    function handleManualAddSrs() {
+      const esEl = document.getElementById("new-srs-es");
+      const enEl = document.getElementById("new-srs-en");
+      if (!esEl.value.trim()) return;
+      addSrsCard(esEl.value.trim(), enEl.value.trim() || "Custom phrase");
+      esEl.value = "";
+      enEl.value = "";
+    }
+
+    function removeSrsCard(id) {
+      srsDeck = srsDeck.filter((c) => c.id !== id);
+      saveSrsDeck();
+    }
+
+    function speakAllSrsCards() {
+      const combined = srsDeck.map((c) => c.es).join(". ");
+      speakSpanishText(combined, 0.88);
+    }
+
+    function renderSrsDeck() {
+      const container = document.getElementById("srs-deck-container");
+      if (!container) return;
+      container.innerHTML = srsDeck.map((card) => `
+        <div class="word-chip" style="padding:12px;">
+          <div class="word-chip-top" style="font-size:16px;">
+            <span>${escapeHtml(card.es)}</span>
+            <div style="display:flex; gap:6px;">
+              <button class="mini-btn" onclick="speakSpanishText('${card.es.replace(/'/g, "\\'")}')">🔊 Play</button>
+              <button class="mini-btn" style="background:#991b1b;" onclick="removeSrsCard(${card.id})">✕</button>
+            </div>
+          </div>
+          <div class="word-chip-en" style="font-size:14px; margin-top:4px;">${escapeHtml(card.en)}</div>
+        </div>
+      `).join("");
+    }
+
+    // --- TAB 5: TONY MARSH VERB MATRIX DRILLS ---
+    const VERB_MATRICES = {
+      compartir: {
+        infinitive: "Compartir (To share)",
+        rows: [
+          { pronoun: "Yo", pres: "comparto", past: "compartí", fut: "voy a compartir" },
+          { pronoun: "Tú", pres: "compartes", past: "compartiste", fut: "vas a compartir" },
+          { pronoun: "Él / Ella", pres: "comparte", past: "compartió", fut: "va a compartir" },
+          { pronoun: "Nosotros", pres: "compartimos", past: "compartimos", fut: "vamos a compartir" },
+          { pronoun: "Ellos / Uds.", pres: "comparten", past: "compartieron", fut: "van a compartir" }
+        ]
+      },
+      tener: {
+        infinitive: "Tener (To have)",
+        rows: [
+          { pronoun: "Yo", pres: "tengo", past: "tuve", fut: "voy a tener" },
+          { pronoun: "Tú", pres: "tienes", past: "tuviste", fut: "vas a tener" },
+          { pronoun: "Él / Ella", pres: "tiene", past: "tuvo", fut: "va a tener" },
+          { pronoun: "Nosotros", pres: "tenemos", past: "tuvimos", fut: "vamos a tener" },
+          { pronoun: "Ellos / Uds.", pres: "tienen", past: "tuvieron", fut: "van a tener" }
+        ]
+      },
+      poder: {
+        infinitive: "Poder (To be able to / Can)",
+        rows: [
+          { pronoun: "Yo", pres: "puedo", past: "pude", fut: "voy a poder" },
+          { pronoun: "Tú", pres: "puedes", past: "pudiste", fut: "vas a poder" },
+          { pronoun: "Él / Ella", pres: "puede", past: "pudo", fut: "va a poder" },
+          { pronoun: "Nosotros", pres: "podemos", past: "pudimos", fut: "vamos a poder" },
+          { pronoun: "Ellos / Uds.", pres: "pueden", past: "pudieron", fut: "van a poder" }
+        ]
+      },
+      hacer: {
+        infinitive: "Hacer (To do / To make)",
+        rows: [
+          { pronoun: "Yo", pres: "hago", past: "hice", fut: "voy a hacer" },
+          { pronoun: "Tú", pres: "haces", past: "hiciste", fut: "vas a hacer" },
+          { pronoun: "Él / Ella", pres: "hace", past: "hizo", fut: "va a hacer" },
+          { pronoun: "Nosotros", pres: "hacemos", past: "hicimos", fut: "vamos a hacer" },
+          { pronoun: "Ellos / Uds.", pres: "hacen", past: "hicieron", fut: "van a hacer" }
+        ]
+      }
+    };
+
+    function renderVerbMatrix(verbKey) {
+      const pillsContainer = document.getElementById("verb-selector-pills");
+      pillsContainer.innerHTML = Object.keys(VERB_MATRICES).map((k) => `
+        <button class="filter-pill ${k === verbKey ? "active" : ""}" onclick="renderVerbMatrix('${k}')">
+          ${VERB_MATRICES[k].infinitive}
+        </button>
+      `).join("");
+
+      const data = VERB_MATRICES[verbKey];
+      const container = document.getElementById("verb-matrix-container");
+      container.innerHTML = `
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Pronoun</th>
+              <th>Present</th>
+              <th>Past (Preterite)</th>
+              <th>Near Future</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${data.rows.map((r) => `
+              <tr>
+                <td><strong>${r.pronoun}</strong></td>
+                <td style="cursor:pointer;" onclick="speakSpanishText('${r.pronoun} ${r.pres}')">🔊 ${r.pres}</td>
+                <td style="cursor:pointer;" onclick="speakSpanishText('${r.pronoun} ${r.past}')">🔊 ${r.past}</td>
+                <td style="cursor:pointer;" onclick="speakSpanishText('${r.pronoun} ${r.fut}')">🔊 ${r.fut}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    // --- SETTINGS MODAL ---
+    function openSettingsModal() {
+      document.getElementById("api-key-input").value = getSavedApiKey();
+      document.getElementById("settings-modal").classList.add("open");
+    }
+
+    function closeSettingsModal() {
+      document.getElementById("settings-modal").classList.remove("open");
+    }
+
+    function saveSettingsApiKey() {
+      const val = document.getElementById("api-key-input").value.trim();
+      try {
+        localStorage.setItem("gemini_api_key", val);
+      } catch (e) {}
+      closeSettingsModal();
+    }
+
+    // --- INITIALIZE ON LOAD ---
+    window.addEventListener("DOMContentLoaded", function () {
+      syncTutorDisplay(false);
+      renderSlangList("cuba");
+      renderMediaLines();
+      saveSrsDeck();
+      renderVerbMatrix("compartir");
+    });
   </script>
 </body>
 </html>
