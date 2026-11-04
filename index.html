@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Yordanis — Live Spanish Tutor</title>
+  <title>Vozzy — Yordanis Live Spanish Tutor</title>
   <style>
     :root {
       --bg-main: #090d16;
@@ -21,6 +21,7 @@
       --accent-green: #22c55e;
       --accent-amber: #f59e0b;
       --accent-red: #ef4444;
+      --accent-teal: #0d9488;
     }
 
     * {
@@ -178,6 +179,40 @@
       margin-top: 8px;
     }
 
+    /* DEDICATED QUICK TRANSLATION RESULT CARD */
+    .translation-result-card {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      background: linear-gradient(135deg, #0f292e 0%, #111827 100%);
+      border: 1px solid #14b8a6;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    .translation-result-card.visible {
+      display: flex;
+    }
+
+    .trans-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 800;
+      color: #5eead4;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    .trans-main-spanish {
+      font-size: 22px;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.35;
+    }
+
     /* WORD BREAKDOWN DRAWER */
     .breakdown-grid {
       display: none;
@@ -223,8 +258,8 @@
       color: #ffffff;
       font-size: 10px;
       font-weight: 700;
-      padding: 3px 7px;
-      border-radius: 5px;
+      padding: 4px 8px;
+      border-radius: 6px;
       cursor: pointer;
       flex-shrink: 0;
     }
@@ -234,7 +269,7 @@
       background: var(--bg-card-alt);
       border: 1px solid var(--border-color);
       border-radius: 18px;
-      padding: 34px 20px;
+      padding: 32px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -331,15 +366,17 @@
 
     .input-row {
       display: flex;
-      gap: 10px;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
     .text-input {
       flex: 1;
+      min-width: 170px;
       background: var(--bg-card);
       border: 1px solid #1f2937;
       color: #ffffff;
-      padding: 14px 16px;
+      padding: 14px 14px;
       border-radius: 12px;
       font-size: 14px;
       outline: none;
@@ -349,11 +386,27 @@
       border-color: var(--border-highlight);
     }
 
+    .translate-btn {
+      background: var(--accent-teal);
+      border: 1px solid #14b8a6;
+      color: #ffffff;
+      padding: 0 16px;
+      min-height: 46px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
     .send-btn {
       background: #4f46e5;
       border: none;
       color: #ffffff;
-      padding: 0 22px;
+      padding: 0 18px;
+      min-height: 46px;
       border-radius: 12px;
       font-size: 14px;
       font-weight: 700;
@@ -454,8 +507,8 @@
       align-items: center;
       justify-content: center;
       gap: 5px;
-      height: 26px;
-      margin: 6px 0;
+      height: 24px;
+      margin: 4px 0;
     }
 
     .wave-bar {
@@ -475,7 +528,7 @@
 
     @keyframes waveAnim {
       0%, 100% { height: 6px; }
-      50% { height: 24px; }
+      50% { height: 22px; }
     }
 
     /* LIVE STREAM BODY */
@@ -522,7 +575,7 @@
       font-weight: 600;
       line-height: 1.4;
       color: #f8fafc;
-      min-height: 28px;
+      min-height: 26px;
     }
 
     .interim-words {
@@ -536,13 +589,9 @@
       border: 1px solid #3b82f6;
       border-radius: 14px;
       padding: 14px;
-      display: none;
+      display: flex;
       flex-direction: column;
       gap: 6px;
-    }
-
-    .coach-card.visible {
-      display: flex;
     }
 
     .coach-title {
@@ -760,6 +809,22 @@
         <div id="main-breakdown" class="breakdown-grid"></div>
       </div>
 
+      <!-- IN-PLACE INSTANT TRANSLATION RESULT CARD -->
+      <div id="main-translation-card" class="translation-result-card">
+        <div class="trans-header">
+          <span id="main-trans-direction">🌐 Instant Translation</span>
+          <div style="display:flex; gap:6px;">
+            <button class="mini-btn" onclick="speakSpanishText(lastTranslatedSpanish, 0.92)">🔊 Hear</button>
+            <button class="mini-btn" style="background:#4f46e5;" onclick="speakSpanishText(lastTranslatedSpanish, 0.72)">🐢 Slow</button>
+            <button class="mini-btn" style="background:#15803d;" onclick="addSrsCard(lastTranslatedSpanish, lastTranslatedEnglish)">+SRS</button>
+          </div>
+        </div>
+        <div id="main-trans-es" class="trans-main-spanish"></div>
+        <div id="main-trans-phonetic" class="phonetic-box" style="margin:4px 0; text-align:left;" onclick="speakSpanishText(lastTranslatedSpanish)"></div>
+        <div id="main-trans-en" class="english-subtext" style="text-align:left; margin-top:2px;"></div>
+        <div id="main-trans-notes" style="font-size:12px; color:#5eead4; font-style:italic; margin-top:4px;"></div>
+      </div>
+
       <!-- BIG BLUE SPEAK SPANISH ORB -->
       <div class="orb-stage">
         <button class="orb-btn" onclick="openLiveTutorCall('es')">
@@ -780,23 +845,62 @@
         </button>
       </div>
 
-      <!-- TEXT INPUT ROW -->
+      <!-- TEXT INPUT ROW WITH DEDICATED TRANSLATE & SEND BUTTONS -->
       <div class="input-row">
         <input
           type="text"
           id="main-text-input"
           class="text-input"
-          placeholder="Or type Spanish / English question here"
-          onkeydown="if(event.key === 'Enter') handleMainTextSubmit()"
+          placeholder="Type English or Spanish word/phrase..."
+          onkeydown="if(event.key === 'Enter') handleDirectTranslation('main')"
         />
-        <button class="send-btn" onclick="handleMainTextSubmit()">Send</button>
+        <button class="translate-btn" onclick="handleDirectTranslation('main')" title="Translate without entering call">
+          🌐 Translate
+        </button>
+        <button class="send-btn" onclick="handleMainTextSubmit()">
+          Send
+        </button>
       </div>
     </section>
 
     <!-- =======================================================
-         TAB 2: LENS & STREET SLANG
+         TAB 2: LENS & STREET SLANG + INSTANT TRANSLATOR
          ======================================================= -->
     <section id="tab-lens" class="tab-panel">
+      <div class="tutor-card">
+        <div class="section-title">🔎 Instant Phrase / Slang Translator & Analyzer</div>
+        <p class="english-subtext" style="text-align:left; margin-bottom:10px;">
+          Type any English word (like "White" or "It's fine") or Spanish slang phrase to get the instant translation, pronunciation, and breakdown right here.
+        </p>
+        <div class="input-row">
+          <input
+            type="text"
+            id="lens-input"
+            class="text-input"
+            placeholder="e.g., White / It's fine / ¿Qué onda güey?"
+            onkeydown="if(event.key === 'Enter') analyzeSlangPhrase(false)"
+          />
+          <button class="translate-btn" onclick="analyzeSlangPhrase(false)">🌐 Translate</button>
+          <button class="send-btn" onclick="analyzeSlangPhrase(true)">🔍 Analyze</button>
+        </div>
+
+        <!-- IN-PLACE LENS TRANSLATION / ANALYSIS RESULT -->
+        <div id="lens-translation-card" class="translation-result-card" style="margin-top:12px;">
+          <div class="trans-header">
+            <span id="lens-trans-direction">🌐 Translation & Breakdown</span>
+            <div style="display:flex; gap:6px;">
+              <button class="mini-btn" onclick="speakSpanishText(lastTranslatedSpanish, 0.92)">🔊 Hear</button>
+              <button class="mini-btn" style="background:#4f46e5;" onclick="speakSpanishText(lastTranslatedSpanish, 0.72)">🐢 Slow</button>
+              <button class="mini-btn" style="background:#15803d;" onclick="addSrsCard(lastTranslatedSpanish, lastTranslatedEnglish)">+SRS</button>
+            </div>
+          </div>
+          <div id="lens-trans-es" class="trans-main-spanish"></div>
+          <div id="lens-trans-phonetic" class="phonetic-box" style="margin:4px 0; text-align:left;" onclick="speakSpanishText(lastTranslatedSpanish)"></div>
+          <div id="lens-trans-en" class="english-subtext" style="text-align:left; margin-top:2px;"></div>
+          <div id="lens-trans-notes" style="font-size:12px; color:#5eead4; font-style:italic; margin-top:4px;"></div>
+        </div>
+      </div>
+
       <div class="tutor-card">
         <div class="section-title">
           <span>📸 Street Slang & Regional Expressions</span>
@@ -809,17 +913,6 @@
         </div>
         <div id="slang-list-container" style="display:flex; flex-direction:column; gap:10px;"></div>
       </div>
-
-      <div class="tutor-card">
-        <div class="section-title">🔎 Instant Phrase / Slang Analyzer</div>
-        <p class="english-subtext" style="text-align:left; margin-bottom:10px;">
-          Paste or type any Spanish sign, menu item, or street phrase for an instant phonetic & literal breakdown.
-        </p>
-        <div class="input-row">
-          <input type="text" id="lens-input" class="text-input" placeholder="e.g., ¿Qué onda güey? / No manches" />
-          <button class="send-btn" onclick="analyzeSlangPhrase()">Analyze</button>
-        </div>
-      </div>
     </section>
 
     <!-- =======================================================
@@ -827,15 +920,21 @@
          ======================================================= -->
     <section id="tab-media" class="tab-panel">
       <div class="tutor-card">
-        <div class="section-title">🎧 Song Lyrics & Anime Line Breakdown</div>
+        <div class="section-title">🎧 Song Lyrics & Anime Line Translator</div>
         <p class="english-subtext" style="text-align:left; margin-bottom:12px;">
-          Tap any line to hear it spoken at natural or slow speed, or paste lyrics/dialogue below.
+          Tap any line to hear it spoken at 1x or 0.7x speed, or paste any Spanish/English line below to translate and add it to your list.
         </p>
-        <div id="media-lines-container" style="display:flex; flex-direction:column; gap:10px;"></div>
-        <div class="input-row" style="margin-top:12px;">
-          <input type="text" id="media-custom-input" class="text-input" placeholder="Paste a Spanish lyric or anime quote..." />
-          <button class="send-btn" onclick="addCustomMediaLine()">Break Down</button>
+        <div class="input-row" style="margin-bottom:12px;">
+          <input
+            type="text"
+            id="media-custom-input"
+            class="text-input"
+            placeholder="Paste a lyric, anime quote, or English line..."
+            onkeydown="if(event.key === 'Enter') addCustomMediaLine()"
+          />
+          <button class="translate-btn" onclick="addCustomMediaLine()">🌐 Translate & Add</button>
         </div>
+        <div id="media-lines-container" style="display:flex; flex-direction:column; gap:10px;"></div>
       </div>
     </section>
 
@@ -910,22 +1009,22 @@
       <!-- 1. User's Real-Time Speech Stream -->
       <div class="stream-box user-box">
         <div class="box-header">
-          <span id="live-user-header">🎙️ YOU (SPEAKING SPANISH)</span>
+          <span id="live-user-header">🎙️ YOU (A2 SPANISH)</span>
           <span id="live-mic-badge" style="color:#22c55e;">● MIC LIVE</span>
         </div>
         <div class="live-user-transcript">
           <span id="live-final-span"></span>
           <span id="live-interim-span" class="interim-words"></span>
           <span id="live-placeholder-span" style="color:#64748b; font-style:italic; font-size:15px;">
-            Start speaking... your words appear here live as you talk.
+            Habla en español o pregunta "How do I say..." en inglés.
           </span>
         </div>
       </div>
 
-      <!-- 2. Real-Time Fluency & Grammar Coach Card -->
+      <!-- 2. Real-Time Fluency, Translation & Grammar Coach Card -->
       <div id="live-coach-card" class="coach-card">
         <div class="coach-title">
-          <span id="coach-badge-title">💡 Live Grammar & Fluency Coach</span>
+          <span id="coach-badge-title">💡 Live Translation & Fluency Coach</span>
           <div style="display:flex; gap:6px;">
             <button class="mini-btn" onclick="speakNativeSuggestion()">🔊 Hear Native</button>
             <button class="mini-btn" style="background:#15803d;" onclick="saveNativeSuggestionToSrs()">+SRS</button>
@@ -933,16 +1032,18 @@
         </div>
 
         <div id="coach-correction-row" class="coach-row">
-          <span class="tag-fix">Correction:</span>
-          <span id="coach-correction-text"></span>
+          <span class="tag-fix" id="coach-fix-label">Spanish Translation:</span>
+          <strong id="coach-correction-text" style="color:#ffffff;">¡Está bien! / Todo bien.</strong>
         </div>
 
         <div id="coach-fluent-row" class="coach-row">
           <span class="tag-fluent">More Fluent Way:</span>
-          <strong id="coach-fluent-text" style="color:#ffffff;"></strong>
+          <strong id="coach-fluent-text" style="color:#ffffff;">"¡Qué bola, asere! Vamos a practicar español."</strong>
         </div>
 
-        <div id="coach-tip-text" class="coach-tip"></div>
+        <div id="coach-tip-text" class="coach-tip">
+          Say any Spanish phrase or ask "How do I say [word]?" in English!
+        </div>
       </div>
 
       <!-- 3. Yordanis Live Word-by-Word Response Stream -->
@@ -953,7 +1054,7 @@
         </div>
 
         <div id="live-ai-es-text" class="spanish-main-text" style="text-align:left; margin-bottom:10px;">
-          ¡Qué bola! Estoy escuchando. Habla tranquilo y yo te ayudo a sonar más natural.
+          ¡Qué bola! Estoy escuchando. Habla en español o pregúntame cómo se dice cualquier palabra en inglés.
         </div>
 
         <div id="live-ai-phonetic" class="phonetic-box" style="text-align:left;" onclick="speakSpanishText(currentTutorState.replySpanish)">
@@ -961,7 +1062,7 @@
         </div>
 
         <div id="live-ai-en-text" class="english-subtext" style="text-align:left;">
-          What's up! I'm listening. Speak comfortably and I'll help you sound more natural.
+          What's up! I'm listening. Speak in Spanish or ask me how to say any word in English.
         </div>
 
         <div id="live-breakdown" class="breakdown-grid"></div>
@@ -975,7 +1076,7 @@
           🐢 Slow (0.75x)
         </button>
 
-        <button id="live-orb-btn" class="orb-btn listening" style="width:102px; height:102px;" onclick="handleLiveOrbTap()">
+        <button id="live-orb-btn" class="orb-btn listening" style="width:100px; height:100px;" onclick="handleLiveOrbTap()">
           <span class="orb-icon">🎙️</span>
           <span id="live-orb-label" class="orb-label">TAP IF DONE</span>
         </button>
@@ -985,16 +1086,17 @@
         </button>
       </div>
 
-      <!-- Quick fallback input inside live call -->
+      <!-- Quick input inside live call with both Translate & Send -->
       <div class="input-row">
         <input
           type="text"
           id="live-text-input"
           class="text-input"
-          placeholder="Or type here during the live call..."
-          onkeydown="if(event.key === 'Enter') handleLiveTextSubmit()"
+          placeholder="Type word to translate or message..."
+          onkeydown="if(event.key === 'Enter') handleLiveTextSubmit(false)"
         />
-        <button class="send-btn" onclick="handleLiveTextSubmit()">Send</button>
+        <button class="translate-btn" onclick="handleLiveTextSubmit(true)">🌐 Translate</button>
+        <button class="send-btn" onclick="handleLiveTextSubmit(false)">Send</button>
       </div>
     </div>
   </div>
@@ -1008,7 +1110,7 @@
         <span>⚙️ Tutor Settings & API Key</span>
       </div>
       <p style="font-size:13px; color:#94a3b8; line-height:1.4;">
-        Enter your Gemini API key below for unlimited dynamic AI responses. (Even without a key, Yordanis's built-in smart coaching engine works offline!)
+        Optional: Paste your Gemini API key below for full AI conversations. Live translation, phonetics, and fluency coaching also work automatically out of the box!
       </p>
       <input
         type="password"
@@ -1024,26 +1126,30 @@
   </div>
 
   <!-- =========================================================
-       APPLICATION JAVASCRIPT (ZERO EXTERNAL DEPENDENCIES)
+       APPLICATION JAVASCRIPT (COMPLETE ENGINE)
        ========================================================= -->
   <script>
-    // --- STATE ---
+    // --- CORE STATE ---
     let studentLevel = "A2";
     let isLiveModalOpen = false;
     let liveMicLang = "es"; // "es" or "en"
-    let callPhase = "idle"; // "listening" | "thinking" | "speaking" | "paused"
+    let callPhase = "idle";
     let recognitionInstance = null;
     let silenceTimer = null;
     let wordStreamTimer = null;
     let accumulatedTranscript = "";
     let currentInterimTranscript = "";
 
+    let lastTranslatedSpanish = "Está bien";
+    let lastTranslatedEnglish = "It's fine / Okay";
+
     let currentTutorState = {
       userOriginal: "",
       isNatural: true,
-      correction: "",
+      isTranslationResponse: false,
+      correction: "Está bien / Todo bien",
       moreFluentWay: "¡Qué bola, asere! Vamos a practicar español.",
-      coachingTip: "Use natural greetings to jump right into conversation.",
+      coachingTip: "Tap 🌐 Translate or ask 'How do I say...' anytime for instant Spanish translations.",
       replySpanish: "¡Qué bola, asere! Soy Yordanis. Toca el círculo para hablar en español, o usa el botón en inglés abajo si quieres saber cómo se dice una palabra.",
       replyPhonetic: "[keh · boh-lah · ah-seh-reh · sohy · yohr-dah-neh · toh-kah · ehl · keer-koo-loh · pah-rah · ah-blahr · ehn · ehs-pah-nyohl · oh · oo-sah · ehl · boh-tohn · ehn · eeng-lehs · ah-bah-hoh · see · keh-rehs · sah-behr · koh-moh · seh · dee-seh · oo-nah · pah-lah-brah]",
       replyEnglish: "What's up, bro! I'm Yordanis. Tap the orb to speak Spanish, or use the English button below to ask how to say any English word.",
@@ -1055,6 +1161,248 @@
         { es: "cómo se dice", en: "how to say" }
       ]
     };
+
+    // --- BUILT-IN BILINGUAL DICTIONARY FOR INSTANT ZERO-LATENCY LOOKUPS ---
+    const INSTANT_DICTIONARY = {
+      "it's fine": {
+        es: "Está bien / No pasa nada",
+        fluent: "¡Está bien, tranquilo! No pasa nada.",
+        en: "It's fine / No worries",
+        tip: "Use 'Está bien' for general 'it's fine/okay', or 'No pasa nada' when reassuring someone ('no worries')."
+      },
+      "its fine": {
+        es: "Está bien / No pasa nada",
+        fluent: "¡Está bien, tranquilo! No pasa nada.",
+        en: "It's fine / No worries",
+        tip: "Use 'Está bien' for general 'it's fine/okay', or 'No pasa nada' when reassuring someone."
+      },
+      "fine": {
+        es: "Bien / Está bien",
+        fluent: "Todo bien, gracias.",
+        en: "Fine / All good",
+        tip: "'Todo bien' is the most natural everyday way to say 'everything's fine'."
+      },
+      "white": {
+        es: "Blanco / Blanca",
+        fluent: "El color blanco (e.g., una camisa blanca)",
+        en: "White",
+        tip: "Remember gender agreement: 'blanco' for masculine nouns (el carro blanco) and 'blanca' for feminine nouns (la casa blanca)."
+      },
+      "black": {
+        es: "Negro / Negra",
+        fluent: "El color negro",
+        en: "Black",
+        tip: "Use 'negro' for masculine nouns and 'negra' for feminine nouns."
+      },
+      "red": {
+        es: "Rojo / Roja",
+        fluent: "El color rojo",
+        en: "Red",
+        tip: "Changes ending to match the noun: 'rojo' (masc.) or 'roja' (fem.)."
+      },
+      "blue": {
+        es: "Azul",
+        fluent: "El color azul",
+        en: "Blue",
+        tip: "'Azul' stays the same for both masculine and feminine singular nouns!"
+      },
+      "green": {
+        es: "Verde",
+        fluent: "El color verde",
+        en: "Green",
+        tip: "'Verde' works for both masculine and feminine nouns."
+      },
+      "yellow": {
+        es: "Amarillo / Amarilla",
+        fluent: "El color amarillo",
+        en: "Yellow",
+        tip: "Pronounced [ah-mah-ree-yoh] with a soft 'll' sound."
+      },
+      "thank you": {
+        es: "Gracias / Muchas gracias",
+        fluent: "¡Mil gracias, te lo agradezco!",
+        en: "Thank you / Thanks a ton",
+        tip: "Add 'te lo agradezco' (I appreciate it) to sound super natural."
+      },
+      "thanks": {
+        es: "Gracias",
+        fluent: "¡Muchas gracias, asere!",
+        en: "Thanks!",
+        tip: "'Muchas gracias' or 'Mil gracias' sounds warmer than a single 'gracias'."
+      },
+      "how are you": {
+        es: "¿Cómo estás? / ¿Qué tal?",
+        fluent: "¿Cómo va todo? / ¿Qué cuentas?",
+        en: "How are you? / How's everything going?",
+        tip: "Natives constantly use '¿Cómo va todo?' or '¿Qué tal?' in casual conversation."
+      },
+      "what's up": {
+        es: "¿Qué tal? / ¿Qué onda? / ¡Qué bola!",
+        fluent: "¡Qué bola, asere! ¿Cómo anda todo?",
+        en: "What's up! How's everything going?",
+        tip: "'¡Qué bola!' is Cuban slang, '¿Qué onda?' is Mexican, and '¿Qué tal?' works everywhere."
+      },
+      "i don't know": {
+        es: "No sé / No lo sé",
+        fluent: "La verdad, no tengo idea.",
+        en: "I don't know / Honestly, I have no idea.",
+        tip: "'No sé' is standard; 'No tengo idea' sounds very fluent."
+      },
+      "i understand": {
+        es: "Entiendo / Ya entiendo",
+        fluent: "¡Ah, ya veo! / Te entiendo perfectamente.",
+        en: "I understand / Ah, I see!",
+        tip: "'Ya entiendo' means 'Now I get it'."
+      },
+      "i don't understand": {
+        es: "No entiendo",
+        fluent: "Disculpa, no te entendí bien. ¿Me lo repites?",
+        en: "Sorry, I didn't quite catch that. Can you repeat it?",
+        tip: "Asking '¿Me lo repites?' (Can you repeat that for me?) is super natural."
+      },
+      "where is the bathroom": {
+        es: "¿Dónde está el baño?",
+        fluent: "Disculpa, ¿me dices dónde queda el baño?",
+        en: "Excuse me, can you tell me where the restroom is?",
+        tip: "Using '¿Dónde queda...?' instead of '¿Dónde está...?' is very common in Latin America."
+      },
+      "how much is it": {
+        es: "¿Cuánto cuesta? / ¿Cuánto es?",
+        fluent: "¿En cuánto sale esto?",
+        en: "How much does this come out to?",
+        tip: "'¿Cuánto cuesta?' works everywhere; '¿En cuánto sale?' is great street Spanish."
+      },
+      "check please": {
+        es: "La cuenta, por favor.",
+        fluent: "Jefe, ¿me trae la cuenta cuando pueda, por favor?",
+        en: "Boss, could you bring me the check when you can, please?",
+        tip: "Always say 'La cuenta, por favor' at restaurants."
+      },
+      "see you later": {
+        es: "Hasta luego / Nos vemos",
+        fluent: "¡Nos vemos ahorita! Cuídate.",
+        en: "See you in a bit! Take care.",
+        tip: "'Nos vemos' (literally 'we see each other') is the most common way to say 'see ya'."
+      },
+      "share": {
+        es: "Compartir",
+        fluent: "Vamos a compartir esto.",
+        en: "To share / Let's share this.",
+        tip: "Regular -IR verb: yo comparto, tú compartes, nosotros compartimos."
+      }
+    };
+
+    // --- AUTOMATIC SPANISH PHONETIC GENERATOR ---
+    function generateSpanishPhonetics(spanishStr) {
+      if (!spanishStr) return "";
+      const clean = spanishStr
+        .toLowerCase()
+        .replace(/[¡!¿?.,":;()«»]/g, "")
+        .trim();
+      if (!clean) return "";
+
+      const words = clean.split(/\s+/);
+      const phoneticWords = words.map((w) => {
+        if (w === "que" || w === "qué") return "keh";
+        if (w === "quien" || w === "quién") return "kyehn";
+        if (w === "quiero") return "kyeh-roh";
+        if (w === "quieres") return "kyeh-rehs";
+        if (w === "como" || w === "cómo") return "koh-moh";
+        if (w === "está" || w === "esta") return "ehs-tah";
+        if (w === "estás" || w === "estas") return "ehs-tahs";
+        if (w === "estoy") return "ehs-tohy";
+        if (w === "bien") return "byehn";
+        if (w === "muy") return "mwee";
+        if (w === "hola") return "oh-lah";
+        if (w === "blanco") return "blahn-koh";
+        if (w === "blanca") return "blahn-kah";
+        if (w === "todo") return "toh-doh";
+        if (w === "nada") return "nah-dah";
+        if (w === "pasa") return "pah-sah";
+        if (w === "gracias") return "grah-syahs";
+        if (w === "por") return "pohr";
+        if (w === "favor") return "fah-bohr";
+        if (w === "dice") return "dee-seh";
+        if (w === "se") return "seh";
+        if (w === "en") return "ehn";
+        if (w === "español") return "ehs-pah-nyohl";
+        if (w === "yo") return "yoh";
+        if (w === "tú" || w === "tu") return "too";
+        if (w === "el" || w === "él") return "ehl";
+        if (w === "la") return "lah";
+        if (w === "no") return "noh";
+        if (w === "sí" || w === "si") return "see";
+        if (w === "y") return "ee";
+        if (w === "o") return "oh";
+
+        let p = w
+          .replace(/^h/, "")
+          .replace(/ch/g, "ch")
+          .replace(/ll/g, "y")
+          .replace(/ñ/g, "ny")
+          .replace(/qu([eiéí])/g, "k$1")
+          .replace(/gue/g, "geh")
+          .replace(/gui/g, "gee")
+          .replace(/ce/g, "seh")
+          .replace(/ci/g, "see")
+          .replace(/z/g, "s")
+          .replace(/ge/g, "heh")
+          .replace(/gi/g, "hee")
+          .replace(/j/g, "h")
+          .replace(/v/g, "b")
+          .replace(/á/g, "ah")
+          .replace(/é/g, "eh")
+          .replace(/í/g, "ee")
+          .replace(/ó/g, "oh")
+          .replace(/ú/g, "oo");
+
+        return p;
+      });
+
+      return "[" + phoneticWords.join(" · ") + "]";
+    }
+
+    // --- DETECT IF USER INPUT IS ENGLISH OR A TRANSLATION REQUEST ---
+    function detectTranslationIntent(rawText, currentMode) {
+      const text = String(rawText || "").trim();
+      const lower = text.toLowerCase();
+
+      // Explicit patterns like "How do I say...", "Translate...", "What does X mean"
+      const howToSayMatch = lower.match(/(?:how do (?:i|you) say|how to say|what is|how do you translate|translate|como se dice|cómo se dice)\s+["']?(.+?)["']?\s*(?:in spanish|en español|\?)?$/i);
+      if (howToSayMatch && howToSayMatch[1]) {
+        return { isTranslation: true, targetPhrase: howToSayMatch[1].replace(/\?+$/, "").trim() };
+      }
+
+      // Check if exact phrase is in our English dictionary
+      const stripped = lower.replace(/[?.!,]/g, "").trim();
+      if (INSTANT_DICTIONARY[stripped]) {
+        return { isTranslation: true, targetPhrase: stripped };
+      }
+
+      // Check for common English words when user speaks English even in Spanish mode
+      const englishSignalWords = /\b(it's|its|the|what|where|when|why|how|fine|white|black|red|blue|green|yellow|please|thank|thanks|water|food|bathroom|check|money|good|bad|morning|night|today|tomorrow|understand|know|want|need|can|could|would|should|sorry|excuse|help)\b/i;
+      if (currentMode === "en" || englishSignalWords.test(lower)) {
+        return { isTranslation: true, targetPhrase: text.replace(/\?+$/, "").trim() };
+      }
+
+      return { isTranslation: false, targetPhrase: text };
+    }
+
+    // --- FREE CLOUD TRANSLATION FALLBACK (WORKS WITHOUT AN API KEY) ---
+    async function fetchFreeTranslation(phrase, sourceLang, targetLang) {
+      try {
+        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(phrase)}&langpair=${sourceLang}|${targetLang}`;
+        const res = await fetch(url);
+        if (res.ok) {
+          const data = await res.json();
+          const translated = data?.responseData?.translatedText;
+          if (translated && translated.toLowerCase() !== phrase.toLowerCase()) {
+            return translated;
+          }
+        }
+      } catch (e) {}
+      return null;
+    }
 
     // --- SAFE LOCALSTORAGE HELPERS ---
     function getSavedApiKey() {
@@ -1070,9 +1418,9 @@
 
     function loadSrsDeck() {
       const defaultDeck = [
-        { id: 1, es: "¿Cómo se dice...?", en: "How do you say...?", phonetic: "[koh-moh · seh · dee-seh]" },
-        { id: 2, es: "Compartir", en: "To share", phonetic: "[kohm-pahr-teer]" },
-        { id: 3, es: "Hasta luego", en: "See you later", phonetic: "[ahs-tah · lweh-goh]" },
+        { id: 1, es: "Está bien / No pasa nada", en: "It's fine / No worries", phonetic: "[ehs-tah · byehn]" },
+        { id: 2, es: "¿Cómo se dice...?", en: "How do you say...?", phonetic: "[koh-moh · seh · dee-seh]" },
+        { id: 3, es: "Compartir", en: "To share", phonetic: "[kohm-pahr-teer]" },
         { id: 4, es: "Ahorita vengo", en: "I'll be right back", phonetic: "[ah-oh-ree-tah · behn-goh]" }
       ];
       try {
@@ -1098,12 +1446,10 @@
 
     // --- TAB NAVIGATION ---
     function switchTab(tabId) {
-      const tabs = document.querySelectorAll(".nav-tab");
-      tabs.forEach((btn) => {
+      document.querySelectorAll(".nav-tab").forEach((btn) => {
         btn.classList.toggle("active", btn.getAttribute("data-tab") === tabId);
       });
-      const panels = document.querySelectorAll(".tab-panel");
-      panels.forEach((panel) => {
+      document.querySelectorAll(".tab-panel").forEach((panel) => {
         panel.classList.toggle("active", panel.id === "tab-" + tabId);
       });
     }
@@ -1111,6 +1457,14 @@
     function toggleBreakdown(containerId) {
       const el = document.getElementById(containerId);
       if (el) el.classList.toggle("open");
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
     }
 
     function renderBreakdowns() {
@@ -1135,14 +1489,6 @@
       if (liveBd) liveBd.innerHTML = html;
     }
 
-    function escapeHtml(str) {
-      return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
-    }
-
     // --- UPDATE MAIN & LIVE UI CARDS ---
     function syncTutorDisplay(streamWords = false) {
       document.getElementById("main-es-text").textContent = currentTutorState.replySpanish;
@@ -1155,34 +1501,168 @@
         document.getElementById("live-ai-es-text").textContent = currentTutorState.replySpanish;
       }
 
-      // Update Live Grammar & Fluency Coach Card
-      const coachCard = document.getElementById("live-coach-card");
-      if (currentTutorState.correction || currentTutorState.moreFluentWay) {
-        coachCard.classList.add("visible");
-        document.getElementById("coach-badge-title").textContent = currentTutorState.isNatural
+      // Update Live Grammar, Translation & Fluency Coach Card
+      const badgeTitle = document.getElementById("coach-badge-title");
+      const fixLabel = document.getElementById("coach-fix-label");
+      const corrRow = document.getElementById("coach-correction-row");
+      const fluentRow = document.getElementById("coach-fluent-row");
+
+      if (currentTutorState.isTranslationResponse) {
+        badgeTitle.textContent = "🌐 Instant Spanish Translation & Usage";
+        fixLabel.textContent = "Spanish Translation:";
+      } else {
+        badgeTitle.textContent = currentTutorState.isNatural
           ? "✅ Sounds Native! (+ Fluent Alternative)"
           : "💡 Live Grammar & Fluency Coach";
-
-        const corrRow = document.getElementById("coach-correction-row");
-        if (currentTutorState.correction && !currentTutorState.isNatural) {
-          corrRow.style.display = "block";
-          document.getElementById("coach-correction-text").textContent = currentTutorState.correction;
-        } else {
-          corrRow.style.display = "none";
-        }
-
-        const fluentRow = document.getElementById("coach-fluent-row");
-        if (currentTutorState.moreFluentWay) {
-          fluentRow.style.display = "block";
-          document.getElementById("coach-fluent-text").textContent = '"' + currentTutorState.moreFluentWay + '"';
-        } else {
-          fluentRow.style.display = "none";
-        }
-
-        document.getElementById("coach-tip-text").textContent = currentTutorState.coachingTip || "";
+        fixLabel.textContent = "Correction:";
       }
 
+      if (currentTutorState.correction) {
+        corrRow.style.display = "block";
+        document.getElementById("coach-correction-text").textContent = currentTutorState.correction;
+      } else {
+        corrRow.style.display = "none";
+      }
+
+      if (currentTutorState.moreFluentWay) {
+        fluentRow.style.display = "block";
+        document.getElementById("coach-fluent-text").textContent = '"' + currentTutorState.moreFluentWay + '"';
+      } else {
+        fluentRow.style.display = "none";
+      }
+
+      document.getElementById("coach-tip-text").textContent = currentTutorState.coachingTip || "";
       renderBreakdowns();
+    }
+
+    // --- DEDICATED IN-PLACE TRANSLATION HANDLER (MAIN & LENS TABS) ---
+    async function handleDirectTranslation(sourceTab) {
+      const inputId = sourceTab === "lens" ? "lens-input" : "main-text-input";
+      const inputEl = document.getElementById(inputId);
+      const rawText = inputEl.value.trim();
+      if (!rawText) return;
+
+      const cardId = sourceTab === "lens" ? "lens-translation-card" : "main-translation-card";
+      const prefix = sourceTab === "lens" ? "lens-trans" : "main-trans";
+
+      const cardEl = document.getElementById(cardId);
+      cardEl.classList.add("visible");
+      document.getElementById(prefix + "-es").textContent = "Translating...";
+      document.getElementById(prefix + "-phonetic").textContent = "🔊 ...";
+      document.getElementById(prefix + "-en").textContent = rawText;
+      document.getElementById(prefix + "-notes").textContent = "";
+
+      const result = await translateAndExplainPhrase(rawText);
+
+      lastTranslatedSpanish = result.spanishMain;
+      lastTranslatedEnglish = result.englishMeaning;
+
+      document.getElementById(prefix + "-direction").textContent = "🌐 Translation for: \"" + rawText + "\"";
+      document.getElementById(prefix + "-es").textContent = result.spanishMain;
+      document.getElementById(prefix + "-phonetic").textContent = "🔊 " + result.phonetic;
+      document.getElementById(prefix + "-en").textContent = "Meaning: " + result.englishMeaning;
+      document.getElementById(prefix + "-notes").textContent = "💡 " + result.tip;
+
+      // Also update Yordanis main card & speak the Spanish translation aloud
+      currentTutorState = result.tutorState;
+      syncTutorDisplay(false);
+      speakSpanishText(result.spanishMain, 0.9);
+    }
+
+    // --- CORE TRANSLATION ENGINE (GEMINI + DICTIONARY + CLOUD TRANSLATE) ---
+    async function translateAndExplainPhrase(rawQuery) {
+      const intent = detectTranslationIntent(rawQuery, "en");
+      const cleanPhrase = intent.targetPhrase.replace(/^["']|["']$/g, "").trim();
+      const lookupKey = cleanPhrase.toLowerCase().replace(/[?.!,]/g, "").trim();
+
+      // 1. Check built-in instant dictionary first
+      if (INSTANT_DICTIONARY[lookupKey]) {
+        const entry = INSTANT_DICTIONARY[lookupKey];
+        const primarySpanish = entry.es.split("/")[0].trim();
+        const phon = generateSpanishPhonetics(entry.es);
+        const replyEs = `En español, "${cleanPhrase}" se dice «${entry.es}». Por ejemplo: "${entry.fluent}"`;
+        return {
+          spanishMain: entry.es,
+          englishMeaning: entry.en,
+          phonetic: phon,
+          tip: entry.tip,
+          tutorState: {
+            userOriginal: rawQuery,
+            isNatural: true,
+            isTranslationResponse: true,
+            correction: entry.es,
+            moreFluentWay: entry.fluent,
+            coachingTip: entry.tip,
+            replySpanish: replyEs,
+            replyPhonetic: generateSpanishPhonetics(replyEs),
+            replyEnglish: `In Spanish, "${cleanPhrase}" is "${entry.es}". For example: "${entry.fluent}"`,
+            wordBreakdown: [
+              { es: primarySpanish, en: cleanPhrase },
+              { es: entry.fluent, en: entry.en }
+            ]
+          }
+        };
+      }
+
+      // 2. Try Gemini API if user has a key saved
+      const apiKey = getSavedApiKey();
+      if (apiKey) {
+        try {
+          const tutorObj = await callGeminiTutorAPI(
+            `Translate and explain how to say "${cleanPhrase}" in natural Spanish.`,
+            "en",
+            apiKey
+          );
+          if (tutorObj && tutorObj.correction) {
+            return {
+              spanishMain: tutorObj.correction,
+              englishMeaning: cleanPhrase,
+              phonetic: generateSpanishPhonetics(tutorObj.correction),
+              tip: tutorObj.coachingTip || "Natural Spanish translation.",
+              tutorState: tutorObj
+            };
+          }
+        } catch (e) {}
+      }
+
+      // 3. Free Cloud Translation API (Translates ANY English or Spanish phrase without a key)
+      let translatedEs = await fetchFreeTranslation(cleanPhrase, "en", "es");
+      let translatedEn = cleanPhrase;
+
+      // If the input was already Spanish, translate ES -> EN too
+      if (!translatedEs || translatedEs.toLowerCase() === cleanPhrase.toLowerCase()) {
+        const maybeEnglish = await fetchFreeTranslation(cleanPhrase, "es", "en");
+        if (maybeEnglish && maybeEnglish.toLowerCase() !== cleanPhrase.toLowerCase()) {
+          translatedEs = cleanPhrase;
+          translatedEn = maybeEnglish;
+        }
+      }
+
+      const finalEs = translatedEs || cleanPhrase;
+      const phonetic = generateSpanishPhonetics(finalEs);
+      const replyEs = `Para decir "${cleanPhrase}" en español, dices: «${finalEs}». ¡Intenta repetirlo en voz alta!`;
+
+      return {
+        spanishMain: finalEs,
+        englishMeaning: translatedEn,
+        phonetic: phonetic,
+        tip: `Tap 🔊 Hear to listen to "${finalEs}" or +SRS to save it to your flashcards.`,
+        tutorState: {
+          userOriginal: rawQuery,
+          isNatural: true,
+          isTranslationResponse: true,
+          correction: finalEs,
+          moreFluentWay: finalEs,
+          coachingTip: `Direct translation for "${cleanPhrase}": «${finalEs}»`,
+          replySpanish: replyEs,
+          replyPhonetic: generateSpanishPhonetics(replyEs),
+          replyEnglish: `To say "${cleanPhrase}" in Spanish, you say: "${finalEs}". Try repeating it out loud!`,
+          wordBreakdown: [
+            { es: finalEs, en: translatedEn },
+            { es: "En voz alta", en: "Out loud" }
+          ]
+        }
+      };
     }
 
     // --- LIVE TUTOR CALL INTERFACE ---
@@ -1221,11 +1701,11 @@
       if (liveMicLang === "en") {
         userHeader.textContent = "🇺🇸 YOU (ASKING IN ENGLISH)";
         toggleLabel.textContent = "🇪🇸 Speak Spanish";
-        placeholder.textContent = 'Ask in English (e.g., "How do I ask for the check?")...';
+        placeholder.textContent = 'Ask in English (e.g., "How do I say it\'s fine?")...';
       } else {
         userHeader.textContent = "🎙️ YOU (" + studentLevel + " SPANISH)";
         toggleLabel.textContent = "🇺🇸 Ask English";
-        placeholder.textContent = "Habla en español... tus palabras aparecerán aquí en vivo.";
+        placeholder.textContent = "Habla en español o pregunta 'How do I say...' en inglés.";
       }
     }
 
@@ -1250,7 +1730,7 @@
         micBadge.style.color = "#22c55e";
       } else if (phase === "thinking") {
         dot.style.background = "#f59e0b";
-        text.textContent = "Yordanis is coaching...";
+        text.textContent = "Yordanis is translating / coaching...";
         orbLabel.textContent = "THINKING...";
         wave.classList.add("active");
         micBadge.textContent = "ANALYZING";
@@ -1348,8 +1828,8 @@
         if (silenceTimer) clearTimeout(silenceTimer);
         if (combined.length > 1) {
           silenceTimer = setTimeout(function () {
-            finalizeUserSpeechAndReply(combined);
-          }, 1850);
+            finalizeUserSpeechAndReply(combined, false);
+          }, 1800);
         }
       };
 
@@ -1367,7 +1847,7 @@
       }
     }
 
-    async function finalizeUserSpeechAndReply(explicitText) {
+    async function finalizeUserSpeechAndReply(explicitText, forceTranslateMode) {
       if (silenceTimer) clearTimeout(silenceTimer);
       if (recognitionInstance) {
         recognitionInstance.onend = null;
@@ -1389,7 +1869,11 @@
       document.getElementById("live-interim-span").textContent = "";
       setLivePhaseUI("thinking");
 
-      const responseObj = await generateTutorResponse(finalSpoken, liveMicLang);
+      const responseObj = await generateTutorResponse(
+        finalSpoken,
+        forceTranslateMode ? "en" : liveMicLang,
+        forceTranslateMode
+      );
       currentTutorState = responseObj;
       syncTutorDisplay(true);
       speakSpanishWithLiveWordStream(responseObj.replySpanish, true);
@@ -1436,8 +1920,6 @@
         if (wordStreamTimer) clearInterval(wordStreamTimer);
         aiTextEl.textContent = spanishText;
         if (autoResumeListening && isLiveModalOpen) {
-          liveMicLang = "es";
-          updateLiveLangUI();
           setTimeout(function () {
             startLiveSpeechRecognition();
           }, 450);
@@ -1465,107 +1947,110 @@
     }
 
     function speakNativeSuggestion() {
-      if (currentTutorState.moreFluentWay) {
-        speakSpanishWithLiveWordStream(currentTutorState.moreFluentWay, false, 0.88);
+      const target = currentTutorState.isTranslationResponse
+        ? (currentTutorState.correction || currentTutorState.moreFluentWay)
+        : (currentTutorState.moreFluentWay || currentTutorState.correction);
+      if (target) {
+        speakSpanishWithLiveWordStream(target, false, 0.88);
       }
     }
 
     function saveNativeSuggestionToSrs() {
-      if (currentTutorState.moreFluentWay) {
+      const esToSave = currentTutorState.correction || currentTutorState.moreFluentWay;
+      if (esToSave) {
         addSrsCard(
-          currentTutorState.moreFluentWay,
-          currentTutorState.coachingTip || "Native fluency phrasing"
+          esToSave,
+          currentTutorState.userOriginal || currentTutorState.coachingTip || "Saved phrase"
         );
       }
     }
 
-    // --- AI TUTOR ENGINE (GEMINI API + BUILT-IN SMART OFFLINE ENGINE) ---
-    async function generateTutorResponse(userText, mode) {
-      const apiKey = getSavedApiKey();
-
-      if (apiKey) {
-        const prompt = `
-You are Yordanis, an intuitive, encouraging, street-smart Spanish tutor in a live voice session.
+    // --- GEMINI API HELPER ---
+    async function callGeminiTutorAPI(userText, mode, apiKey) {
+      const prompt = `
+You are Yordanis, an intuitive, street-smart Spanish tutor in a live voice session.
 Student CEFR Level: ${studentLevel}.
-Input Mode: ${mode === "en" ? "Student is asking a question in English." : "Student is speaking Spanish."}
+If the user says an English word/phrase (like "It's fine" or "White") or asks "How do I say...", you MUST provide the exact Spanish translation in "correction", a natural full sentence using it in "moreFluentWay", and explain it clearly in "replySpanish" and "replyEnglish".
+NEVER insert untranslated English words into Spanish sentences.
 
-Analyze what the student said and return ONLY valid JSON with this exact schema:
+Return ONLY valid JSON with this exact schema:
 {
   "userOriginal": "what the user said",
   "isNatural": false,
-  "correction": "Corrected Spanish sentence if they made a grammar or word choice mistake (or empty string if already correct)",
-  "moreFluentWay": "A more natural, fluent, native Spanish way to say what the user meant",
-  "coachingTip": "Brief 1-sentence tip in English explaining why the fluent version sounds more natural",
-  "replySpanish": "Your natural conversational response in Spanish (1-2 sentences, keep the conversation going like a real tutor)",
-  "replyPhonetic": "Syllable-by-syllable phonetic pronunciation guide in brackets, e.g. [keh · boh-lah · ah-seh-reh]",
+  "isTranslationResponse": true,
+  "correction": "Direct Spanish translation or corrected Spanish sentence",
+  "moreFluentWay": "A natural, native Spanish sentence using the translation or expressing the user's idea",
+  "coachingTip": "1 brief sentence in English explaining the translation or grammar nuance",
+  "replySpanish": "Your conversational response in Spanish teaching the phrase or continuing the chat (1-2 sentences)",
+  "replyPhonetic": "Syllable-by-syllable phonetic pronunciation guide in brackets, e.g. [ehs-tah · byehn]",
   "replyEnglish": "English translation of your replySpanish",
   "wordBreakdown": [
-    { "es": "Spanish phrase", "en": "English meaning" }
+    { "es": "Spanish word/phrase", "en": "English meaning" }
   ]
 }`;
 
-        const models = ["gemini-2.5-flash", "gemini-2.0-flash"];
-        for (let m = 0; m < models.length; m++) {
-          try {
-            const res = await fetch(
-              "https://generativelanguage.googleapis.com/v1beta/models/" + models[m] + ":generateContent?key=" + apiKey,
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  systemInstruction: { parts: [{ text: prompt }] },
-                  contents: [{ role: "user", parts: [{ text: userText }] }],
-                  generationConfig: {
-                    temperature: 0.7,
-                    responseMimeType: "application/json"
-                  }
-                })
+      const models = ["gemini-2.5-flash", "gemini-2.0-flash"];
+      for (let m = 0; m < models.length; m++) {
+        const res = await fetch(
+          "https://generativelanguage.googleapis.com/v1beta/models/" + models[m] + ":generateContent?key=" + apiKey,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              systemInstruction: { parts: [{ text: prompt }] },
+              contents: [{ role: "user", parts: [{ text: userText }] }],
+              generationConfig: {
+                temperature: 0.6,
+                responseMimeType: "application/json"
               }
-            );
-            if (res.ok) {
-              const data = await res.json();
-              const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-              const cleaned = raw.replace(/```json|```/g, "").trim();
-              const parsed = JSON.parse(cleaned);
-              if (parsed && parsed.replySpanish) return parsed;
-            }
-          } catch (err) {
-            console.warn("Model attempt failed:", models[m], err);
+            })
           }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+          const cleaned = raw.replace(/```json|```/g, "").trim();
+          const parsed = JSON.parse(cleaned);
+          if (parsed && parsed.replySpanish) return parsed;
+        }
+      }
+      return null;
+    }
+
+    // --- MASTER TUTOR RESPONSE GENERATOR ---
+    async function generateTutorResponse(userText, mode, forceTranslate) {
+      // 1. Check if the user is asking for a translation or speaking English (e.g., "It's fine", "White", "How do I say...")
+      const intent = detectTranslationIntent(userText, mode);
+      if (forceTranslate || intent.isTranslation) {
+        const transResult = await translateAndExplainPhrase(intent.targetPhrase);
+        lastTranslatedSpanish = transResult.spanishMain;
+        lastTranslatedEnglish = transResult.englishMeaning;
+        return transResult.tutorState;
+      }
+
+      // 2. If user has a Gemini API key, use full AI conversation
+      const apiKey = getSavedApiKey();
+      if (apiKey) {
+        try {
+          const aiReply = await callGeminiTutorAPI(userText, mode, apiKey);
+          if (aiReply) return aiReply;
+        } catch (e) {
+          console.warn("Gemini API fallback:", e);
         }
       }
 
-      // Smart Built-In Offline Coaching Engine (works immediately with zero setup)
-      return buildSmartOfflineCoaching(userText, mode);
+      // 3. Built-in Spanish Coaching & Conversation Engine
+      return buildSpanishConversationCoaching(userText);
     }
 
-    function buildSmartOfflineCoaching(userText, mode) {
+    async function buildSpanishConversationCoaching(userText) {
       const lower = userText.toLowerCase().trim();
 
-      if (mode === "en" || lower.includes("how do i say") || lower.includes("how do you say")) {
-        const cleanedQuery = userText.replace(/how do (i|you) say/i, "").replace(/\?/g, "").trim() || "that";
-        return {
-          userOriginal: userText,
-          isNatural: true,
-          correction: "",
-          moreFluentWay: "¿Cómo se dice \"" + cleanedQuery + "\" en español?",
-          coachingTip: "Ask '¿Cómo se dice...?' whenever you want a native speaker to give you the right word.",
-          replySpanish: "¡Buena pregunta! Para decir eso de forma natural, úsalo en una frase corta y dilo con confianza. ¿Quieres intentarlo en voz alta?",
-          replyPhonetic: "[bweh-nah · preh-goon-tah · pah-rah · deh-seer · eh-soh · deh · fohr-mah · nah-too-rahl]",
-          replyEnglish: "Good question! To say that naturally, use it in a short phrase and say it with confidence. Want to try it out loud?",
-          wordBreakdown: [
-            { es: "¡Buena pregunta!", en: "Good question!" },
-            { es: "de forma natural", en: "in a natural way" },
-            { es: "en voz alta", en: "out loud" }
-          ]
-        };
-      }
-
-      // Common Spanish learner mistake detections
       if (lower.includes("yo gusto") || lower.includes("yo gusta")) {
         return {
           userOriginal: userText,
           isNatural: false,
+          isTranslationResponse: false,
           correction: "Me gusta mucho practicar español.",
           moreFluentWay: "¡Me encanta practicar español contigo!",
           coachingTip: "With 'gustar', always use 'Me gusta' (it pleases me) instead of 'Yo gusto'.",
@@ -1574,17 +2059,18 @@ Analyze what the student said and return ONLY valid JSON with this exact schema:
           replyEnglish: "Just like that! You say 'me gusta' or 'me encanta'. What do you like doing most in your free time?",
           wordBreakdown: [
             { es: "¡Así mismo!", en: "Just like that! / Exactly!" },
-            { es: "Me encanta", en: "I love (it enchants me)" },
+            { es: "Me encanta", en: "I love" },
             { es: "tiempo libre", en: "free time" }
           ]
         };
       }
 
-      if (lower.includes("estoy bien") || lower.includes("hola") || lower.includes("buenos dias") || lower.includes("que tal")) {
+      if (lower.includes("estoy bien") || lower.includes("todo bien") || lower.includes("hola") || lower.includes("que tal") || lower.includes("qué tal")) {
         return {
           userOriginal: userText,
           isNatural: true,
-          correction: "",
+          isTranslationResponse: false,
+          correction: "¡Todo bien por aquí!",
           moreFluentWay: "¡Todo bien por aquí! ¿Y tú, qué cuentas?",
           coachingTip: "Adding '¿Y tú, qué cuentas?' (And you, what's new?) makes your greeting sound 100% native.",
           replySpanish: "¡Qué bueno escucharte! Hoy vamos a soltar la lengua. Cuéntame, ¿cómo va tu día hoy?",
@@ -1598,38 +2084,22 @@ Analyze what the student said and return ONLY valid JSON with this exact schema:
         };
       }
 
-      if (lower.includes("quiero") || lower.includes("necesito")) {
-        return {
-          userOriginal: userText,
-          isNatural: true,
-          correction: userText.charAt(0).toUpperCase() + userText.slice(1),
-          moreFluentWay: "Me gustaría " + lower.replace(/^(yo\s+)?(quiero|necesito)\s*/i, "") + ", por favor.",
-          coachingTip: "Using 'Me gustaría...' (I would like...) or 'Quisiera...' sounds smoother and more polite than 'Quiero'.",
-          replySpanish: "¡Perfecto! Te entendí clarito. Si quieres sonar aún más natural, puedes decir «me gustaría». ¿Seguimos practicando?",
-          replyPhonetic: "[pehr-fehk-toh · teh · ehn-tehn-dee · klah-ree-toh · see · keh-rehs · soh-nahr · ah-oon · mahs · nah-too-rahl]",
-          replyEnglish: "Perfect! I understood you clearly. If you want to sound even more natural, you can say 'me gustaría'. Shall we keep practicing?",
-          wordBreakdown: [
-            { es: "Te entendí clarito", en: "I understood you loud and clear" },
-            { es: "sonar más natural", en: "to sound more natural" },
-            { es: "Me gustaría", en: "I would like" }
-          ]
-        };
-      }
+      // Translate the user's Spanish sentence to English so we can show its meaning accurately
+      const englishMeaning = (await fetchFreeTranslation(userText, "es", "en")) || "Spanish practice phrase";
 
-      // Default encouraging coaching response
       return {
         userOriginal: userText,
-        isNatural: false,
-        correction: userText.charAt(0).toUpperCase() + userText.slice(1) + ".",
-        moreFluentWay: "La verdad es que " + lower + ", ¿sabes a qué me refiero?",
-        coachingTip: "Connecting your thought with 'La verdad es que...' (The truth is that...) gives you natural native rhythm.",
-        replySpanish: "¡Bien dicho! Me gusta cómo armaste la frase. Dime un poco más sobre eso en español para seguir practicando.",
-        replyPhonetic: "[byehn · dee-choh · meh · goos-tah · koh-moh · ahr-mahs-teh · lah · frah-seh · dee-meh · oon · poh-koh · mahs]",
-        replyEnglish: "Well said! I like how you put that sentence together. Tell me a bit more about that in Spanish to keep practicing.",
+        isNatural: true,
+        isTranslationResponse: false,
+        correction: userText.charAt(0).toUpperCase() + userText.slice(1),
+        moreFluentWay: "¡Claro! " + userText.charAt(0).toUpperCase() + userText.slice(1) + ".",
+        coachingTip: `Your Spanish phrase means: "${englishMeaning}". Great pronunciation!`,
+        replySpanish: `¡Perfecto! Te entendí muy bien: «${userText}». ¿Cómo dirías otra frase parecida o qué otra palabra quieres traducir?`,
+        replyPhonetic: generateSpanishPhonetics(`Perfecto te entendí muy bien ${userText}`),
+        replyEnglish: `Perfect! I understood you very well ("${englishMeaning}"). Want to try another phrase or translate a new word?`,
         wordBreakdown: [
-          { es: "¡Bien dicho!", en: "Well said!" },
-          { es: "armaste la frase", en: "you put the sentence together" },
-          { es: "Dime un poco más", en: "Tell me a little more" }
+          { es: userText, en: englishMeaning },
+          { es: "Te entendí muy bien", en: "I understood you very well" }
         ]
       };
     }
@@ -1640,18 +2110,18 @@ Analyze what the student said and return ONLY valid JSON with this exact schema:
       if (!val) return;
       input.value = "";
       openLiveTutorCall("es");
-      finalizeUserSpeechAndReply(val);
+      finalizeUserSpeechAndReply(val, false);
     }
 
-    async function handleLiveTextSubmit() {
+    async function handleLiveTextSubmit(isTranslateButton) {
       const input = document.getElementById("live-text-input");
       const val = input.value.trim();
       if (!val) return;
       input.value = "";
-      finalizeUserSpeechAndReply(val);
+      finalizeUserSpeechAndReply(val, Boolean(isTranslateButton));
     }
 
-    // --- TAB 2: SLANG DATA & RENDER ---
+    // --- TAB 2: SLANG DATA & IN-PLACE ANALYZER ---
     const SLANG_DATA = {
       cuba: [
         { es: "¡Qué bola, asere!", en: "What's up, bro/friend!", phonetic: "[keh · boh-lah · ah-seh-reh]" },
@@ -1697,13 +2167,9 @@ Analyze what the student said and return ONLY valid JSON with this exact schema:
       `).join("");
     }
 
-    function analyzeSlangPhrase() {
-      const input = document.getElementById("lens-input");
-      const val = input.value.trim();
-      if (!val) return;
-      input.value = "";
-      openLiveTutorCall("es");
-      finalizeUserSpeechAndReply(val);
+    async function analyzeSlangPhrase() {
+      // Runs the in-place translator & analyzer right inside the Lens tab
+      await handleDirectTranslation("lens");
     }
 
     // --- TAB 3: MEDIA & SONG / ANIME LINES ---
@@ -1722,6 +2188,7 @@ Analyze what the student said and return ONLY valid JSON with this exact schema:
             <div style="display:flex; gap:6px;">
               <button class="mini-btn" onclick="speakSpanishText('${line.es.replace(/'/g, "\\'")}', 0.95)">🔊 1x</button>
               <button class="mini-btn" style="background:#4f46e5;" onclick="speakSpanishText('${line.es.replace(/'/g, "\\'")}', 0.72)">🐢 0.7x</button>
+              <button class="mini-btn" style="background:#15803d;" onclick="addSrsCard('${line.es.replace(/'/g, "\\'")}', '${line.en.replace(/'/g, "\\'")}')">+SRS</button>
             </div>
           </div>
           <div style="color:#fb923c; font-family:monospace; font-size:13px; margin:4px 0;">${escapeHtml(line.phonetic)}</div>
@@ -1730,13 +2197,20 @@ Analyze what the student said and return ONLY valid JSON with this exact schema:
       `).join("");
     }
 
-    function addCustomMediaLine() {
+    async function addCustomMediaLine() {
       const input = document.getElementById("media-custom-input");
       const val = input.value.trim();
       if (!val) return;
       input.value = "";
-      openLiveTutorCall("es");
-      finalizeUserSpeechAndReply(val);
+
+      const res = await translateAndExplainPhrase(val);
+      mediaLines.unshift({
+        es: res.spanishMain,
+        phonetic: res.phonetic,
+        en: res.englishMeaning
+      });
+      renderMediaLines();
+      speakSpanishText(res.spanishMain, 0.9);
     }
 
     // --- TAB 4: SRS FLASHCARDS ---
@@ -1744,7 +2218,12 @@ Analyze what the student said and return ONLY valid JSON with this exact schema:
       if (!es) return;
       const exists = srsDeck.some((c) => c.es.toLowerCase() === es.toLowerCase());
       if (!exists) {
-        srsDeck.unshift({ id: Date.now(), es: es, en: en || "", phonetic: "" });
+        srsDeck.unshift({
+          id: Date.now(),
+          es: es,
+          en: en || "",
+          phonetic: generateSpanishPhonetics(es)
+        });
         saveSrsDeck();
       }
     }
@@ -1780,6 +2259,7 @@ Analyze what the student said and return ONLY valid JSON with this exact schema:
               <button class="mini-btn" style="background:#991b1b;" onclick="removeSrsCard(${card.id})">✕</button>
             </div>
           </div>
+          ${card.phonetic ? `<div style="color:#fb923c; font-family:monospace; font-size:12px; margin-top:3px;">${escapeHtml(card.phonetic)}</div>` : ""}
           <div class="word-chip-en" style="font-size:14px; margin-top:4px;">${escapeHtml(card.en)}</div>
         </div>
       `).join("");
