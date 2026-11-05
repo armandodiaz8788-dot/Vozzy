@@ -1113,13 +1113,13 @@
         <span>⚙️ Tutor Settings & API Key</span>
       </div>
       <p style="font-size:13px; color:#94a3b8; line-height:1.4;">
-        Optional: Paste your Gemini API key below for full AI conversations. Live translation, phonetics, and fluency coaching also work automatically out of the box!
+        Paste your Gemini API key below (supports both <code>AQ....</code> and <code>AIzaSy...</code> keys) for full AI conversations. Stored privately in your browser's localStorage.
       </p>
       <input
         type="password"
         id="api-key-input"
         class="text-input"
-        placeholder="Paste Gemini API Key (AIzaSy...)"
+        placeholder="Paste Gemini API Key (AQ.... or AIzaSy...)"
       />
       <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:6px;">
         <button class="secondary-btn" onclick="closeSettingsModal()">Cancel</button>
@@ -1331,13 +1331,11 @@
       const words = text.trim().split(/\s+/);
       const out = [];
       for (let i = 0; i < words.length; i++) {
-        // Skip immediate duplicate words caused by mobile STT restarts (e.g. "Hola Hola")
         if (i > 0 && words[i].toLowerCase() === words[i - 1].toLowerCase()) {
           continue;
         }
         out.push(words[i]);
       }
-      // Also collapse repeated 2-to-4 word phrases (e.g., "Hola qué tal Hola qué tal")
       let result = out.join(" ");
       result = result.replace(/\b(\w+(?:\s+\w+){1,3})\s+\1\b/gi, "$1");
       return result.trim();
@@ -1352,16 +1350,13 @@
       const aLower = a.toLowerCase();
       const bLower = b.toLowerCase();
 
-      // If Android Chrome sends the cumulative transcript in the new chunk (b starts with a), replace with b!
       if (bLower.startsWith(aLower)) {
         return collapseImmediateWordStutters(b);
       }
-      // If b is already contained at the end of a, ignore b
       if (aLower.endsWith(bLower) || aLower === bLower) {
         return collapseImmediateWordStutters(a);
       }
 
-      // Check word-level overlap between the end of `a` and start of `b`
       const aWords = a.split(/\s+/);
       const bWords = b.split(/\s+/);
       const maxOverlap = Math.min(aWords.length, bWords.length);
@@ -1455,10 +1450,8 @@
       const text = collapseImmediateWordStutters(String(rawText || "").trim());
       const lower = text.toLowerCase();
 
-      // Match even if the user had repeated "how do I" prefixes before the actual phrase
       const howToSayMatch = lower.match(/(?:how\s+do\s+(?:i|you)\s+say|how\s+to\s+say|what\s+is|how\s+do\s+you\s+translate|translate|como\s+se\s+dice|cómo\s+se\s+dice)\s+["']?(.+?)["']?\s*(?:in\s+spanish|en\s+español|\?)?$/i);
       if (howToSayMatch && howToSayMatch[1]) {
-        // Strip any leftover repeated "how do I say" inside group 1
         const cleanedTarget = howToSayMatch[1]
           .replace(/^(?:how\s+do\s+(?:i|you)\s+say\s+)+/i, "")
           .replace(/\?+$/, "")
@@ -1487,7 +1480,6 @@
         if (res.ok) {
           const data = await res.json();
           let translated = (data?.responseData?.translatedText || "").trim();
-          // Fix incomplete trailing "deja de" if translating "stop"
           if (/deja de$/i.test(translated)) {
             translated = translated.replace(/deja de$/i, "¡para!");
           }
@@ -1887,8 +1879,6 @@
 
       const rec = new SpeechRec();
       rec.lang = liveMicLang === "en" ? "en-US" : "es-MX";
-      // On Android Chrome, continuous=true causes cumulative duplicate final chunks ("How How do How do I").
-      // Setting continuous = !isAndroidMobile + overlap deduplication eliminates the stutter completely.
       rec.continuous = !isAndroidMobile;
       rec.interimResults = true;
 
@@ -1914,7 +1904,6 @@
           accumulatedTranscript = mergeSpeechSegments(accumulatedTranscript, latestFinal);
         }
 
-        // Prevent interim from repeating words already in accumulatedTranscript
         if (
           latestInterim &&
           accumulatedTranscript &&
@@ -1944,7 +1933,6 @@
       };
 
       rec.onend = function () {
-        // If Android stopped single-utterance recognition and we already captured speech, reply immediately
         const captured = mergeSpeechSegments(accumulatedTranscript, currentInterimTranscript);
         if (callPhase === "listening" && captured.length > 1) {
           if (silenceTimer) clearTimeout(silenceTimer);
@@ -2082,7 +2070,7 @@
       }
     }
 
-    // --- GEMINI API HELPER ---
+    // --- GEMINI API HELPER (SUPPORTS AQ.... AND AIzaSy... KEYS VIA x-goog-api-key HEADER) ---
     async function callGeminiTutorAPI(userText, mode, apiKey) {
       const prompt = `
 You are Yordanis, an intuitive, street-smart Spanish tutor in a live voice session.
@@ -2106,13 +2094,17 @@ Return ONLY valid JSON with this exact schema:
   ]
 }`;
 
+      const cleanKey = apiKey.trim();
       const models = ["gemini-2.5-flash", "gemini-2.0-flash"];
       for (let m = 0; m < models.length; m++) {
         const res = await fetch(
-          "https://generativelanguage.googleapis.com/v1beta/models/" + models[m] + ":generateContent?key=" + apiKey,
+          "https://generativelanguage.googleapis.com/v1beta/models/" + models[m] + ":generateContent",
           {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              "x-goog-api-key": cleanKey
+            },
             body: JSON.stringify({
               systemInstruction: { parts: [{ text: prompt }] },
               contents: [{ role: "user", parts: [{ text: userText }] }],
