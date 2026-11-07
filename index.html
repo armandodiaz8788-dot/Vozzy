@@ -44,6 +44,7 @@
     .video-placeholder { position: absolute; color: var(--muted); font-size: 0.88rem; text-align: center; padding: 20px; pointer-events: none; z-index: 2; }
     #cam-fps-pill { position: absolute; top: 10px; left: 10px; background: rgba(16, 185, 129, 0.88); color: #fff; font-size: 0.75rem; font-weight: 700; padding: 3px 9px; border-radius: 99px; display: none; z-index: 3; pointer-events: none; }
     #focus-reticle { position: absolute; width: 68px; height: 68px; border: 2px solid #38bdf8; border-radius: 50%; box-shadow: 0 0 12px rgba(56, 189, 248, 0.9); transform: translate(-50%, -50%); pointer-events: none; display: none; z-index: 4; }
+    #live-reply-banner { background: #020617; border: 1px solid #38bdf8; border-radius: 8px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
     .controls { display: flex; flex-wrap: wrap; gap: 8px; }
     .quick-bar { display: flex; gap: 8px; }
     .quick-bar input { flex: 1; }
@@ -115,7 +116,7 @@
         <div class="card">
           <h2>
             <span>Live Voice & Point-and-Ask Camera</span>
-            <span id="session-status" style="font-size: 0.82rem; color: var(--muted);">Ready</span>
+            <span id="session-status" style="font-size: 0.82rem; color: #38bdf8; font-weight: 700;">Ready</span>
           </h2>
           <div class="video-wrap" id="video-wrap" title="Tap any object on video to identify it in Spanish">
             <div id="cam-fps-pill">📸 Camera Live (1 FPS)</div>
@@ -126,8 +127,19 @@
             <video id="camera-feed" playsinline webkit-playsinline autoplay muted></video>
             <div id="focus-reticle"></div>
           </div>
+
+          <!-- Instant Live Reply & Audio Replay Bar -->
+          <div id="live-reply-banner">
+            <div style="flex:1;">
+              <div id="live-reply-es" style="font-weight:700; color:#60a5fa; font-size:0.95rem;">¡Hola! Toca "Start Live Session" o "Start Camera" para empezar.</div>
+              <div id="live-reply-en" style="font-size:0.8rem; color:var(--muted);">Tap Start Live Session or Start Camera to begin.</div>
+            </div>
+            <button id="btn-replay-last" class="secondary" style="padding:6px 10px; font-size:0.8rem;">🔊 Replay</button>
+          </div>
+
           <div class="controls">
             <button id="btn-connect" class="success">Start Live Session</button>
+            <button id="btn-ptt" class="warning" style="display:none;">🎤 Tap & Speak Now</button>
             <button id="btn-camera" class="primary">Start Camera (1 FPS)</button>
             <button id="btn-flip" class="secondary" style="display:none;">Flip Camera 🔄</button>
             <button id="btn-ask-object" class="accent" style="display:none;">¿Cómo se dice esto? 🔍</button>
@@ -137,10 +149,9 @@
             <button id="btn-send-text" class="secondary">Send</button>
           </div>
           <div class="hint-box">
-            <strong>Everything you can do live:</strong><br>
-            • <strong>Point & Ask Camera:</strong> Click <em>Start Camera (1 FPS)</em> anytime, point at an object, and tap the video screen (or click <em>¿Cómo se dice esto?</em>) to hear its Spanish name with <em>el/la</em> and save a flashcard.<br>
-            • <strong>Voice Roleplay:</strong> Say <em>"Can we roleplay? You're a customer designing a kitchen and I'm the specialist."</em><br>
-            • <strong>Live Verb Matrix:</strong> Ask <em>"How do I conjugate poner?"</em> to update the matrix automatically.
+            <strong>How to use Live Tutor & Camera:</strong><br>
+            • <strong>Point & Ask Camera:</strong> Tap <em>Start Camera (1 FPS)</em>, point at any object, and <strong>tap the video screen</strong> (or click <em>¿Cómo se dice esto? 🔍</em>) to hear its Spanish name with <em>el/la</em> and auto-save a flashcard.<br>
+            • <strong>Voice Roleplay:</strong> Say or type <em>"Can we roleplay? You're a customer designing a kitchen and I'm the specialist."</em>
           </div>
         </div>
 
@@ -151,7 +162,7 @@
           </h2>
           <div id="transcript-list" class="scroll-list">
             <div style="color: var(--muted); font-size: 0.84rem;">
-              Spanish responses and English hints appear here. Toggle <strong>Blur Mode</strong> to test listening first (tap any blurred line to reveal).
+              Spanish responses and English hints appear here. Tap any entry to hear it spoken aloud!
             </div>
           </div>
         </div>
@@ -463,94 +474,6 @@
       ]
     };
 
-    const VOZZI_SYSTEM_INSTRUCTION = `You are Vozzi, an adaptive, encouraging conversational Spanish tutor.
-1. Speak primarily in clear, natural Spanish matched to the user's level, and call 'log_comprehensible_input' with your Spanish sentence and English hint.
-2. CAMERA VISION: When video frames are present or the user asks "¿Cómo se dice esto?", identify the object in Spanish (ALWAYS include 'el' or 'la'), explain its usage briefly, and call 'save_flashcard'.
-3. SILENT GRAMMAR: If the user makes a mistake, call 'log_grammar_correction' silently without interrupting speech.
-4. VERB MATRIX: When discussing verb conjugations, call 'show_verb_matrix'.
-5. VOICE ROLEPLAY: When the user asks to roleplay and describes a scene, call 'start_roleplay_scene' and stay strictly in character until they end the roleplay ('end_roleplay_scene').`;
-
-    const VOZZI_TOOLS = [{
-      functionDeclarations: [
-        {
-          name: "start_roleplay_scene",
-          description: "Starts a voice roleplay scene.",
-          parameters: {
-            type: "OBJECT",
-            properties: {
-              scene_title: { type: "STRING" },
-              ai_persona: { type: "STRING" },
-              user_persona: { type: "STRING" },
-              opening_line_spanish: { type: "STRING" }
-            },
-            required: ["scene_title", "ai_persona", "user_persona", "opening_line_spanish"]
-          }
-        },
-        {
-          name: "end_roleplay_scene",
-          description: "Ends the active roleplay scene.",
-          parameters: {
-            type: "OBJECT",
-            properties: { praise: { type: "STRING" }, key_takeaway: { type: "STRING" } },
-            required: ["praise", "key_takeaway"]
-          }
-        },
-        {
-          name: "save_flashcard",
-          description: "Saves a Spanish vocabulary word with el/la to flashcards.",
-          parameters: {
-            type: "OBJECT",
-            properties: {
-              spanish_term: { type: "STRING" },
-              english_meaning: { type: "STRING" },
-              example_sentence: { type: "STRING" },
-              category: { type: "STRING" }
-            },
-            required: ["spanish_term", "english_meaning", "example_sentence"]
-          }
-        },
-        {
-          name: "log_grammar_correction",
-          description: "Silently logs a grammar correction to the UI drawer.",
-          parameters: {
-            type: "OBJECT",
-            properties: {
-              user_said: { type: "STRING" },
-              natural_spanish: { type: "STRING" },
-              quick_rule: { type: "STRING" }
-            },
-            required: ["user_said", "natural_spanish", "quick_rule"]
-          }
-        },
-        {
-          name: "show_verb_matrix",
-          description: "Updates the Verb Conjugation Matrix.",
-          parameters: {
-            type: "OBJECT",
-            properties: {
-              infinitive: { type: "STRING" }, english_meaning: { type: "STRING" },
-              highlight_pronoun: { type: "STRING" }, highlight_tense: { type: "STRING" },
-              yo_present: { type: "STRING" }, yo_preterite: { type: "STRING" }, yo_imperfect: { type: "STRING" },
-              tu_present: { type: "STRING" }, tu_preterite: { type: "STRING" }, tu_imperfect: { type: "STRING" },
-              el_present: { type: "STRING" }, el_preterite: { type: "STRING" }, el_imperfect: { type: "STRING" },
-              nosotros_present: { type: "STRING" }, nosotros_preterite: { type: "STRING" }, nosotros_imperfect: { type: "STRING" },
-              ellos_present: { type: "STRING" }, ellos_preterite: { type: "STRING" }, ellos_imperfect: { type: "STRING" }
-            },
-            required: ["infinitive", "english_meaning"]
-          }
-        },
-        {
-          name: "log_comprehensible_input",
-          description: "Logs spoken Spanish and an English hint to the subtitle drawer.",
-          parameters: {
-            type: "OBJECT",
-            properties: { spanish_sentence: { type: "STRING" }, english_hint: { type: "STRING" } },
-            required: ["spanish_sentence", "english_hint"]
-          }
-        }
-      ]
-    }];
-
     /* 2. TAB NAVIGATION & STORAGE HELPERS */
     function switchTab(tabId) {
       document.querySelectorAll(".tab-btn").forEach((b) => b.classList.toggle("active", b.dataset.tab === tabId));
@@ -601,19 +524,108 @@
       refreshAllCardViews();
     }
 
-    /* 3. NATIVE TTS (WITH MIC ECHO PREVENTION) & 90% ACCURACY SPEECH GATE */
-    function speakSpanishTTS(text, onEnd) {
-      if (!("speechSynthesis" in window)) { if (onEnd) onEnd(); return; }
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = "es-MX";
-      u.rate = 0.96;
-      const v = window.speechSynthesis.getVoices().find((x) => x.lang.includes("es-MX") || x.lang.includes("es-US") || x.lang.startsWith("es"));
-      if (v) u.voice = v;
-      u.onend = () => { if (onEnd) onEnd(); };
-      u.onerror = () => { if (onEnd) onEnd(); };
-      window.speechSynthesis.speak(u);
+    /* 3. BULLETPROOF MOBILE AUDIO UNLOCKER & SPANISH TTS ENGINE */
+    let sharedAudioCtx = null;
+    let lastSpokenSpanishText = "¡Hola! Estoy listo para practicar español contigo.";
+    window._activeVozziUtterance = null;
+
+    // Must be called synchronously inside button click handlers to unlock mobile TTS & WebAudio
+    function unlockMobileAudio() {
+      try {
+        if (!sharedAudioCtx) {
+          sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (sharedAudioCtx.state === "suspended") {
+          sharedAudioCtx.resume();
+        }
+        if ("speechSynthesis" in window && !window.speechSynthesis.speaking) {
+          const silent = new SpeechSynthesisUtterance("");
+          silent.volume = 0;
+          window.speechSynthesis.speak(silent);
+        }
+      } catch (_) {}
     }
+
+    function playConfirmChime() {
+      try {
+        if (!sharedAudioCtx) sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (sharedAudioCtx.state === "suspended") sharedAudioCtx.resume();
+        const osc = sharedAudioCtx.createOscillator();
+        const gain = sharedAudioCtx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(587.33, sharedAudioCtx.currentTime); // D5
+        gain.gain.setValueAtTime(0.08, sharedAudioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, sharedAudioCtx.currentTime + 0.18);
+        osc.connect(gain);
+        gain.connect(sharedAudioCtx.destination);
+        osc.start();
+        osc.stop(sharedAudioCtx.currentTime + 0.18);
+      } catch (_) {}
+    }
+
+    function speakSpanishTTS(text, onEnd) {
+      if (!text) { if (onEnd) onEnd(); return; }
+      lastSpokenSpanishText = text;
+      document.getElementById("live-reply-es").textContent = text;
+
+      if (!("speechSynthesis" in window)) {
+        if (onEnd) onEnd();
+        return;
+      }
+
+      let finished = false;
+      const done = () => {
+        if (finished) return;
+        finished = true;
+        clearTimeout(watchdog);
+        if (onEnd) onEnd();
+      };
+
+      // Watchdog guarantees UI never gets stuck if mobile browser drops onend
+      const estDurationMs = Math.max(3500, Math.min(18000, text.length * 95));
+      const watchdog = setTimeout(done, estDurationMs);
+
+      try {
+        if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+          window.speechSynthesis.cancel();
+        }
+      } catch (_) {}
+
+      // 80ms delay after cancel() prevents Android Chrome from killing the new utterance
+      setTimeout(() => {
+        try {
+          const u = new SpeechSynthesisUtterance(text);
+          window._activeVozziUtterance = u; // Prevent mobile garbage collection mid-speech
+          u.lang = "es-MX";
+          u.rate = 0.96;
+          u.volume = 1.0;
+
+          const voices = window.speechSynthesis.getVoices() || [];
+          const esVoice =
+            voices.find((v) => v.lang.includes("es-MX") || v.lang.includes("es_MX")) ||
+            voices.find((v) => v.lang.includes("es-US") || v.lang.includes("es_US")) ||
+            voices.find((v) => v.lang.toLowerCase().startsWith("es"));
+          if (esVoice) u.voice = esVoice;
+
+          u.onend = done;
+          u.onerror = done;
+          window.speechSynthesis.speak(u);
+        } catch (_) {
+          done();
+        }
+      }, 80);
+    }
+
+    // Pre-warm voices list on mobile
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
+
+    document.getElementById("btn-replay-last").addEventListener("click", () => {
+      unlockMobileAudio();
+      speakSpanishTTS(lastSpokenSpanishText);
+    });
 
     function normalizeText(s) {
       return (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[¿?¡!.,;:"]/g, "").trim();
@@ -681,12 +693,14 @@
 
     drillLevelSelect.addEventListener("change", () => { drillIndex = 0; drillFadeStage = 1; renderCurrentDrill(); });
     document.getElementById("btn-drill-listen").addEventListener("click", () => {
+      unlockMobileAudio();
       const list = getFilteredDrills();
       if (list.length) speakSpanishTTS(list[drillIndex].example_sentence || list[drillIndex].spanish_term);
     });
     document.getElementById("btn-drill-fade").addEventListener("click", () => { drillFadeStage = drillFadeStage === 3 ? 1 : drillFadeStage + 1; renderCurrentDrill(); });
     document.getElementById("btn-drill-next").addEventListener("click", () => { drillIndex++; drillFadeStage = 1; renderCurrentDrill(); });
     document.getElementById("btn-drill-speak").addEventListener("click", () => {
+      unlockMobileAudio();
       const list = getFilteredDrills();
       if (!list.length) return;
       const target = list[drillIndex].example_sentence || list[drillIndex].spanish_term;
@@ -698,6 +712,7 @@
         bar.style.width = `${pct}%`;
         bar.style.background = passed ? "var(--success)" : "var(--warning)";
         if (passed) {
+          playConfirmChime();
           fb.innerHTML = `✅ <strong>${pct}% Accuracy!</strong> "${spoken}" — Advancing...`;
           setTimeout(() => { if (drillFadeStage < 3) drillFadeStage++; else { drillFadeStage = 1; drillIndex++; } renderCurrentDrill(); }, 1000);
         } else {
@@ -720,7 +735,9 @@
       deck.slice(0, 8).forEach((c) => {
         const d = document.createElement("div");
         d.className = "item-box";
-        d.innerHTML = `<strong>${c.spanish_term}</strong> — ${c.english_meaning}<small>"${c.example_sentence || ""}"</small>`;
+        d.style.cursor = "pointer";
+        d.innerHTML = `<strong>🔊 ${c.spanish_term}</strong> — ${c.english_meaning}<small>"${c.example_sentence || ""}"</small>`;
+        d.addEventListener("click", () => { unlockMobileAudio(); speakSpanishTTS(c.spanish_term); });
         prev.appendChild(d);
       });
 
@@ -741,14 +758,16 @@
     studioCatFilter.addEventListener("change", () => { studioIndex = 0; refreshAllCardViews(); });
     document.getElementById("btn-fc-prev").addEventListener("click", () => { const l = getStudioList(); studioIndex = (studioIndex - 1 + l.length) % l.length; refreshAllCardViews(); });
     document.getElementById("btn-fc-next").addEventListener("click", () => { const l = getStudioList(); studioIndex = (studioIndex + 1) % l.length; refreshAllCardViews(); });
-    document.getElementById("btn-fc-tts").addEventListener("click", () => { const l = getStudioList(); if (l.length) speakSpanishTTS(l[studioIndex].spanish_term); });
+    document.getElementById("btn-fc-tts").addEventListener("click", () => { unlockMobileAudio(); const l = getStudioList(); if (l.length) speakSpanishTTS(l[studioIndex].spanish_term); });
     document.getElementById("btn-fc-voice").addEventListener("click", () => {
+      unlockMobileAudio();
       const l = getStudioList();
       if (!l.length) return;
       const target = l[studioIndex].spanish_term;
       const resEl = document.getElementById("fc-voice-result");
       resEl.innerHTML = `<span style="color:#38bdf8;">🎙️ Say "${target}"...</span>`;
       listenOnceForAccuracy(target, ({ spoken, pct, passed }) => {
+        if (passed) playConfirmChime();
         resEl.innerHTML = passed ? `✅ <strong>${pct}%!</strong> "${spoken}"` : `⚠️ <strong>${pct}%</strong> (You said "${spoken}"). Try again!`;
       });
     });
@@ -781,10 +800,10 @@
       rpScenarioKey = rpScenarioSelect.value;
       rpTurnIndex = 0;
       rpChatHistory.innerHTML = "";
-      loadGuidedRoleplayTurn();
+      loadGuidedRoleplayTurn(false);
     }
 
-    function loadGuidedRoleplayTurn() {
+    function loadGuidedRoleplayTurn(autoSpeak = true) {
       const turns = GUIDED_ROLEPLAYS[rpScenarioKey];
       if (rpTurnIndex >= turns.length) {
         document.getElementById("rp-target-es").textContent = "🎉 ¡Escena completada con éxito!";
@@ -800,7 +819,7 @@
       aiMsg.innerHTML = `<strong>🧑🏽‍💼 Partner:</strong> ${cur.ai_es}<small>${cur.ai_en}</small>`;
       rpChatHistory.appendChild(aiMsg);
       rpChatHistory.scrollTop = rpChatHistory.scrollHeight;
-      speakSpanishTTS(cur.ai_es);
+      if (autoSpeak) speakSpanishTTS(cur.ai_es);
     }
 
     function advanceGuidedRoleplay(spoken, pct) {
@@ -811,23 +830,26 @@
       uMsg.innerHTML = `<strong>🗣️ You (${pct}%):</strong> ${spoken || turns[rpTurnIndex].user_es}`;
       rpChatHistory.appendChild(uMsg);
       rpTurnIndex++;
-      setTimeout(loadGuidedRoleplayTurn, 500);
+      setTimeout(() => loadGuidedRoleplayTurn(true), 450);
     }
 
-    rpScenarioSelect.addEventListener("change", initGuidedRoleplay);
-    document.getElementById("btn-rp-restart").addEventListener("click", initGuidedRoleplay);
-    document.getElementById("btn-rp-advance").addEventListener("click", () => advanceGuidedRoleplay(null, 100));
+    rpScenarioSelect.addEventListener("change", () => { unlockMobileAudio(); initGuidedRoleplay(); });
+    document.getElementById("btn-rp-restart").addEventListener("click", () => { unlockMobileAudio(); initGuidedRoleplay(); });
+    document.getElementById("btn-rp-advance").addEventListener("click", () => { unlockMobileAudio(); advanceGuidedRoleplay(null, 100); });
     document.getElementById("btn-rp-listen").addEventListener("click", () => {
+      unlockMobileAudio();
       const turns = GUIDED_ROLEPLAYS[rpScenarioKey];
       if (rpTurnIndex < turns.length) speakSpanishTTS(turns[rpTurnIndex].user_es);
     });
     document.getElementById("btn-rp-speak").addEventListener("click", () => {
+      unlockMobileAudio();
       const turns = GUIDED_ROLEPLAYS[rpScenarioKey];
       if (rpTurnIndex >= turns.length) return;
       const status = document.getElementById("rp-gate-status");
       status.innerHTML = `<span style="color:#38bdf8;">🎙️ Listening...</span>`;
       listenOnceForAccuracy(turns[rpTurnIndex].user_es, ({ spoken, pct, passed }) => {
         if (passed) {
+          playConfirmChime();
           status.innerHTML = `✅ <strong>${pct}%!</strong> Advancing...`;
           advanceGuidedRoleplay(spoken, pct);
         } else {
@@ -838,8 +860,9 @@
 
     const cup1 = document.getElementById("cup-1"), cup2 = document.getElementById("cup-2"), cup3 = document.getElementById("cup-3"), cupOut = document.getElementById("cup-sentence-output");
     [cup1, cup2, cup3].forEach((s) => s.addEventListener("change", () => { cupOut.textContent = `${cup1.value} ${cup2.value} ${cup3.value}`; }));
-    document.getElementById("btn-cup-speak-tts").addEventListener("click", () => speakSpanishTTS(cupOut.textContent));
+    document.getElementById("btn-cup-speak-tts").addEventListener("click", () => { unlockMobileAudio(); speakSpanishTTS(cupOut.textContent); });
     document.getElementById("btn-cup-practice").addEventListener("click", () => {
+      unlockMobileAudio();
       listenOnceForAccuracy(cupOut.textContent, ({ spoken, pct, passed }) => alert(`${passed ? "✅" : "⚠️"} ${pct}% Accuracy!\nYou said: "${spoken}"`));
     });
     document.getElementById("btn-cup-save").addEventListener("click", () => {
@@ -889,32 +912,9 @@
       alert(`Imported ${count} cards!`);
     });
 
-    /* 6. DUAL-ENGINE LIVE TUTOR (WEBSOCKET PCM + AUTOMATIC CONTINUOUS FALLBACK) */
-    const WORKLET_CODE = `
-      class PcmRecorderProcessor extends AudioWorkletProcessor {
-        constructor() { super(); this.buffer = new Int16Array(2048); this.writeIndex = 0; this.ratio = sampleRate / 16000; this.acc = 0; }
-        process(inputs) {
-          const ch = inputs[0]?.[0]; if (!ch) return true;
-          for (let i = 0; i < ch.length; i++) {
-            this.acc += 1;
-            if (this.acc >= this.ratio) {
-              this.acc -= this.ratio;
-              const s = Math.max(-1, Math.min(1, ch[i]));
-              this.buffer[this.writeIndex++] = s < 0 ? s * 0x8000 : s * 0x7FFF;
-              if (this.writeIndex >= this.buffer.length) {
-                const copy = new Int16Array(this.buffer);
-                this.port.postMessage(copy.buffer, [copy.buffer]);
-                this.writeIndex = 0;
-              }
-            }
-          }
-          return true;
-        }
-      }
-      registerProcessor('pcm-recorder-processor', PcmRecorderProcessor);
-    `;
-
+    /* 6. FAST LIVE TUTOR & CAMERA ENGINE (ZERO THINKING HANG + GUARANTEED AUDIO) */
     const btnConnect = document.getElementById("btn-connect");
+    const btnPtt = document.getElementById("btn-ptt");
     const btnCamera = document.getElementById("btn-camera");
     const btnFlip = document.getElementById("btn-flip");
     const btnAskObject = document.getElementById("btn-ask-object");
@@ -933,8 +933,7 @@
     const grammarList = document.getElementById("grammar-list");
     const rpBanner = document.getElementById("roleplay-banner");
 
-    let isConnected = false, liveMode = "NONE", blurMode = false;
-    let ws = null, audioCtx = null, micStream = null, workletNode = null, nextPlayTime = 0, activeSources = [];
+    let isConnected = false, isBusyThinking = false, isSpeakingNow = false, blurMode = false;
     let hybridRecognizer = null, hybridChatHistory = [], activeRoleplayState = null;
     let cameraStream = null, cameraInterval = null, facingMode = "environment", latestJpegBase64 = null;
     const offscreenCanvas = document.createElement("canvas"), ctx = offscreenCanvas.getContext("2d");
@@ -945,8 +944,12 @@
       document.querySelectorAll("#transcript-list .item-box.transcript").forEach((el) => el.classList.toggle("blurred", blurMode));
     });
 
-    btnConnect.addEventListener("click", async () => {
-      if (isConnected) { stopLiveSession(); return; }
+    btnConnect.addEventListener("click", () => {
+      unlockMobileAudio();
+      if (isConnected) {
+        stopLiveSession();
+        return;
+      }
       const apiKey = apiKeyInput.value.trim() || getStoredApiKey();
       if (!apiKey) return alert("Paste your Google AI Studio API key in the top bar first!");
       localStorage.setItem("VOZZI_API_KEY", apiKey);
@@ -955,180 +958,75 @@
       statusDot.classList.add("live");
       btnConnect.textContent = "End Session";
       btnConnect.className = "danger";
-      sessionStatus.textContent = "Connecting Live Audio...";
+      btnPtt.style.display = "inline-flex";
+      sessionStatus.textContent = "Live (Listening...)";
 
-      startWebSocketWithFallback(apiKey);
+      speakSpanishTTS("¡Hola! Estoy conectado y escuchando. ¿De qué quieres hablar o qué objeto quieres mostrarme?", () => {
+        if (isConnected) startContinuousMic();
+      });
     });
 
-    function startWebSocketWithFallback(apiKey) {
-      let setupDone = false;
-      try {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        audioCtx.resume();
-        const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;
-        ws = new WebSocket(wsUrl);
+    btnPtt.addEventListener("click", () => {
+      unlockMobileAudio();
+      window.speechSynthesis.cancel();
+      isSpeakingNow = false;
+      startContinuousMic(true);
+    });
 
-        ws.onopen = () => {
-          ws.send(JSON.stringify({
-            setup: {
-              model: "models/gemini-2.0-flash-live-001",
-              generationConfig: {
-                responseModalities: ["AUDIO"],
-                speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Aoede" } } }
-              },
-              systemInstruction: { parts: [{ text: VOZZI_SYSTEM_INSTRUCTION }] },
-              tools: VOZZI_TOOLS
-            }
-          }));
-        };
-
-        ws.onmessage = async (ev) => {
-          const raw = ev.data instanceof Blob ? await ev.data.text() : ev.data;
-          const msg = JSON.parse(raw);
-          if (msg.setupComplete !== undefined && !setupDone) {
-            setupDone = true;
-            liveMode = "WS";
-            sessionStatus.textContent = "Live (WebSocket Audio)";
-            await startPcmMicrophone();
-            return;
-          }
-          if (msg.serverContent?.interrupted) {
-            activeSources.forEach((s) => { try { s.stop(); } catch (_) {} });
-            activeSources = [];
-            if (audioCtx) nextPlayTime = audioCtx.currentTime;
-          }
-          const parts = msg.serverContent?.modelTurn?.parts || [];
-          for (const p of parts) {
-            if (p.inlineData?.mimeType?.startsWith("audio/pcm")) playPcmChunk(p.inlineData.data);
-          }
-          if (msg.toolCall?.functionCalls) {
-            handleWsToolCalls(msg.toolCall.functionCalls);
-          }
-        };
-
-        ws.onclose = () => {
-          if (isConnected && liveMode !== "HYBRID") {
-            cleanupWsAudioOnly();
-            activateHybridFallback();
-          }
-        };
-        ws.onerror = () => {
-          if (isConnected && liveMode !== "HYBRID") {
-            cleanupWsAudioOnly();
-            activateHybridFallback();
-          }
-        };
-      } catch (_) {
-        cleanupWsAudioOnly();
-        activateHybridFallback();
+    function stopContinuousMic() {
+      if (hybridRecognizer) {
+        try {
+          hybridRecognizer.onend = null;
+          hybridRecognizer.stop();
+        } catch (_) {}
+        hybridRecognizer = null;
       }
     }
 
-    function cleanupWsAudioOnly() {
-      if (workletNode) { try { workletNode.disconnect(); } catch (_) {} workletNode = null; }
-      if (micStream) { micStream.getTracks().forEach((t) => t.stop()); micStream = null; }
-      if (ws) { try { ws.close(); } catch (_) {} ws = null; }
-    }
+    function startContinuousMic(manualTrigger = false) {
+      if (!isConnected && !manualTrigger) return;
+      if (isBusyThinking || isSpeakingNow) return;
 
-    function handleWsToolCalls(calls) {
-      const functionResponses = [];
-      for (const call of calls) {
-        const { id, name, args } = call;
-        if (name === "start_roleplay_scene") {
-          activeRoleplayState = args;
-          rpBanner.style.display = "flex";
-          document.getElementById("rp-title").textContent = args.scene_title;
-          document.getElementById("rp-ai").textContent = args.ai_persona;
-          document.getElementById("rp-user").textContent = args.user_persona;
-          logComprehensibleEntry(args.opening_line_spanish, `Roleplay: ${args.scene_title}`);
-          functionResponses.push({ id, name, response: { result: { status: "Roleplay started. Speak opening line in character." } } });
-        } else if (name === "end_roleplay_scene") {
-          activeRoleplayState = null;
-          rpBanner.style.display = "none";
-          functionResponses.push({ id, name, response: { result: { status: "Roleplay ended." } } });
-        } else if (name === "save_flashcard") {
-          saveCardToDeck(args);
-          functionResponses.push({ id, name, response: { result: { saved: true, term: args.spanish_term } } });
-        } else if (name === "log_grammar_correction") {
-          appendGrammarBox(args.user_said, args.natural_spanish, args.quick_rule);
-          functionResponses.push({ id, name, response: { result: { logged: true } } });
-        } else if (name === "show_verb_matrix") {
-          renderVerbMatrix(args);
-          functionResponses.push({ id, name, response: { result: { displayed: true } } });
-        } else if (name === "log_comprehensible_input") {
-          logComprehensibleEntry(args.spanish_sentence, args.english_hint);
-          functionResponses.push({ id, name, response: { result: { logged: true } } });
-        }
-      }
-      if (functionResponses.length > 0 && ws?.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ toolResponse: { functionResponses } }));
-      }
-    }
-
-    async function startPcmMicrophone() {
-      try {
-        micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
-        const blob = new Blob([WORKLET_CODE], { type: "application/javascript" });
-        const url = URL.createObjectURL(blob);
-        await audioCtx.audioWorklet.addModule(url);
-        URL.revokeObjectURL(url);
-        const src = audioCtx.createMediaStreamSource(micStream);
-        workletNode = new AudioWorkletNode(audioCtx, "pcm-recorder-processor");
-        workletNode.port.onmessage = (e) => {
-          if (ws?.readyState === WebSocket.OPEN) {
-            const bytes = new Uint8Array(e.data);
-            let bin = "";
-            for (let i = 0; i < bytes.byteLength; i++) bin += String.fromCharCode(bytes[i]);
-            ws.send(JSON.stringify({ realtimeInput: { mediaChunks: [{ mimeType: "audio/pcm;rate=16000", data: btoa(bin) }] } }));
-          }
-        };
-        src.connect(workletNode);
-      } catch (_) {
-        cleanupWsAudioOnly();
-        activateHybridFallback();
-      }
-    }
-
-    function playPcmChunk(b64) {
-      if (!audioCtx) return;
-      const bin = atob(b64), bytes = new Uint8Array(bin.length);
-      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-      const i16 = new Int16Array(bytes.buffer), f32 = new Float32Array(i16.length);
-      for (let i = 0; i < i16.length; i++) f32[i] = i16[i] / 32768.0;
-      const buf = audioCtx.createBuffer(1, f32.length, 24000);
-      buf.getChannelData(0).set(f32);
-      const src = audioCtx.createBufferSource();
-      src.buffer = buf;
-      src.connect(audioCtx.destination);
-      if (nextPlayTime < audioCtx.currentTime) nextPlayTime = audioCtx.currentTime;
-      src.start(nextPlayTime);
-      nextPlayTime += buf.duration;
-      activeSources.push(src);
-    }
-
-    function activateHybridFallback() {
-      if (!isConnected) return;
-      liveMode = "HYBRID";
-      sessionStatus.textContent = "Live (Continuous Voice)";
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) { sessionStatus.textContent = "Live (Text + Camera Mode)"; return; }
+      if (!SR) {
+        sessionStatus.textContent = "Live (Use Text Box / Camera)";
+        return;
+      }
+
+      stopContinuousMic();
       hybridRecognizer = new SR();
       hybridRecognizer.lang = "es-MX";
-      hybridRecognizer.continuous = true;
+      hybridRecognizer.continuous = false; // Single-utterance bursts release Android audio focus cleanly!
       hybridRecognizer.interimResults = false;
+
+      hybridRecognizer.onstart = () => {
+        if (!isBusyThinking && !isSpeakingNow) {
+          sessionStatus.textContent = "🎙️ Listening... Speak now";
+        }
+      };
+
       hybridRecognizer.onresult = (ev) => {
         const last = ev.results[ev.results.length - 1];
-        if (last.isFinal && last[0].transcript.trim()) {
-          window.speechSynthesis.cancel();
-          processUserTurnWithGemini(last[0].transcript.trim(), false);
+        const text = last?.[0]?.transcript?.trim();
+        if (text) {
+          stopContinuousMic();
+          processUserTurnWithGemini(text, false);
         }
       };
+
+      hybridRecognizer.onerror = () => {};
+
       hybridRecognizer.onend = () => {
-        if (isConnected && liveMode === "HYBRID" && hybridRecognizer && !window.speechSynthesis.speaking) {
-          try { hybridRecognizer.start(); } catch (_) {}
+        if (isConnected && !isBusyThinking && !isSpeakingNow) {
+          setTimeout(() => {
+            if (isConnected && !isBusyThinking && !isSpeakingNow) startContinuousMic();
+          }, 250);
         }
       };
-      try { hybridRecognizer.start(); } catch (_) {}
+
+      try {
+        hybridRecognizer.start();
+      } catch (_) {}
     }
 
     async function processUserTurnWithGemini(userText, includeCameraImage) {
@@ -1138,77 +1036,103 @@
         return;
       }
 
-      // If WebSocket is actively open AND user didn't force a REST vision call, also send to WS
-      if (liveMode === "WS" && ws?.readyState === WebSocket.OPEN && !includeCameraImage) {
-        ws.send(JSON.stringify({
-          clientContent: { turns: [{ role: "user", parts: [{ text: userText }] }], turnComplete: true }
-        }));
-        return;
-      }
+      // Stop mic immediately so Android releases the speaker channel before TTS plays
+      isBusyThinking = true;
+      stopContinuousMic();
+      sessionStatus.textContent = includeCameraImage ? "📸 Identifying Object..." : "⚡ Vozzi Responding...";
 
-      sessionStatus.textContent = includeCameraImage ? "📸 Analyzing Camera Object..." : "Vozzi is thinking...";
-
-      const sysPrompt = `You are Vozzi, an adaptive Spanish tutor.
-${activeRoleplayState ? `ACTIVE ROLEPLAY: "${activeRoleplayState.scene_title}" (AI: ${activeRoleplayState.ai_persona}, User: ${activeRoleplayState.user_persona}). STAY STRICTLY IN CHARACTER in Spanish!` : ""}
-Return strictly valid JSON matching this structure:
+      const sysPrompt = `You are Vozzi, an encouraging, natural conversational Spanish tutor.
+${activeRoleplayState ? `ACTIVE ROLEPLAY: "${activeRoleplayState.scene_title}" (You are: ${activeRoleplayState.ai_persona}, User is: ${activeRoleplayState.user_persona}). STAY STRICTLY IN CHARACTER in Spanish for every turn!` : ""}
+Respond ONLY with a valid JSON object matching this exact structure:
 {
-  "spoken_spanish": "Your natural Spanish spoken reply (if identifying an object, name it clearly with el or la and ask a short follow-up question)",
+  "spoken_spanish": "Your natural Spanish spoken reply (if identifying a camera object, clearly state its Spanish name with 'el' or 'la' and ask a short follow-up question)",
   "english_hint": "English translation of your spoken_spanish reply",
-  "grammar_correction": null or { "user_said": "...", "natural_spanish": "...", "quick_rule": "..." },
-  "new_flashcard": null or { "spanish_term": "Spanish noun with el/la", "english_meaning": "English meaning", "example_sentence": "Short Spanish sentence", "category": "Camera Object" },
-  "start_roleplay": null or { "scene_title": "...", "ai_persona": "...", "user_persona": "..." },
+  "grammar_correction": null,
+  "new_flashcard": null,
+  "start_roleplay": null,
   "end_roleplay": false,
-  "verb_lookup": null or "estar"
-}`;
+  "verb_lookup": null
+}
+Rules:
+- If the user made a Spanish grammar error, set "grammar_correction" to {"user_said":"...","natural_spanish":"...","quick_rule":"..."}.
+- If an image is provided or the user asks how to say something, set "new_flashcard" to {"spanish_term":"el/la ...","english_meaning":"...","example_sentence":"...","category":"Camera Object"}.
+- If the user asks to roleplay, set "start_roleplay" to {"scene_title":"...","ai_persona":"...","user_persona":"..."} and make "spoken_spanish" your first in-character line.`;
 
       const currentTurnParts = [{ text: userText }];
       if ((includeCameraImage || cameraStream) && latestJpegBase64) {
         currentTurnParts.push({ inline_data: { mime_type: "image/jpeg", data: latestJpegBase64 } });
       }
 
-      // Build clean alternating history without mutating until request succeeds
       const requestContents = [...hybridChatHistory, { role: "user", parts: currentTurnParts }];
+      const modelsToTry = [
+        { name: "gemini-2.5-flash", noThinking: true },
+        { name: "gemini-2.0-flash", noThinking: false }
+      ];
 
-      const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash"];
       let parsed = null;
       let lastError = "";
 
-      for (const modelName of modelsToTry) {
+      for (const m of modelsToTry) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 12000);
         try {
-          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
+          const genConfig = {
+            responseMimeType: "application/json",
+            temperature: 0.7
+          };
+          if (m.noThinking) {
+            genConfig.thinkingConfig = { thinkingBudget: 0 }; // Prevents 10s thinking hang!
+          }
+
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m.name}:generateContent?key=${apiKey}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
+            signal: controller.signal,
             body: JSON.stringify({
               system_instruction: { parts: [{ text: sysPrompt }] },
               contents: requestContents,
-              generationConfig: { responseMimeType: "application/json" }
+              generationConfig: genConfig
             })
           });
+          clearTimeout(timer);
+
           const data = await res.json();
           if (data.error) {
             lastError = data.error.message;
             continue;
           }
-          const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (rawText) {
-            parsed = JSON.parse(rawText);
-            break;
-          }
+
+          // Skip any 'thought' parts and grab the actual JSON text part
+          const partsList = data?.candidates?.[0]?.content?.parts || [];
+          const textPart = partsList.find((p) => !p.thought && p.text) || partsList[partsList.length - 1];
+          let rawText = (textPart?.text || "").trim();
+          if (!rawText) continue;
+
+          // Strip markdown code fences if present
+          rawText = rawText.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/, "").trim();
+          parsed = JSON.parse(rawText);
+          if (parsed) break;
         } catch (err) {
-          lastError = err.message;
+          clearTimeout(timer);
+          lastError = err.name === "AbortError" ? "Request timed out (12s)" : err.message;
         }
       }
 
+      isBusyThinking = false;
+
       if (!parsed) {
-        sessionStatus.textContent = "API Error (See Log)";
-        logComprehensibleEntry("⚠️ Error de conexión con Gemini API", lastError || "Check your API key in the top bar.");
+        sessionStatus.textContent = "⚠️ API Error";
+        logComprehensibleEntry("⚠️ No se pudo conectar con Gemini", lastError || "Verify your API key in the top bar.");
+        if (isConnected) setTimeout(() => startContinuousMic(), 800);
         return;
       }
 
-      // Save text-only turn into history so future turns never bloat with old base64 images
+      const spanishReply = parsed.spoken_spanish || parsed.spanish_reply || parsed.response || "¡Entendido! ¿Qué más te gustaría practicar?";
+      const englishHint = parsed.english_hint || parsed.english_translation || "";
+
       hybridChatHistory.push({ role: "user", parts: [{ text: userText }] });
-      hybridChatHistory.push({ role: "model", parts: [{ text: parsed.spoken_spanish || "" }] });
-      if (hybridChatHistory.length > 12) hybridChatHistory = hybridChatHistory.slice(-12);
+      hybridChatHistory.push({ role: "model", parts: [{ text: spanishReply }] });
+      if (hybridChatHistory.length > 10) hybridChatHistory = hybridChatHistory.slice(-10);
 
       if (parsed.start_roleplay?.scene_title) {
         activeRoleplayState = parsed.start_roleplay;
@@ -1217,22 +1141,14 @@ Return strictly valid JSON matching this structure:
         document.getElementById("rp-ai").textContent = activeRoleplayState.ai_persona;
         document.getElementById("rp-user").textContent = activeRoleplayState.user_persona;
       }
-      if (parsed.end_roleplay) { activeRoleplayState = null; rpBanner.style.display = "none"; }
-
-      if (parsed.spoken_spanish) {
-        logComprehensibleEntry(parsed.spoken_spanish, parsed.english_hint || "");
-        if (hybridRecognizer) { try { hybridRecognizer.stop(); } catch (_) {} }
-        speakSpanishTTS(parsed.spoken_spanish, () => {
-          sessionStatus.textContent = isConnected ? "Live (Listening...)" : "Ready";
-          if (isConnected && liveMode === "HYBRID" && hybridRecognizer) {
-            try { hybridRecognizer.start(); } catch (_) {}
-          }
-        });
+      if (parsed.end_roleplay) {
+        activeRoleplayState = null;
+        rpBanner.style.display = "none";
       }
 
       if (parsed.grammar_correction?.natural_spanish) {
         const g = parsed.grammar_correction;
-        appendGrammarBox(g.user_said, g.natural_spanish, g.quick_rule);
+        appendGrammarBox(g.user_said || userText, g.natural_spanish, g.quick_rule || "");
       }
       if (parsed.new_flashcard?.spanish_term) {
         saveCardToDeck(parsed.new_flashcard);
@@ -1240,6 +1156,24 @@ Return strictly valid JSON matching this structure:
       if (parsed.verb_lookup && VERB_PRESETS[parsed.verb_lookup]) {
         renderVerbMatrix(VERB_PRESETS[parsed.verb_lookup]);
       }
+
+      // Update live banner & log immediately, then play chime + Spanish TTS
+      document.getElementById("live-reply-es").textContent = spanishReply;
+      document.getElementById("live-reply-en").textContent = englishHint;
+      logComprehensibleEntry(spanishReply, englishHint);
+
+      playConfirmChime();
+      isSpeakingNow = true;
+      sessionStatus.textContent = "🔊 Vozzi Speaking...";
+
+      // Wait 120ms so Android audio hardware finishes releasing mic before TTS starts
+      setTimeout(() => {
+        speakSpanishTTS(spanishReply, () => {
+          isSpeakingNow = false;
+          sessionStatus.textContent = isConnected ? "🎙️ Live (Listening...)" : "Ready";
+          if (isConnected) startContinuousMic();
+        });
+      }, 120);
     }
 
     function appendGrammarBox(userSaid, naturalSpanish, quickRule) {
@@ -1254,42 +1188,49 @@ Return strictly valid JSON matching this structure:
       if (transcriptList.children.length === 1 && !transcriptList.children[0].classList.contains("item-box")) transcriptList.innerHTML = "";
       const div = document.createElement("div");
       div.className = `item-box transcript ${blurMode ? "blurred" : ""}`;
-      div.innerHTML = `<div class="blur-target"><strong>${es}</strong><small>${en}</small></div>`;
-      div.addEventListener("click", () => div.classList.toggle("blurred"));
+      div.innerHTML = `<div class="blur-target"><strong>🔊 ${es}</strong><small>${en}</small></div>`;
+      div.addEventListener("click", () => {
+        unlockMobileAudio();
+        div.classList.remove("blurred");
+        speakSpanishTTS(es);
+      });
       transcriptList.prepend(div);
     }
 
     btnSendText.addEventListener("click", () => {
+      unlockMobileAudio();
       const val = textPromptInput.value.trim();
       if (!val) return;
       textPromptInput.value = "";
       processUserTurnWithGemini(val, false);
     });
     textPromptInput.addEventListener("keydown", (e) => { if (e.key === "Enter") btnSendText.click(); });
-    btnEndRp.addEventListener("click", () => { activeRoleplayState = null; rpBanner.style.display = "none"; processUserTurnWithGemini("End roleplay and summarize.", false); });
+    btnEndRp.addEventListener("click", () => {
+      unlockMobileAudio();
+      activeRoleplayState = null;
+      rpBanner.style.display = "none";
+      processUserTurnWithGemini("End roleplay and summarize how I did.", false);
+    });
 
-    /* 7. 1 FPS CAMERA STREAMER & TAP-TO-IDENTIFY RETICLE (FIXED) */
+    /* 7. 1 FPS CAMERA STREAMER & TAP-TO-IDENTIFY RETICLE */
     function captureFrameToBuffer() {
       const vw = videoEl.videoWidth || 640;
       const vh = videoEl.videoHeight || 480;
       if (!cameraStream || videoEl.readyState < 2) return false;
 
-      const scale = 640 / vw;
-      offscreenCanvas.width = 640;
+      const scale = 480 / vw; // Compact 480px width for fast mobile upload
+      offscreenCanvas.width = 480;
       offscreenCanvas.height = Math.round(vh * scale);
       ctx.drawImage(videoEl, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
-      latestJpegBase64 = offscreenCanvas.toDataURL("image/jpeg", 0.7).split(",")[1];
+      latestJpegBase64 = offscreenCanvas.toDataURL("image/jpeg", 0.6).split(",")[1];
 
       camFpsPill.style.display = "block";
       camFpsPill.textContent = "📸 1 FPS Vision Active";
-
-      if (liveMode === "WS" && ws?.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ realtimeInput: { mediaChunks: [{ mimeType: "image/jpeg", data: latestJpegBase64 }] } }));
-      }
       return true;
     }
 
     function triggerCameraObjectIdentify(clientX, clientY) {
+      unlockMobileAudio(); // Unlock mobile speech synchronously on tap!
       if (!cameraStream) {
         alert("Tap 'Start Camera (1 FPS)' first so Vozzi can see the object!");
         return;
@@ -1303,7 +1244,7 @@ Return strictly valid JSON matching this structure:
       }
       if (captureFrameToBuffer()) {
         processUserTurnWithGemini(
-          "¿Cómo se dice el objeto principal que te estoy mostrando en la cámara? Dime su nombre en español con su artículo (el o la), guárdalo en mis flashcards en 'new_flashcard' y hazme una pregunta corta.",
+          "¿Cómo se dice el objeto principal que te estoy mostrando en la cámara? Dime su nombre en español con su artículo (el o la), guárdalo en 'new_flashcard' y hazme una pregunta corta.",
           true
         );
       } else {
@@ -1321,11 +1262,13 @@ Return strictly valid JSON matching this structure:
     });
 
     btnCamera.addEventListener("click", async () => {
+      unlockMobileAudio();
       if (cameraStream) stopCamera();
       else await startCamera();
     });
 
     btnFlip.addEventListener("click", async () => {
+      unlockMobileAudio();
       facingMode = facingMode === "environment" ? "user" : "environment";
       stopCamera();
       await startCamera();
@@ -1339,13 +1282,12 @@ Return strictly valid JSON matching this structure:
             audio: false
           });
         } catch (_) {
-          // Fallback for desktop webcams or browsers that reject facingMode constraints
           cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         }
 
         videoEl.srcObject = cameraStream;
         videoEl.muted = true;
-        await videoEl.play(); // Critical fix: explicitly play the video stream on mobile!
+        await videoEl.play();
 
         videoPlaceholder.style.display = "none";
         camFpsPill.style.display = "block";
@@ -1354,11 +1296,10 @@ Return strictly valid JSON matching this structure:
         btnFlip.style.display = "inline-block";
         btnAskObject.style.display = "inline-block";
 
-        // Capture initial frame once metadata loads, then every 1000ms (1 FPS)
         setTimeout(captureFrameToBuffer, 300);
         cameraInterval = setInterval(captureFrameToBuffer, 1000);
       } catch (err) {
-        alert("Camera permission or hardware error: " + err.message + "\nMake sure you allowed camera access in your browser bar.");
+        alert("Camera error: " + err.message);
       }
     }
 
@@ -1380,16 +1321,16 @@ Return strictly valid JSON matching this structure:
 
     function stopLiveSession() {
       isConnected = false;
-      liveMode = "NONE";
+      isBusyThinking = false;
+      isSpeakingNow = false;
+      stopContinuousMic();
       stopCamera();
-      window.speechSynthesis.cancel();
-      if (hybridRecognizer) { try { hybridRecognizer.stop(); } catch (_) {} hybridRecognizer = null; }
-      cleanupWsAudioOnly();
-      if (audioCtx) { try { audioCtx.close(); } catch (_) {} audioCtx = null; }
+      try { window.speechSynthesis.cancel(); } catch (_) {}
       statusDot.classList.remove("live");
       sessionStatus.textContent = "Ready";
       btnConnect.textContent = "Start Live Session";
       btnConnect.className = "success";
+      btnPtt.style.display = "none";
       rpBanner.style.display = "none";
     }
 
