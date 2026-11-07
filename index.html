@@ -4,11 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#0f172a" />
-  <title>Vozzi – Live Spanish Tutor</title>
+  <title>Vozzi & Speak Pro Ultra – Live Spanish Suite</title>
   <style>
     :root {
       --bg: #0f172a;
       --panel: #1e293b;
+      --panel-alt: #020617;
       --border: #334155;
       --text: #f8fafc;
       --muted: #94a3b8;
@@ -17,6 +18,7 @@
       --warning: #f59e0b;
       --danger: #ef4444;
       --accent: #8b5cf6;
+      --pink: #ec4899;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,9 +27,10 @@
       background: var(--bg);
       color: var(--text);
       line-height: 1.5;
-      padding-bottom: 48px;
+      padding-bottom: 60px;
     }
 
+    /* Top Header */
     header {
       background: var(--panel);
       border-bottom: 1px solid var(--border);
@@ -39,11 +42,11 @@
       gap: 12px;
       position: sticky;
       top: 0;
-      z-index: 50;
+      z-index: 100;
     }
 
     .brand {
-      font-size: 1.35rem;
+      font-size: 1.3rem;
       font-weight: 800;
       letter-spacing: -0.5px;
       color: #60a5fa;
@@ -53,15 +56,15 @@
     }
 
     .status-dot {
-      width: 10px;
-      height: 10px;
+      width: 11px;
+      height: 11px;
       border-radius: 50%;
       background: var(--muted);
       display: inline-block;
     }
     .status-dot.live {
       background: var(--success);
-      box-shadow: 0 0 8px var(--success);
+      box-shadow: 0 0 10px var(--success);
     }
 
     .key-bar {
@@ -71,13 +74,14 @@
       flex-wrap: wrap;
     }
 
-    input[type="password"], input[type="text"] {
+    input[type="password"], input[type="text"], select, textarea {
       background: var(--bg);
       border: 1px solid var(--border);
       color: var(--text);
       padding: 8px 12px;
       border-radius: 6px;
       font-size: 0.88rem;
+      font-family: inherit;
     }
 
     button {
@@ -90,14 +94,43 @@
       cursor: pointer;
       font-size: 0.88rem;
       transition: opacity 0.15s, transform 0.1s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
     button:hover { opacity: 0.92; }
     button:active { transform: scale(0.98); }
     button:disabled { opacity: 0.45; cursor: not-allowed; }
     button.secondary { background: var(--border); }
     button.success { background: var(--success); }
+    button.warning { background: var(--warning); color: #000; }
     button.danger { background: var(--danger); }
     button.accent { background: var(--accent); }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      max-width: 1160px;
+      margin: 14px auto 0;
+      padding: 0 16px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+    .tab-btn {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 9px 15px;
+      border-radius: 8px;
+      white-space: nowrap;
+      font-size: 0.88rem;
+    }
+    .tab-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: #60a5fa;
+    }
 
     /* Active Roleplay Banner */
     #roleplay-banner {
@@ -112,17 +145,22 @@
       flex-wrap: wrap;
     }
 
-    .container {
-      max-width: 1120px;
-      margin: 20px auto;
+    /* Main Containers */
+    .tab-panel {
+      display: none;
+      max-width: 1160px;
+      margin: 16px auto;
       padding: 0 16px;
+    }
+    .tab-panel.active { display: block; }
+
+    .grid-2 {
       display: grid;
       grid-template-columns: 1.05fr 0.95fr;
       gap: 20px;
     }
-
-    @media (max-width: 820px) {
-      .container { grid-template-columns: 1fr; }
+    @media (max-width: 860px) {
+      .grid-2 { grid-template-columns: 1fr; }
     }
 
     .col {
@@ -150,14 +188,15 @@
       justify-content: space-between;
       align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
     }
 
-    /* Camera Viewfinder & Tap-to-Identify Reticle */
+    /* Camera Viewfinder & Reticle */
     .video-wrap {
       position: relative;
       width: 100%;
       aspect-ratio: 4 / 3;
-      background: #020617;
+      background: var(--panel-alt);
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid var(--border);
@@ -166,13 +205,7 @@
       justify-content: center;
       cursor: crosshair;
     }
-
-    video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
+    video { width: 100%; height: 100%; object-fit: cover; }
     .video-placeholder {
       position: absolute;
       color: var(--muted);
@@ -181,7 +214,6 @@
       padding: 20px;
       pointer-events: none;
     }
-
     #focus-reticle {
       position: absolute;
       width: 68px;
@@ -192,30 +224,15 @@
       transform: translate(-50%, -50%);
       pointer-events: none;
       display: none;
-      animation: pulseReticle 0.8s ease-out;
     }
 
-    @keyframes pulseReticle {
-      0% { transform: translate(-50%, -50%) scale(1.4); opacity: 1; }
-      100% { transform: translate(-50%, -50%) scale(1); opacity: 0.85; }
-    }
-
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    /* Quick Prompt Input */
-    .quick-bar {
-      display: flex;
-      gap: 8px;
-    }
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; }
+    .quick-bar { display: flex; gap: 8px; }
     .quick-bar input { flex: 1; }
 
-    /* Scrollable Lists */
+    /* Scroll Lists */
     .scroll-list {
-      max-height: 240px;
+      max-height: 260px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
@@ -228,40 +245,115 @@
       padding: 10px 12px;
       border-radius: 6px;
       font-size: 0.88rem;
-      transition: filter 0.2s;
     }
     .item-box.grammar { border-left-color: var(--warning); }
     .item-box.transcript { border-left-color: var(--success); cursor: pointer; }
-    .item-box.blurred .blur-target {
-      filter: blur(6px);
-      user-select: none;
-    }
+    .item-box.blurred .blur-target { filter: blur(6px); user-select: none; }
     .item-box small { color: var(--muted); display: block; margin-top: 4px; }
 
-    /* Flashcards Flip & Gender Badges */
-    .flashcard {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--primary);
-      padding: 12px;
-      border-radius: 8px;
+    /* 3D Flashcard Studio */
+    .flashcard-3d-stage {
+      perspective: 1000px;
+      width: 100%;
+      height: 220px;
+      margin: 6px 0;
       cursor: pointer;
-      position: relative;
     }
-    .flashcard.masc { border-left-color: #3b82f6; } /* el */
-    .flashcard.fem { border-left-color: #ec4899; }  /* la */
-    .flashcard .card-back { display: none; margin-top: 6px; color: #38bdf8; }
-    .flashcard.flipped .card-back { display: block; }
+    .flashcard-3d-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+    .flashcard-3d-stage.flipped .flashcard-3d-inner {
+      transform: rotateY(180deg);
+    }
+    .flashcard-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 12px;
+      border: 2px solid var(--border);
+      background: linear-gradient(145deg, #0f172a, #1e293b);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      gap: 8px;
+    }
+    .flashcard-face.back {
+      transform: rotateY(180deg);
+      border-color: var(--primary);
+      background: linear-gradient(145deg, #1e293b, #0f172a);
+    }
+    .flashcard-term { font-size: 1.65rem; font-weight: 800; color: #f8fafc; }
+    .flashcard-example { font-size: 0.95rem; color: #93c5fd; font-style: italic; }
     .badge {
       font-size: 0.72rem;
-      padding: 2px 6px;
-      border-radius: 4px;
+      padding: 3px 8px;
+      border-radius: 99px;
       background: var(--border);
       color: var(--text);
-      float: right;
     }
 
-    /* Verb Conjugation Matrix */
+    /* Progressive Fading Drills & 90% Gate */
+    .drill-stage-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .drill-spanish {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #60a5fa;
+      letter-spacing: 0.3px;
+    }
+    .drill-english {
+      font-size: 0.98rem;
+      color: var(--muted);
+    }
+    .accuracy-meter {
+      height: 10px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .accuracy-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--success);
+      transition: width 0.3s ease;
+    }
+
+    /* Verb Cups & Conjugation Matrix */
+    .cups-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 640px) {
+      .cups-grid { grid-template-columns: 1fr; }
+    }
+    .cup-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-top: 4px solid var(--primary);
+      border-radius: 8px;
+      padding: 10px;
+    }
+    .cup-card h4 { font-size: 0.85rem; color: #93c5fd; margin-bottom: 8px; }
+    .cup-card select { width: 100%; }
+
     table.verb-matrix {
       width: 100%;
       border-collapse: collapse;
@@ -275,10 +367,7 @@
       padding: 7px 8px;
       text-align: left;
     }
-    table.verb-matrix th {
-      background: #020617;
-      color: #93c5fd;
-    }
+    table.verb-matrix th { background: var(--panel-alt); color: #93c5fd; }
     table.verb-matrix td.highlight {
       background: rgba(245, 158, 11, 0.25);
       border: 1px solid var(--warning);
@@ -297,14 +386,14 @@
 </head>
 <body>
 
-  <!-- Header & Smart LocalStorage API Key Bar -->
+  <!-- Header & Smart API Key Bar -->
   <header>
     <div class="brand">
       <span id="status-dot" class="status-dot"></span>
-      Vozzi
+      Vozzi <span style="font-size:0.75rem; color:var(--muted); font-weight:500;">+ Speak Pro Ultra v5</span>
     </div>
     <div class="key-bar">
-      <input type="password" id="api-key-input" placeholder="Gemini API Key..." />
+      <input type="password" id="api-key-input" placeholder="Paste Gemini API Key..." />
       <button id="btn-save-key" class="secondary">Save Key</button>
     </div>
   </header>
@@ -312,73 +401,309 @@
   <!-- Active Roleplay Banner -->
   <div id="roleplay-banner">
     <div>
-      <strong>🎭 Live Roleplay:</strong> <span id="rp-title"></span>
+      <strong>🎭 Active Roleplay:</strong> <span id="rp-title"></span>
       <span style="opacity: 0.85; margin-left: 8px;">(AI: <span id="rp-ai"></span> | You: <span id="rp-user"></span>)</span>
     </div>
     <button id="btn-end-rp" class="danger" style="padding: 5px 10px; font-size: 0.8rem;">End Scene</button>
   </div>
 
-  <!-- Main Workspace -->
-  <div class="container">
-    <!-- Left Column: Camera, Audio Controls, & Live Comprehensible Input Subtitles -->
-    <div class="col">
-      <div class="card">
-        <h2>
-          <span>Live Voice & Point-and-Ask Camera</span>
-          <span id="session-status" style="font-size: 0.82rem; color: var(--muted);">Disconnected</span>
-        </h2>
+  <!-- Multi-Tab Navigation Bar -->
+  <nav class="nav-tabs">
+    <button class="tab-btn active" data-tab="tab-live">🎙️ Live Tutor & Camera</button>
+    <button class="tab-btn" data-tab="tab-drills">🎯 Fading Drills (90% Gate)</button>
+    <button class="tab-btn" data-tab="tab-flashcards">🗂️ 3D Flashcard Studio</button>
+    <button class="tab-btn" data-tab="tab-roleplay">🎭 Guided Roleplay Studio</button>
+    <button class="tab-btn" data-tab="tab-verbs">🥤 Verb Cups & Matrix</button>
+    <button class="tab-btn" data-tab="tab-export">📦 Import / Export Hub</button>
+  </nav>
 
-        <div class="video-wrap" id="video-wrap" title="Tap anywhere on the video to identify an object in Spanish">
-          <div id="video-placeholder" class="video-placeholder">
-            Camera Off<br>
-            <small>Start camera and <strong>tap any object on screen</strong> to ask "¿Cómo se dice esto?"</small>
+  <!-- =========================================================
+       TAB 1: LIVE VOICE TUTOR & 1 FPS POINT-AND-ASK CAMERA
+       ========================================================= -->
+  <section id="tab-live" class="tab-panel active">
+    <div class="grid-2">
+      <div class="col">
+        <div class="card">
+          <h2>
+            <span>Live Voice & Point-and-Ask Camera</span>
+            <span id="session-status" style="font-size: 0.82rem; color: var(--muted);">Disconnected</span>
+          </h2>
+
+          <div class="video-wrap" id="video-wrap" title="Tap anywhere on the video to identify an object in Spanish">
+            <div id="video-placeholder" class="video-placeholder">
+              Camera Off<br>
+              <small>Start camera and <strong>tap any object on screen</strong> to ask "¿Cómo se dice esto?"</small>
+            </div>
+            <video id="camera-feed" playsinline autoplay muted></video>
+            <div id="focus-reticle"></div>
           </div>
-          <video id="camera-feed" playsinline autoplay muted></video>
-          <div id="focus-reticle"></div>
+
+          <div class="controls">
+            <button id="btn-connect" class="success">Start Live Session</button>
+            <button id="btn-camera" class="secondary" disabled>Start Camera (1 FPS)</button>
+            <button id="btn-flip" class="secondary" style="display:none;">Flip Camera</button>
+            <button id="btn-ask-object" class="accent" style="display:none;">¿Cómo se dice esto?</button>
+          </div>
+
+          <div class="quick-bar">
+            <input type="text" id="text-prompt-input" placeholder="Type a message or say 'Can we roleplay...'" />
+            <button id="btn-send-text" class="secondary" disabled>Send</button>
+          </div>
+
+          <div class="hint-box">
+            <strong>Dual-Engine Live Protection Active:</strong><br>
+            • Connects via WebSocket Live API and automatically falls back to Hybrid Continuous Voice + Gemini 2.5 Flash if your mobile carrier or key blocks raw sockets—so your session <strong>never drops after 0.5s</strong>.<br>
+            • <strong>Voice Roleplay:</strong> Say <em>"Can we roleplay? You're a customer designing a kitchen and I'm the specialist."</em>
+          </div>
         </div>
 
-        <div class="controls">
-          <button id="btn-connect" class="success">Start Live Session</button>
-          <button id="btn-camera" class="secondary" disabled>Start Camera (1 FPS)</button>
-          <button id="btn-flip" class="secondary" style="display:none;">Flip Camera</button>
-          <button id="btn-ask-object" class="accent" style="display:none;">¿Cómo se dice esto?</button>
-        </div>
-
-        <!-- Text fallback / quick roleplay trigger bar -->
-        <div class="quick-bar">
-          <input type="text" id="text-prompt-input" placeholder="Or type a message / roleplay scene..." />
-          <button id="btn-send-text" class="secondary" disabled>Send</button>
-        </div>
-
-        <div class="hint-box">
-          <strong>Everything you can do live:</strong><br>
-          • <strong>Roleplay by Voice:</strong> Say <em>"Can we roleplay? You're a customer designing a kitchen and I'm the specialist."</em><br>
-          • <strong>Point & Ask Camera:</strong> Turn on the camera and tap the video (or say <em>"¿Cómo se dice esto?"</em>) to identify items and auto-save flashcards.<br>
-          • <strong>Verb Matrix:</strong> Ask <em>"How do I conjugate poner / estar / ser?"</em> to pop up the live conjugation matrix.
+        <div class="card">
+          <h2>
+            <span>Comprehensible Input Log</span>
+            <button id="btn-toggle-blur" class="secondary" style="padding: 4px 10px; font-size: 0.75rem;">Blur Mode: OFF</button>
+          </h2>
+          <div id="transcript-list" class="scroll-list">
+            <div style="color: var(--muted); font-size: 0.84rem;">
+              Live Spanish responses and English hints appear here. Toggle <strong>Blur Mode</strong> to train your ear first.
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Comprehensible Input Subtitles & Blur Toggle -->
-      <div class="card">
-        <h2>
-          <span>Comprehensible Input Log</span>
-          <button id="btn-toggle-blur" class="secondary" style="padding: 4px 10px; font-size: 0.75rem;">Blur Mode: OFF</button>
-        </h2>
-        <div id="transcript-list" class="scroll-list">
-          <div style="color: var(--muted); font-size: 0.84rem;">
-            Key Spanish phrases and comprehensible input notes appear here. Toggle <strong>Blur Mode</strong> to test your listening first (tap any blurred line to reveal).
+      <div class="col">
+        <div class="card">
+          <h2>
+            <span>Silent Grammar Drawer</span>
+            <small style="font-weight: normal; color: var(--muted);">Auto-logged without interrupting you</small>
+          </h2>
+          <div id="grammar-list" class="scroll-list">
+            <div style="color: var(--muted); font-size: 0.84rem;">
+              Corrections (like <em>fue</em> vs. <em>estuvo</em> or <em>dímelo</em>) appear here silently while you talk.
+            </div>
           </div>
+        </div>
+
+        <div class="card">
+          <h2>
+            <span>Recent Saved Cards (<span id="live-card-count">0</span>)</span>
+            <button class="secondary" style="padding: 4px 8px; font-size: 0.75rem;" onclick="switchTab('tab-flashcards')">Open Studio →</button>
+          </h2>
+          <div id="live-flashcards-preview" class="scroll-list"></div>
         </div>
       </div>
     </div>
+  </section>
 
-    <!-- Right Column: Verb Conjugation Matrix, Silent Grammar Drawer, & Interactive Flashcards -->
-    <div class="col">
-      <!-- Verb Conjugation Matrix -->
+  <!-- =========================================================
+       TAB 2: PROGRESSIVE FADING DRILLS & 90% ACCURACY GATE
+       ========================================================= -->
+  <section id="tab-drills" class="tab-panel">
+    <div class="card">
+      <h2>
+        <span>🎯 Progressive Fading Drills (Strict 90% Accuracy Gate)</span>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <select id="drill-level-select">
+            <option value="ALL">All Curriculum Levels</option>
+            <option value="Level 4: Connectors & Lo Que" selected>Level 4: Connectors, "Lo Que" & Power Verbs</option>
+            <option value="Level 3: Kitchen & Customer Service">Level 3: Kitchen Design & Customer Service</option>
+            <option value="Level 2: Cognates Mastery">Level 2: Cognates (-ción / -ico / -mente)</option>
+            <option value="Level 1: Core Everyday">Level 1: Core Everyday & Survival</option>
+          </select>
+        </div>
+      </h2>
+
+      <div class="drill-stage-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <span class="badge" id="drill-category-badge">Level 4</span>
+          <span class="badge" id="drill-fade-badge" style="background:var(--primary);">Stage 1/3: Full Text</span>
+          <span class="badge" id="drill-progress-badge">Card 1 of 20</span>
+        </div>
+
+        <div class="drill-spanish" id="drill-spanish-display">Además, eso es exactamente lo que necesitas.</div>
+        <div class="drill-english" id="drill-english-display">"Furthermore, that is exactly what you need."</div>
+
+        <div class="accuracy-meter">
+          <div class="accuracy-fill" id="drill-accuracy-bar"></div>
+        </div>
+        <div id="drill-feedback-text" style="font-size:0.88rem; color:var(--muted);">
+          Tap <strong>🎤 Speak Drill</strong> and hit <strong>90%+ accuracy</strong> to advance through the 3 fading stages!
+        </div>
+
+        <div class="controls" style="justify-content:center; margin-top:6px;">
+          <button id="btn-drill-listen" class="secondary">🔊 Listen (Native TTS)</button>
+          <button id="btn-drill-speak" class="success">🎤 Speak Drill (90% Gate)</button>
+          <button id="btn-drill-fade" class="accent">Change Fade Stage</button>
+          <button id="btn-drill-next" class="secondary">Skip →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       TAB 3: 3D FLASHCARD STUDIO
+       ========================================================= -->
+  <section id="tab-flashcards" class="tab-panel">
+    <div class="grid-2">
       <div class="card">
         <h2>
-          <span>Verb Conjugation Matrix: <strong id="verb-title" style="color:#60a5fa;">estar (to be - temporary/location)</strong></span>
-          <small style="font-weight: normal; color: var(--muted);">Auto-updates on verb questions</small>
+          <span>🗂️ 3D Flashcard Studio (<span id="studio-total-count">0</span> Cards)</span>
+          <select id="studio-category-filter">
+            <option value="ALL">All Categories</option>
+            <option value="Level 4: Connectors & Lo Que">Connectors & "Lo Que"</option>
+            <option value="Power Verbs">Power Verbs</option>
+            <option value="Level 3: Kitchen & Customer Service">Kitchen & Customer Service</option>
+            <option value="Level 2: Cognates Mastery">Cognates Mastery</option>
+            <option value="Camera Object">Camera Sightings</option>
+          </select>
+        </h2>
+
+        <div class="flashcard-3d-stage" id="flashcard-3d" title="Tap card to flip 3D">
+          <div class="flashcard-3d-inner">
+            <div class="flashcard-face front">
+              <span class="badge" id="fc-front-cat">Category</span>
+              <div class="flashcard-term" id="fc-front-term">el gabinete de cocina</div>
+              <div class="flashcard-example" id="fc-front-ex">"Vamos a medir el gabinete de cocina."</div>
+              <small style="color:var(--muted); margin-top:8px;">(Tap card to flip ↻)</small>
+            </div>
+            <div class="flashcard-face back">
+              <span class="badge" style="background:var(--primary);">English Meaning</span>
+              <div class="flashcard-term" id="fc-back-meaning" style="color:#38bdf8;">the kitchen cabinet</div>
+              <div class="flashcard-example" id="fc-back-ex">"Vamos a medir el gabinete de cocina."</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="fc-voice-result" style="text-align:center; font-size:0.86rem; color:var(--muted);">
+          Practice pronunciation right on the card with native TTS or voice testing.
+        </div>
+
+        <div class="controls" style="justify-content:center;">
+          <button id="btn-fc-prev" class="secondary">← Prev</button>
+          <button id="btn-fc-tts" class="primary">🔊 Pronounce</button>
+          <button id="btn-fc-voice" class="success">🎤 Voice Test (90%)</button>
+          <button id="btn-fc-next" class="secondary">Next →</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>
+          <span>Add Custom Flashcard</span>
+          <button id="btn-reset-default-deck" class="secondary" style="font-size:0.75rem; padding:4px 8px;">Restore Default Deck</button>
+        </h2>
+        <input type="text" id="new-fc-es" placeholder="Spanish term (include el/la for nouns)..." />
+        <input type="text" id="new-fc-en" placeholder="English meaning..." />
+        <input type="text" id="new-fc-ex" placeholder="Example Spanish sentence..." />
+        <select id="new-fc-cat">
+          <option value="Level 4: Connectors & Lo Que">Connectors & "Lo Que"</option>
+          <option value="Power Verbs">Power Verbs</option>
+          <option value="Level 3: Kitchen & Customer Service">Kitchen & Customer Service</option>
+          <option value="Level 2: Cognates Mastery">Cognates Mastery</option>
+          <option value="Camera Object">Camera Sightings</option>
+        </select>
+        <button id="btn-add-fc" class="success">＋ Save to Deck</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       TAB 4: MULTI-TURN GUIDED ROLEPLAY STUDIO
+       ========================================================= -->
+  <section id="tab-roleplay" class="tab-panel">
+    <div class="card">
+      <h2>
+        <span>🎭 Multi-Turn Roleplay Studio (Fixed State Machine)</span>
+        <select id="rp-scenario-select">
+          <option value="kitchen">Scenario 1: Kitchen Design & Measurement Consultation</option>
+          <option value="order">Scenario 2: Customer Service Order & Delivery Lookup</option>
+          <option value="bistro">Scenario 3: Bistro Dinner & Mocktail Ordering</option>
+        </select>
+      </h2>
+
+      <div id="rp-chat-history" class="scroll-list" style="max-height:300px; background:var(--bg); padding:12px; border-radius:8px;"></div>
+
+      <div class="drill-stage-box" style="padding:14px;">
+        <div style="font-size:0.82rem; color:var(--muted);">Your Target Spanish Response (Turn <span id="rp-turn-num">1</span>):</div>
+        <div class="drill-spanish" id="rp-target-es" style="font-size:1.2rem;">¡Buenas tardes! ¿En qué le puedo ayudar hoy con el diseño de su cocina?</div>
+        <div class="drill-english" id="rp-target-en">"Good afternoon! How can I help you today with your kitchen design?"</div>
+        <div id="rp-gate-status" style="font-size:0.85rem; color:var(--muted);">Speak with ≥90% accuracy (or click Advance) to continue to the next turn without stalling!</div>
+
+        <div class="controls" style="justify-content:center;">
+          <button id="btn-rp-listen" class="secondary">🔊 Hear AI / Target</button>
+          <button id="btn-rp-speak" class="success">🎤 Speak My Turn (90% Gate)</button>
+          <button id="btn-rp-advance" class="accent">Next Turn →</button>
+          <button id="btn-rp-restart" class="secondary">Restart Scene</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       TAB 5: TONY MARSH 1-2-3 VERB CUPS & CONJUGATION MATRIX
+       ========================================================= -->
+  <section id="tab-verbs" class="tab-panel">
+    <div class="grid-2">
+      <div class="card">
+        <h2>
+          <span>🥤 Tony Marsh 1-2-3 Verb Cups Builder</span>
+          <small style="color:var(--muted); font-weight:normal;">Build fluent multi-verb sentences effortlessly</small>
+        </h2>
+
+        <div class="cups-grid">
+          <div class="cup-card">
+            <h4>Cup 1: Subject / Connector</h4>
+            <select id="cup-1">
+              <option value="Además, yo">Además, yo (Furthermore, I)</option>
+              <option value="Sin embargo, tú">Sin embargo, tú (However, you)</option>
+              <option value="La verdad es que él">La verdad es que él (The truth is he)</option>
+              <option value="Por eso nosotros">Por eso nosotros (Therefore we)</option>
+              <option value="Hoy ellos">Hoy ellos (Today they)</option>
+            </select>
+          </div>
+          <div class="cup-card">
+            <h4>Cup 2: Power Verb</h4>
+            <select id="cup-2">
+              <option value="quiero / necesito">quiero / necesito (want / need to)</option>
+              <option value="puedo / debo">puedo / debo (can / must)</option>
+              <option value="voy a">voy a (am going to)</option>
+              <option value="acabo de">acabo de (just finished)</option>
+              <option value="vuelvo a">vuelvo a (do again)</option>
+            </select>
+          </div>
+          <div class="cup-card">
+            <h4>Cup 3: Action + Object</h4>
+            <select id="cup-3">
+              <option value="medir el espacio de la cocina.">medir el espacio de la cocina.</option>
+              <option value="confirmar su número de pedido.">confirmar su número de pedido.</option>
+              <option value="preparar lo que me pediste.">preparar lo que me pediste.</option>
+              <option value="compartir las ideas con el cliente.">compartir las ideas con el cliente.</option>
+              <option value="practicar español todos los días.">practicar español todos los días.</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="drill-stage-box" style="margin-top:8px;">
+          <div class="drill-spanish" id="cup-sentence-output" style="font-size:1.25rem;">Además, yo quiero medir el espacio de la cocina.</div>
+          <div class="controls" style="justify-content:center;">
+            <button id="btn-cup-speak-tts" class="primary">🔊 Hear Sentence</button>
+            <button id="btn-cup-practice" class="success">🎤 Practice Speaking</button>
+            <button id="btn-cup-save" class="secondary">＋ Save as Flashcard</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>
+          <span>Live Verb Matrix: <strong id="verb-title" style="color:#60a5fa;">estar (temporary / location)</strong></span>
+          <select id="verb-preset-select">
+            <option value="estar">estar (to be - state/loc)</option>
+            <option value="ser">ser (to be - identity)</option>
+            <option value="tener">tener (to have)</option>
+            <option value="poder">poder (can / to be able)</option>
+            <option value="poner">poner (to put / place)</option>
+            <option value="hacer">hacer (to do / make)</option>
+            <option value="ir">ir (to go)</option>
+            <option value="compartir">compartir (to share)</option>
+          </select>
         </h2>
         <div style="overflow-x: auto;">
           <table class="verb-matrix" id="verb-table">
@@ -390,250 +715,237 @@
                 <th>Imperfect</th>
               </tr>
             </thead>
-            <tbody id="verb-tbody">
-              <tr><td><strong>yo</strong></td><td>estoy</td><td class="highlight">estuve</td><td>estaba</td></tr>
-              <tr><td><strong>tú</strong></td><td>estás</td><td>estuviste</td><td>estabas</td></tr>
-              <tr><td><strong>él / ella / Ud.</strong></td><td>está</td><td class="highlight">estuvo</td><td>estaba</td></tr>
-              <tr><td><strong>nosotros</strong></td><td>estamos</td><td>estuvimos</td><td>estábamos</td></tr>
-              <tr><td><strong>ellos / Uds.</strong></td><td>están</td><td>estuvieron</td><td>estaban</td></tr>
-            </tbody>
+            <tbody id="verb-tbody"></tbody>
           </table>
         </div>
       </div>
+    </div>
+  </section>
 
-      <!-- Silent Grammar Feedback Drawer -->
+  <!-- =========================================================
+       TAB 6: EXPORT & CUSTOM IMPORT HUB
+       ========================================================= -->
+  <section id="tab-export" class="tab-panel">
+    <div class="grid-2">
       <div class="card">
-        <h2>
-          <span>Silent Grammar Drawer</span>
-          <small style="font-weight: normal; color: var(--muted);">Logged without interrupting speech</small>
-        </h2>
-        <div id="grammar-list" class="scroll-list">
-          <div style="color: var(--muted); font-size: 0.84rem;">Corrections (like <em>fue</em> vs. <em>estuvo</em> or <em>dímelo</em>) appear here silently while you talk.</div>
+        <h2><span>📤 Export & Share Hub</span></h2>
+        <p style="font-size:0.88rem; color:var(--muted);">
+          Download your complete flashcard deck and custom study phrases as JSON or CSV for backup or Anki import.
+        </p>
+        <div class="controls">
+          <button id="btn-export-json" class="primary">⬇️ Export Deck (.JSON)</button>
+          <button id="btn-export-csv" class="success">⬇️ Export Spreadsheet (.CSV)</button>
         </div>
       </div>
 
-      <!-- Interactive Flashcards (Tap to Flip) -->
       <div class="card">
-        <h2>
-          <span>Saved Flashcards (<span id="card-count">0</span>) <small style="font-weight:normal; color:var(--muted);">— Tap card to flip</small></span>
-          <button id="btn-clear-cards" class="secondary" style="padding: 4px 8px; font-size: 0.75rem;">Clear</button>
-        </h2>
-        <div id="flashcards-list" class="scroll-list"></div>
+        <h2><span>📥 Import Custom Study Module</span></h2>
+        <p style="font-size:0.84rem; color:var(--muted);">
+          Paste lines formatted as <code>Spanish | English | Example</code> (one per line) to add directly to your Flashcards and Fading Drills:
+        </p>
+        <textarea id="import-textarea" rows="4" placeholder="Su pedido está listo | Your order is ready | Hola, su pedido está listo para recoger."></textarea>
+        <button id="btn-import-lines" class="accent">＋ Import Lines into App</button>
       </div>
     </div>
-  </div>
+  </section>
 
   <script>
     /**************************************************************
-     * 1. SYSTEM INSTRUCTION & ALL 6 LIVE TOOLS
+     * 1. PRE-LOADED SPEAK PRO ULTRA + VOZZI CURRICULUM DECK
      **************************************************************/
-    const VOZZI_SYSTEM_INSTRUCTION = `
-You are Vozzi, an adaptive, encouraging conversational Spanish tutor.
+    const DEFAULT_FLASHCARDS = [
+      // Level 4: Connectors, "Lo Que" & Power Verbs
+      { spanish_term: "además", english_meaning: "furthermore / besides", example_sentence: "Además, tenemos entrega a domicilio.", category: "Level 4: Connectors & Lo Que" },
+      { spanish_term: "sin embargo", english_meaning: "however / nevertheless", example_sentence: "Es pequeño; sin embargo, tiene mucho espacio.", category: "Level 4: Connectors & Lo Que" },
+      { spanish_term: "por lo tanto", english_meaning: "therefore", example_sentence: "Ya medimos todo; por lo tanto, podemos empezar.", category: "Level 4: Connectors & Lo Que" },
+      { spanish_term: "lo que necesitas", english_meaning: "what you need (that which you need)", example_sentence: "Esto es exactamente lo que necesitas para tu cocina.", category: "Level 4: Connectors & Lo Que" },
+      { spanish_term: "lo que me dijiste", english_meaning: "what you told me", example_sentence: "Entiendo muy bien lo que me dijiste ayer.", category: "Level 4: Connectors & Lo Que" },
+      { spanish_term: "lo que más me gusta", english_meaning: "what I like the most", example_sentence: "Lo que más me gusta es el diseño moderno.", category: "Level 4: Connectors & Lo Que" },
+      { spanish_term: "acabo de + infinitivo", english_meaning: "I just (did something)", example_sentence: "Acabo de revisar el inventario en el sistema.", category: "Power Verbs" },
+      { spanish_term: "volver a + infinitivo", english_meaning: "to do (something) again", example_sentence: "Voy a volver a medir la pared para estar seguro.", category: "Power Verbs" },
+      { spanish_term: "dejar de + infinitivo", english_meaning: "to stop doing (something)", example_sentence: "No voy a dejar de practicar español cada día.", category: "Power Verbs" },
+      // Level 3: Kitchen Design & Customer Service
+      { spanish_term: "¿En qué le puedo ayudar hoy?", english_meaning: "How can I help you today? (formal)", example_sentence: "¡Bienvenido! ¿En qué le puedo ayudar hoy?", category: "Level 3: Kitchen & Customer Service" },
+      { spanish_term: "¿Cuál es su número de pedido?", english_meaning: "What is your order number?", example_sentence: "Para buscarlo, ¿cuál es su número de pedido?", category: "Level 3: Kitchen & Customer Service" },
+      { spanish_term: "¿Me podría confirmar su dirección?", english_meaning: "Could you confirm your address for me?", example_sentence: "Antes de enviar, ¿me podría confirmar su dirección?", category: "Level 3: Kitchen & Customer Service" },
+      { spanish_term: "Su pedido está listo", english_meaning: "Your order is ready", example_sentence: "Buenas tardes, su pedido está listo para recoger.", category: "Level 3: Kitchen & Customer Service" },
+      { spanish_term: "el gabinete de cocina", english_meaning: "the kitchen cabinet", example_sentence: "Este gabinete de cocina tiene cierre suave.", category: "Level 3: Kitchen & Customer Service" },
+      { spanish_term: "la encimera", english_meaning: "the countertop", example_sentence: "La encimera de cuarzo es muy resistente.", category: "Level 3: Kitchen & Customer Service" },
+      { spanish_term: "las medidas", english_meaning: "the measurements", example_sentence: "Necesitamos las medidas exactas de la pared.", category: "Level 3: Kitchen & Customer Service" },
+      { spanish_term: "el cajón", english_meaning: "the drawer", example_sentence: "El cajón interior organiza los cubiertos.", category: "Level 3: Kitchen & Customer Service" },
+      { spanish_term: "la sartén de hierro fundido", english_meaning: "the cast-iron frying pan", example_sentence: "Esta sartén de hierro fundido dura toda la vida.", category: "Level 3: Kitchen & Customer Service" },
+      // Level 2: Cognates Mastery
+      { spanish_term: "la reservación", english_meaning: "the reservation (-tion → -ción)", example_sentence: "Tengo una reservación para dos personas a las cinco y media.", category: "Level 2: Cognates Mastery" },
+      { spanish_term: "sarcástico", english_meaning: "sarcastic (-ic → -ico)", example_sentence: "Él tiene un sentido del humor un poco sarcástico.", category: "Level 2: Cognates Mastery" },
+      { spanish_term: "exactamente", english_meaning: "exactly (-ly → -mente)", example_sentence: "Eso es exactamente lo que estaba buscando.", category: "Level 2: Cognates Mastery" },
+      { spanish_term: "la posibilidad", english_meaning: "the possibility (-ty → -dad)", example_sentence: "Hay una buena posibilidad de entregarlo mañana.", category: "Level 2: Cognates Mastery" },
+      // Level 1: Core Everyday
+      { spanish_term: "ahora mismo", english_meaning: "right now", example_sentence: "Lo voy a verificar en la computadora ahora mismo.", category: "Level 1: Core Everyday" },
+      { spanish_term: "compartir", english_meaning: "to share", example_sentence: "Te voy a compartir el plano del diseño por correo.", category: "Level 1: Core Everyday" },
+      { spanish_term: "dímelo", english_meaning: "tell it to me (di + me + lo)", example_sentence: "Si tienes alguna duda con las medidas, dímelo.", category: "Level 1: Core Everyday" }
+    ];
 
-CORE BEHAVIORS:
-1. COMPREHENSIBLE INPUT (i+1): Speak primarily in clear, natural Spanish matched to the user's level, using cognates and context clues. Whenever you introduce a key Spanish response or target sentence, also call 'log_comprehensible_input' so the user has a visual subtitle with an English hint in their Comprehensible Input Log.
-2. CAMERA VISION & POINT-AND-ASK: When video frames are streaming, naturally reference objects the user shows you. If they ask "¿Cómo se dice esto?", tap an object, or ask about an item in view, identify it in Spanish (ALWAYS include 'el' or 'la'), explain its usage briefly, and call 'save_flashcard'.
-3. SILENT GRAMMAR LOGGING: Never interrupt the flow of conversation to lecture on grammar. If the user makes a mistake (e.g., ser vs. estar such as 'fue' vs. 'estuvo', gender agreement, or object pronouns like 'dime' vs. 'dímelo'), call 'log_grammar_correction' silently in the background and keep the spoken conversation moving naturally.
-4. LIVE VERB CONJUGATION MATRIX: Whenever the user asks how to conjugate a verb, mixes up a verb tense, or practices verb forms, call 'show_verb_matrix' with the Present, Preterite, and Imperfect conjugations and specify which pronoun/tense cell to highlight.
-5. VOICE-ACTIVATED MULTI-TURN ROLEPLAY:
-   - Whenever the user asks to roleplay (e.g., "Can we roleplay...", "Let's do a roleplay where...") and describes a scene, IMMEDIATELY call 'start_roleplay_scene' with the scene details.
-   - Once inside a roleplay, STAY STRICTLY IN CHARACTER for every turn. Do not break character to explain vocabulary unless the user explicitly asks "How do I say..." or says "Pause roleplay".
-   - Keep driving the scene forward by reacting naturally and asking in-character follow-up questions so the conversation never dead-ends after the first turn.
-   - When the user says "End roleplay", "Stop roleplay", or "Terminar juego de rol", call 'end_roleplay_scene' and give them a warm summary of how they did.
-`;
+    const VERB_PRESETS = {
+      estar: {
+        infinitive: "estar", english_meaning: "to be (temporary / location)",
+        yo_present: "estoy", yo_preterite: "estuve", yo_imperfect: "estaba",
+        tu_present: "estás", tu_preterite: "estuviste", tu_imperfect: "estabas",
+        el_present: "está", el_preterite: "estuvo", el_imperfect: "estaba",
+        nosotros_present: "estamos", nosotros_preterite: "estuvimos", nosotros_imperfect: "estábamos",
+        ellos_present: "están", ellos_preterite: "estuvieron", ellos_imperfect: "estaban"
+      },
+      ser: {
+        infinitive: "ser", english_meaning: "to be (identity / permanent)",
+        yo_present: "soy", yo_preterite: "fui", yo_imperfect: "era",
+        tu_present: "eres", tu_preterite: "fuiste", tu_imperfect: "eras",
+        el_present: "es", el_preterite: "fue", el_imperfect: "era",
+        nosotros_present: "somos", nosotros_preterite: "fuimos", nosotros_imperfect: "éramos",
+        ellos_present: "son", ellos_preterite: "fueron", ellos_imperfect: "eran"
+      },
+      tener: {
+        infinitive: "tener", english_meaning: "to have",
+        yo_present: "tengo", yo_preterite: "tuve", yo_imperfect: "tenía",
+        tu_present: "tienes", tu_preterite: "tuviste", tu_imperfect: "tenías",
+        el_present: "tiene", el_preterite: "tuvo", el_imperfect: "tenía",
+        nosotros_present: "tenemos", nosotros_preterite: "tuvimos", nosotros_imperfect: "teníamos",
+        ellos_present: "tienen", ellos_preterite: "tuvieron", ellos_imperfect: "tenían"
+      },
+      poder: {
+        infinitive: "poder", english_meaning: "can / to be able to",
+        yo_present: "puedo", yo_preterite: "pude", yo_imperfect: "podía",
+        tu_present: "puedes", tu_preterite: "pudiste", tu_imperfect: "podías",
+        el_present: "puede", el_preterite: "pudo", el_imperfect: "podía",
+        nosotros_present: "podemos", nosotros_preterite: "pudimos", nosotros_imperfect: "podíamos",
+        ellos_present: "pueden", ellos_preterite: "pudieron", ellos_imperfect: "podían"
+      },
+      poner: {
+        infinitive: "poner", english_meaning: "to put / place",
+        yo_present: "pongo", yo_preterite: "puse", yo_imperfect: "ponía",
+        tu_present: "pones", tu_preterite: "pusiste", tu_imperfect: "ponías",
+        el_present: "pone", el_preterite: "puso", el_imperfect: "ponía",
+        nosotros_present: "ponemos", nosotros_preterite: "pusimos", nosotros_imperfect: "poníamos",
+        ellos_present: "ponen", ellos_preterite: "pusieron", ellos_imperfect: "ponían"
+      },
+      hacer: {
+        infinitive: "hacer", english_meaning: "to do / make",
+        yo_present: "hago", yo_preterite: "hice", yo_imperfect: "hacía",
+        tu_present: "haces", tu_preterite: "hiciste", tu_imperfect: "hacías",
+        el_present: "hace", el_preterite: "hizo", el_imperfect: "hacía",
+        nosotros_present: "hacemos", nosotros_preterite: "hicimos", nosotros_imperfect: "hacíamos",
+        ellos_present: "hacen", ellos_preterite: "hicieron", ellos_imperfect: "hacían"
+      },
+      ir: {
+        infinitive: "ir", english_meaning: "to go",
+        yo_present: "voy", yo_preterite: "fui", yo_imperfect: "iba",
+        tu_present: "vas", tu_preterite: "fuiste", tu_imperfect: "ibas",
+        el_present: "va", el_preterite: "fue", el_imperfect: "iba",
+        nosotros_present: "vamos", nosotros_preterite: "fuimos", nosotros_imperfect: "íbamos",
+        ellos_present: "van", ellos_preterite: "fueron", ellos_imperfect: "iban"
+      },
+      compartir: {
+        infinitive: "compartir", english_meaning: "to share (regular -ir)",
+        yo_present: "comparto", yo_preterite: "compartí", yo_imperfect: "compartía",
+        tu_present: "compartes", tu_preterite: "compartiste", tu_imperfect: "compartías",
+        el_present: "comparte", el_preterite: "compartió", el_imperfect: "compartía",
+        nosotros_present: "compartimos", nosotros_preterite: "compartimos", nosotros_imperfect: "compartíamos",
+        ellos_present: "comparten", ellos_preterite: "compartieron", ellos_imperfect: "compartían"
+      }
+    };
 
-    const VOZZI_TOOLS = [{
-      functionDeclarations: [
+    const GUIDED_ROLEPLAYS = {
+      kitchen: [
         {
-          name: "start_roleplay_scene",
-          description: "Triggers when the user verbally asks to start a roleplay and describes the scenario.",
-          parameters: {
-            type: "OBJECT",
-            properties: {
-              scene_title: { type: "STRING", description: "Short title of the scene" },
-              ai_persona: { type: "STRING", description: "The character the AI is playing" },
-              user_persona: { type: "STRING", description: "The character the user is playing" },
-              opening_line_spanish: { type: "STRING", description: "The first in-character Spanish line the AI will speak" }
-            },
-            required: ["scene_title", "ai_persona", "user_persona", "opening_line_spanish"]
-          }
+          ai_es: "¡Hola! Buenas tardes. Queremos renovar nuestra cocina pero no sabemos por dónde empezar.",
+          ai_en: "Hello! Good afternoon. We want to renovate our kitchen but don't know where to start.",
+          user_es: "¡Buenas tardes! ¿En qué le puedo ayudar hoy con el diseño de su cocina?",
+          user_en: "Good afternoon! How can I help you today with your kitchen design?"
         },
         {
-          name: "end_roleplay_scene",
-          description: "Exits the active roleplay mode when the user asks to stop or finishes the scene.",
-          parameters: {
-            type: "OBJECT",
-            properties: {
-              praise: { type: "STRING", description: "What the user did well during the scene" },
-              key_takeaway: { type: "STRING", description: "One main tip or phrase to remember from the roleplay" }
-            },
-            required: ["praise", "key_takeaway"]
-          }
+          ai_es: "Tenemos una pared de tres metros y queremos gabinetes blancos con muchos cajones.",
+          ai_en: "We have a three-meter wall and we want white cabinets with lots of drawers.",
+          user_es: "Perfecto, eso es exactamente lo que podemos planear en el sistema.",
+          user_en: "Perfect, that is exactly what we can plan in the system."
         },
         {
-          name: "save_flashcard",
-          description: "Saves a Spanish vocabulary word or phrase to the user's persistent flashcard deck.",
-          parameters: {
-            type: "OBJECT",
-            properties: {
-              spanish_term: { type: "STRING", description: "Spanish word or phrase including 'el' or 'la' if a noun" },
-              english_meaning: { type: "STRING", description: "English translation" },
-              example_sentence: { type: "STRING", description: "Short Spanish example sentence" },
-              category: { type: "STRING", description: "Tag such as 'Camera Object', 'Roleplay', 'Verbs', or 'Everyday'" }
-            },
-            required: ["spanish_term", "english_meaning", "example_sentence"]
-          }
+          ai_es: "¿Cuánto tiempo tarda la entrega de los gabinetes y la encimera?",
+          ai_en: "How long does the delivery of the cabinets and countertop take?",
+          user_es: "Además de revisar el inventario, ¿me podría confirmar su dirección?",
+          user_en: "Besides checking the inventory, could you confirm your address for me?"
         },
         {
-          name: "log_grammar_correction",
-          description: "Silently logs a grammar or phrasing correction to the UI drawer without interrupting speech.",
-          parameters: {
-            type: "OBJECT",
-            properties: {
-              user_said: { type: "STRING", description: "What the user said containing the error" },
-              natural_spanish: { type: "STRING", description: "The corrected or more natural Spanish phrasing" },
-              quick_rule: { type: "STRING", description: "Brief explanation of the rule" }
-            },
-            required: ["user_said", "natural_spanish", "quick_rule"]
-          }
+          ai_es: "Sí, claro. Aquí tiene mi código postal y las medidas exactas.",
+          ai_en: "Yes, of course. Here is my zip code and the exact measurements.",
+          user_es: "Excelente, su pedido está listo para programar la entrega.",
+          user_en: "Excellent, your order is ready to schedule the delivery."
+        }
+      ],
+      order: [
+        {
+          ai_es: "Hola, vengo a recoger unos artículos para mi casa.",
+          ai_en: "Hi, I'm coming to pick up some items for my house.",
+          user_es: "¡Bienvenido! Para buscarlo ahora mismo, ¿cuál es su número de pedido?",
+          user_en: "Welcome! To look it up right now, what is your order number?"
         },
         {
-          name: "show_verb_matrix",
-          description: "Populates and highlights the on-screen Verb Conjugation Matrix when discussing or correcting a Spanish verb.",
-          parameters: {
-            type: "OBJECT",
-            properties: {
-              infinitive: { type: "STRING", description: "Spanish verb infinitive, e.g., 'estar'" },
-              english_meaning: { type: "STRING", description: "English meaning, e.g., 'to be (temporary/location)'" },
-              highlight_pronoun: { type: "STRING", description: "One of: 'yo', 'tú', 'él/ella/Ud.', 'nosotros', 'ellos/Uds.'" },
-              highlight_tense: { type: "STRING", description: "One of: 'present', 'preterite', 'imperfect'" },
-              yo_present: { type: "STRING" }, yo_preterite: { type: "STRING" }, yo_imperfect: { type: "STRING" },
-              tu_present: { type: "STRING" }, tu_preterite: { type: "STRING" }, tu_imperfect: { type: "STRING" },
-              el_present: { type: "STRING" }, el_preterite: { type: "STRING" }, el_imperfect: { type: "STRING" },
-              nosotros_present: { type: "STRING" }, nosotros_preterite: { type: "STRING" }, nosotros_imperfect: { type: "STRING" },
-              ellos_present: { type: "STRING" }, ellos_preterite: { type: "STRING" }, ellos_imperfect: { type: "STRING" }
-            },
-            required: [
-              "infinitive", "english_meaning",
-              "yo_present", "yo_preterite", "yo_imperfect",
-              "tu_present", "tu_preterite", "tu_imperfect",
-              "el_present", "el_preterite", "el_imperfect",
-              "nosotros_present", "nosotros_preterite", "nosotros_imperfect",
-              "ellos_present", "ellos_preterite", "ellos_imperfect"
-            ]
-          }
+          ai_es: "Aquí lo tengo en mi teléfono, termina en cuatro-ocho-dos.",
+          ai_en: "I have it here on my phone, it ends in 4-8-2.",
+          user_es: "Muchas gracias, acabo de verificarlo y su pedido está listo.",
+          user_en: "Thank you very much, I just verified it and your order is ready."
         },
         {
-          name: "log_comprehensible_input",
-          description: "Logs key Spanish sentences spoken by Vozzi along with an English hint for the Comprehensible Input subtitle drawer.",
-          parameters: {
-            type: "OBJECT",
-            properties: {
-              spanish_sentence: { type: "STRING", description: "The Spanish sentence or question spoken" },
-              english_hint: { type: "STRING", description: "English translation or cognate hint" }
-            },
-            required: ["spanish_sentence", "english_hint"]
-          }
+          ai_es: "¡Qué rápido! ¿Necesita que firme algo?",
+          ai_en: "How fast! Do you need me to sign anything?",
+          user_es: "Solo firme aquí por favor y que tenga un excelente día.",
+          user_en: "Just sign here please and have an excellent day."
+        }
+      ],
+      bistro: [
+        {
+          ai_es: "¡Bonsoir y bienvenidos al bistró! ¿Tienen una reservación para esta tarde?",
+          ai_en: "Good evening and welcome to the bistro! Do you have a reservation for this evening?",
+          user_es: "Sí, tenemos una reservación para dos personas a las cinco y media.",
+          user_en: "Yes, we have a reservation for two people at 5:30."
+        },
+        {
+          ai_es: "Excelente, pasen por aquí. ¿Les gustaría empezar con algo de beber?",
+          ai_en: "Excellent, come this way. Would you like to start with something to drink?",
+          user_es: "Para empezar, queremos dos bebidas sin alcohol y ver el menú de mariscos.",
+          user_en: "To start, we want two non-alcoholic drinks and to see the seafood menu."
+        },
+        {
+          ai_es: "¡Por supuesto! Nuestro salmón con verduras está delicioso hoy.",
+          ai_en: "Of course! Our salmon with vegetables is delicious today.",
+          user_es: "Eso es exactamente lo que vamos a pedir, muchas gracias.",
+          user_en: "That is exactly what we are going to order, thank you very much."
         }
       ]
-    }];
+    };
 
     /**************************************************************
-     * 2. INLINE AUDIOWORKLET FOR 16kHz PCM MICROPHONE STREAMING
+     * 2. TAB NAVIGATION & INITIALIZATION
      **************************************************************/
-    const WORKLET_CODE = `
-      class PcmRecorderProcessor extends AudioWorkletProcessor {
-        constructor() {
-          super();
-          this.targetRate = 16000;
-          this.buffer = new Int16Array(2048);
-          this.writeIndex = 0;
-          this.ratio = sampleRate / this.targetRate;
-          this.acc = 0;
-        }
-        process(inputs) {
-          const input = inputs[0];
-          if (!input || !input[0]) return true;
-          const channel = input[0];
-          for (let i = 0; i < channel.length; i++) {
-            this.acc += 1;
-            if (this.acc >= this.ratio) {
-              this.acc -= this.ratio;
-              const s = Math.max(-1, Math.min(1, channel[i]));
-              this.buffer[this.writeIndex++] = s < 0 ? s * 0x8000 : s * 0x7FFF;
-              if (this.writeIndex >= this.buffer.length) {
-                const copy = new Int16Array(this.buffer);
-                this.port.postMessage(copy.buffer, [copy.buffer]);
-                this.writeIndex = 0;
-              }
-            }
-          }
-          return true;
-        }
-      }
-      registerProcessor('pcm-recorder-processor', PcmRecorderProcessor);
-    `;
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-btn").forEach((b) => {
+        b.classList.toggle("active", b.dataset.tab === tabId);
+      });
+      document.querySelectorAll(".tab-panel").forEach((p) => {
+        p.classList.toggle("active", p.id === tabId);
+      });
+    }
+
+    document.querySelectorAll(".tab-btn").forEach((btn) => {
+      btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+    });
 
     /**************************************************************
-     * 3. STATE & DOM ELEMENTS
+     * 3. API KEY & PERSISTENT DECK STORAGE
      **************************************************************/
     const apiKeyInput = document.getElementById("api-key-input");
     const btnSaveKey = document.getElementById("btn-save-key");
-    const btnConnect = document.getElementById("btn-connect");
-    const btnCamera = document.getElementById("btn-camera");
-    const btnFlip = document.getElementById("btn-flip");
-    const btnAskObject = document.getElementById("btn-ask-object");
-    const btnEndRp = document.getElementById("btn-end-rp");
-    const btnClearCards = document.getElementById("btn-clear-cards");
-    const btnToggleBlur = document.getElementById("btn-toggle-blur");
-    const textPromptInput = document.getElementById("text-prompt-input");
-    const btnSendText = document.getElementById("btn-send-text");
 
-    const statusDot = document.getElementById("status-dot");
-    const sessionStatus = document.getElementById("session-status");
-    const videoWrap = document.getElementById("video-wrap");
-    const videoEl = document.getElementById("camera-feed");
-    const videoPlaceholder = document.getElementById("video-placeholder");
-    const focusReticle = document.getElementById("focus-reticle");
-
-    const transcriptList = document.getElementById("transcript-list");
-    const grammarList = document.getElementById("grammar-list");
-    const flashcardsList = document.getElementById("flashcards-list");
-    const cardCount = document.getElementById("card-count");
-    const verbTitle = document.getElementById("verb-title");
-    const verbTbody = document.getElementById("verb-tbody");
-
-    const rpBanner = document.getElementById("roleplay-banner");
-    const rpTitle = document.getElementById("rp-title");
-    const rpAi = document.getElementById("rp-ai");
-    const rpUser = document.getElementById("rp-user");
-
-    let ws = null;
-    let isConnected = false;
-    let isSetupComplete = false;
-    let blurMode = false;
-    let sessionHistorySummary = [];
-
-    // Audio Contexts & Playback Queue
-    let audioCtx = null;
-    let micStream = null;
-    let workletNode = null;
-    let nextPlayTime = 0;
-    let activeSources = [];
-
-    // Camera State
-    let cameraStream = null;
-    let cameraInterval = null;
-    let facingMode = "environment";
-    const offscreenCanvas = document.createElement("canvas");
-    const ctx = offscreenCanvas.getContext("2d");
-
-    /**************************************************************
-     * 4. SMART API KEY DETECTION & FLASHCARDS PERSISTENCE
-     **************************************************************/
     function getStoredApiKey() {
-      const possibleKeys = ["VOZZI_API_KEY", "GEMINI_API_KEY", "gemini_api_key", "apiKey", "google_ai_key"];
-      for (const k of possibleKeys) {
+      const keys = ["VOZZI_API_KEY", "GEMINI_API_KEY", "gemini_api_key", "apiKey", "google_ai_key"];
+      for (const k of keys) {
         const val = localStorage.getItem(k);
         if (val && val.trim().startsWith("AIza")) return val.trim();
       }
@@ -645,57 +957,558 @@ CORE BEHAVIORS:
 
     btnSaveKey.addEventListener("click", () => {
       const val = apiKeyInput.value.trim();
-      if (!val) return alert("Please enter a valid Google AI Studio API Key.");
+      if (!val) return alert("Please paste a valid Google AI Studio API Key starting with AIza...");
       localStorage.setItem("VOZZI_API_KEY", val);
       localStorage.setItem("GEMINI_API_KEY", val);
       btnSaveKey.textContent = "Saved ✓";
       setTimeout(() => (btnSaveKey.textContent = "Save Key"), 1500);
     });
 
-    function loadFlashcards() {
-      const cards = JSON.parse(localStorage.getItem("VOZZI_FLASHCARDS") || "[]");
-      flashcardsList.innerHTML = "";
-      cardCount.textContent = cards.length;
-      if (cards.length === 0) {
-        flashcardsList.innerHTML = `<div style="color: var(--muted); font-size: 0.84rem;">Saved flashcards appear here. Tap any card to flip between Spanish and English.</div>`;
+    function getDeck() {
+      const raw = localStorage.getItem("VOZZI_FLASHCARDS_V5");
+      if (!raw) {
+        localStorage.setItem("VOZZI_FLASHCARDS_V5", JSON.stringify(DEFAULT_FLASHCARDS));
+        return [...DEFAULT_FLASHCARDS];
+      }
+      try {
+        const parsed = JSON.parse(raw);
+        return parsed.length > 0 ? parsed : [...DEFAULT_FLASHCARDS];
+      } catch (_) {
+        return [...DEFAULT_FLASHCARDS];
+      }
+    }
+
+    function saveCardToDeck(card) {
+      const deck = getDeck();
+      deck.unshift({
+        spanish_term: card.spanish_term,
+        english_meaning: card.english_meaning,
+        example_sentence: card.example_sentence || "",
+        category: card.category || "Camera Object"
+      });
+      localStorage.setItem("VOZZI_FLASHCARDS_V5", JSON.stringify(deck));
+      refreshAllCardViews();
+    }
+
+    /**************************************************************
+     * 4. SPEECH SYNTHESIS (TTS) & 90% ACCURACY SPEECH GATE
+     **************************************************************/
+    function speakSpanishTTS(text, onEndCallback) {
+      if (!("speechSynthesis" in window)) {
+        if (onEndCallback) onEndCallback();
         return;
       }
-      cards.forEach((c) => {
-        const termLower = (c.spanish_term || "").toLowerCase().trim();
-        let genderClass = "";
-        if (termLower.startsWith("el ") || termLower.startsWith("un ")) genderClass = "masc";
-        if (termLower.startsWith("la ") || termLower.startsWith("una ")) genderClass = "fem";
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "es-MX";
+      utter.rate = 0.96;
+      const voices = window.speechSynthesis.getVoices();
+      const esVoice = voices.find((v) => v.lang.includes("es-MX") || v.lang.includes("es-US") || v.lang.startsWith("es"));
+      if (esVoice) utter.voice = esVoice;
+      if (onEndCallback) utter.onend = onEndCallback;
+      window.speechSynthesis.speak(utter);
+    }
 
-        const div = document.createElement("div");
-        div.className = `flashcard ${genderClass}`;
-        div.innerHTML = `
-          <span class="badge">${c.category || "Vocab"}</span>
-          <strong>${c.spanish_term}</strong>
-          <small>"${c.example_sentence || ""}"</small>
-          <div class="card-back"><strong>Meaning:</strong> ${c.english_meaning}</div>
-        `;
-        div.addEventListener("click", () => div.classList.toggle("flipped"));
-        flashcardsList.appendChild(div);
+    function normalizeText(str) {
+      return (str || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[¿?¡!.,;:"]/g, "")
+        .trim();
+    }
+
+    function calculateSimilarityPercent(spoken, target) {
+      const a = normalizeText(spoken);
+      const b = normalizeText(target);
+      if (!a || !b) return 0;
+      if (a === b) return 100;
+
+      // Levenshtein distance
+      const matrix = Array.from({ length: a.length + 1 }, () => Array(b.length + 1).fill(0));
+      for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
+      for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
+      for (let i = 1; i <= a.length; i++) {
+        for (let j = 1; j <= b.length; j++) {
+          const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j - 1] + cost
+          );
+        }
+      }
+      const distance = matrix[a.length][b.length];
+      const maxLen = Math.max(a.length, b.length);
+      return Math.max(0, Math.round(((maxLen - distance) / maxLen) * 100));
+    }
+
+    function listenOnceForAccuracy(targetSpanish, onResult) {
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRec) {
+        alert("Speech recognition requires Chrome, Edge, or Safari.");
+        return;
+      }
+      const rec = new SpeechRec();
+      rec.lang = "es-MX";
+      rec.interimResults = false;
+      rec.maxAlternatives = 1;
+
+      rec.onresult = (e) => {
+        const spoken = e.results[0][0].transcript;
+        const pct = calculateSimilarityPercent(spoken, targetSpanish);
+        onResult({ spoken, pct, passed: pct >= 90 });
+      };
+      rec.onerror = (err) => {
+        onResult({ spoken: "", pct: 0, passed: false, error: err.error });
+      };
+      rec.start();
+    }
+
+    /**************************************************************
+     * 5. TAB 2: PROGRESSIVE FADING DRILLS LOGIC
+     **************************************************************/
+    let drillIndex = 0;
+    let drillFadeStage = 1; // 1 = Full, 2 = 50% Cloze, 3 = Blank Recall
+
+    const drillLevelSelect = document.getElementById("drill-level-select");
+    const drillCategoryBadge = document.getElementById("drill-category-badge");
+    const drillFadeBadge = document.getElementById("drill-fade-badge");
+    const drillProgressBadge = document.getElementById("drill-progress-badge");
+    const drillSpanishDisplay = document.getElementById("drill-spanish-display");
+    const drillEnglishDisplay = document.getElementById("drill-english-display");
+    const drillAccuracyBar = document.getElementById("drill-accuracy-bar");
+    const drillFeedbackText = document.getElementById("drill-feedback-text");
+
+    function getFilteredDrills() {
+      const deck = getDeck();
+      const lvl = drillLevelSelect.value;
+      return lvl === "ALL" ? deck : deck.filter((c) => c.category === lvl);
+    }
+
+    function applyProgressiveFade(sentence, stage) {
+      if (stage === 1) return sentence;
+      const words = sentence.split(" ");
+      if (stage === 2) {
+        return words.map((w, idx) => (idx % 2 === 1 ? "____" : w)).join(" ");
+      }
+      return words.map((w) => "____").join(" ");
+    }
+
+    function renderCurrentDrill() {
+      const list = getFilteredDrills();
+      if (list.length === 0) return;
+      if (drillIndex >= list.length) drillIndex = 0;
+      const item = list[drillIndex];
+      const targetSentence = item.example_sentence || item.spanish_term;
+
+      drillCategoryBadge.textContent = item.category;
+      drillFadeBadge.textContent =
+        drillFadeStage === 1 ? "Stage 1/3: Full Text" :
+        drillFadeStage === 2 ? "Stage 2/3: 50% Faded" : "Stage 3/3: Blind Recall";
+      drillProgressBadge.textContent = `Drill ${drillIndex + 1} of ${list.length}`;
+
+      drillSpanishDisplay.textContent = applyProgressiveFade(targetSentence, drillFadeStage);
+      drillEnglishDisplay.textContent = `${item.spanish_term} — "${item.english_meaning}"`;
+    }
+
+    drillLevelSelect.addEventListener("change", () => {
+      drillIndex = 0;
+      drillFadeStage = 1;
+      renderCurrentDrill();
+    });
+
+    document.getElementById("btn-drill-listen").addEventListener("click", () => {
+      const list = getFilteredDrills();
+      if (!list.length) return;
+      const item = list[drillIndex];
+      speakSpanishTTS(item.example_sentence || item.spanish_term);
+    });
+
+    document.getElementById("btn-drill-fade").addEventListener("click", () => {
+      drillFadeStage = drillFadeStage === 3 ? 1 : drillFadeStage + 1;
+      renderCurrentDrill();
+    });
+
+    document.getElementById("btn-drill-next").addEventListener("click", () => {
+      drillIndex++;
+      drillFadeStage = 1;
+      drillAccuracyBar.style.width = "0%";
+      renderCurrentDrill();
+    });
+
+    document.getElementById("btn-drill-speak").addEventListener("click", () => {
+      const list = getFilteredDrills();
+      if (!list.length) return;
+      const item = list[drillIndex];
+      const target = item.example_sentence || item.spanish_term;
+
+      drillFeedbackText.innerHTML = `<span style="color:#38bdf8;">🎙️ Listening... Speak the Spanish sentence clearly!</span>`;
+      listenOnceForAccuracy(target, ({ spoken, pct, passed, error }) => {
+        if (error) {
+          drillFeedbackText.textContent = `Mic status: ${error}. Tap Speak Drill to try again.`;
+          return;
+        }
+        drillAccuracyBar.style.width = `${pct}%`;
+        drillAccuracyBar.style.background = passed ? "var(--success)" : "var(--warning)";
+
+        if (passed) {
+          drillFeedbackText.innerHTML = `✅ <strong>${pct}% Accuracy!</strong> You said: <em>"${spoken}"</em> — Gate Passed! Advancing...`;
+          setTimeout(() => {
+            if (drillFadeStage < 3) {
+              drillFadeStage++;
+            } else {
+              drillFadeStage = 1;
+              drillIndex++;
+            }
+            renderCurrentDrill();
+          }, 1100);
+        } else {
+          drillFeedbackText.innerHTML = `⚠️ <strong>${pct}% Accuracy</strong> (Need 90%+). You said: <em>"${spoken}"</em>. Try again!`;
+        }
       });
+    });
+
+    /**************************************************************
+     * 6. TAB 3: 3D FLASHCARD STUDIO LOGIC
+     **************************************************************/
+    let studioIndex = 0;
+    const fcStage = document.getElementById("flashcard-3d");
+    const studioCatFilter = document.getElementById("studio-category-filter");
+
+    fcStage.addEventListener("click", () => fcStage.classList.toggle("flipped"));
+
+    function getStudioList() {
+      const deck = getDeck();
+      const cat = studioCatFilter.value;
+      return cat === "ALL" ? deck : deck.filter((c) => c.category === cat);
     }
 
-    function saveFlashcardToStorage(card) {
-      const cards = JSON.parse(localStorage.getItem("VOZZI_FLASHCARDS") || "[]");
-      cards.unshift(card);
-      localStorage.setItem("VOZZI_FLASHCARDS", JSON.stringify(cards));
-      loadFlashcards();
+    function refreshAllCardViews() {
+      const deck = getDeck();
+      document.getElementById("studio-total-count").textContent = deck.length;
+      document.getElementById("live-card-count").textContent = deck.length;
+
+      // Render Live Preview
+      const previewEl = document.getElementById("live-flashcards-preview");
+      previewEl.innerHTML = "";
+      deck.slice(0, 8).forEach((c) => {
+        const d = document.createElement("div");
+        d.className = "item-box";
+        d.innerHTML = `<strong>${c.spanish_term}</strong> — ${c.english_meaning}<small>"${c.example_sentence || ""}"</small>`;
+        previewEl.appendChild(d);
+      });
+
+      // Render 3D Card
+      const list = getStudioList();
+      if (!list.length) return;
+      if (studioIndex >= list.length) studioIndex = 0;
+      const card = list[studioIndex];
+      fcStage.classList.remove("flipped");
+      document.getElementById("fc-front-cat").textContent = `${card.category || "Vocab"} (${studioIndex + 1}/${list.length})`;
+      document.getElementById("fc-front-term").textContent = card.spanish_term;
+      document.getElementById("fc-front-ex").textContent = `"${card.example_sentence || ""}"`;
+      document.getElementById("fc-back-meaning").textContent = card.english_meaning;
+      document.getElementById("fc-back-ex").textContent = `"${card.example_sentence || ""}"`;
+
+      renderCurrentDrill();
     }
 
-    btnClearCards.addEventListener("click", () => {
-      if (confirm("Clear all saved flashcards?")) {
-        localStorage.removeItem("VOZZI_FLASHCARDS");
-        loadFlashcards();
+    studioCatFilter.addEventListener("change", () => {
+      studioIndex = 0;
+      refreshAllCardViews();
+    });
+
+    document.getElementById("btn-fc-prev").addEventListener("click", () => {
+      const list = getStudioList();
+      studioIndex = (studioIndex - 1 + list.length) % list.length;
+      refreshAllCardViews();
+    });
+
+    document.getElementById("btn-fc-next").addEventListener("click", () => {
+      const list = getStudioList();
+      studioIndex = (studioIndex + 1) % list.length;
+      refreshAllCardViews();
+    });
+
+    document.getElementById("btn-fc-tts").addEventListener("click", () => {
+      const list = getStudioList();
+      if (!list.length) return;
+      speakSpanishTTS(list[studioIndex].spanish_term);
+    });
+
+    document.getElementById("btn-fc-voice").addEventListener("click", () => {
+      const list = getStudioList();
+      if (!list.length) return;
+      const target = list[studioIndex].spanish_term;
+      const resEl = document.getElementById("fc-voice-result");
+      resEl.innerHTML = `<span style="color:#38bdf8;">🎙️ Say "${target}" now...</span>`;
+      listenOnceForAccuracy(target, ({ spoken, pct, passed }) => {
+        resEl.innerHTML = passed
+          ? `✅ <strong>${pct}%!</strong> "${spoken}" — Spot on!`
+          : `⚠️ <strong>${pct}%</strong> (You said "${spoken}"). Tap 🔊 Pronounce and try again!`;
+      });
+    });
+
+    document.getElementById("btn-add-fc").addEventListener("click", () => {
+      const es = document.getElementById("new-fc-es").value.trim();
+      const en = document.getElementById("new-fc-en").value.trim();
+      const ex = document.getElementById("new-fc-ex").value.trim();
+      const cat = document.getElementById("new-fc-cat").value;
+      if (!es || !en) return alert("Enter both Spanish and English!");
+      saveCardToDeck({ spanish_term: es, english_meaning: en, example_sentence: ex, category: cat });
+      document.getElementById("new-fc-es").value = "";
+      document.getElementById("new-fc-en").value = "";
+      document.getElementById("new-fc-ex").value = "";
+    });
+
+    document.getElementById("btn-reset-default-deck").addEventListener("click", () => {
+      if (confirm("Restore the full default Speak Pro Ultra + Vozzi deck?")) {
+        localStorage.setItem("VOZZI_FLASHCARDS_V5", JSON.stringify(DEFAULT_FLASHCARDS));
+        refreshAllCardViews();
       }
     });
 
-    loadFlashcards();
+    /**************************************************************
+     * 7. TAB 4: MULTI-TURN GUIDED ROLEPLAY STATE MACHINE
+     **************************************************************/
+    let rpScenarioKey = "kitchen";
+    let rpTurnIndex = 0;
 
-    // Blur Mode Toggle for Comprehensible Input
+    const rpScenarioSelect = document.getElementById("rp-scenario-select");
+    const rpChatHistory = document.getElementById("rp-chat-history");
+    const rpTurnNum = document.getElementById("rp-turn-num");
+    const rpTargetEs = document.getElementById("rp-target-es");
+    const rpTargetEn = document.getElementById("rp-target-en");
+    const rpGateStatus = document.getElementById("rp-gate-status");
+
+    function initGuidedRoleplay() {
+      rpScenarioKey = rpScenarioSelect.value;
+      rpTurnIndex = 0;
+      rpChatHistory.innerHTML = "";
+      loadGuidedRoleplayTurn();
+    }
+
+    function loadGuidedRoleplayTurn() {
+      const turns = GUIDED_ROLEPLAYS[rpScenarioKey];
+      if (rpTurnIndex >= turns.length) {
+        rpTargetEs.textContent = "🎉 ¡Escena completada con éxito!";
+        rpTargetEn.textContent = "You completed every turn of this roleplay!";
+        rpGateStatus.innerHTML = `<span style="color:var(--success);">Click Restart Scene or choose another scenario above.</span>`;
+        return;
+      }
+
+      const current = turns[rpTurnIndex];
+      rpTurnNum.textContent = `${rpTurnIndex + 1} of ${turns.length}`;
+      rpTargetEs.textContent = current.user_es;
+      rpTargetEn.textContent = `"${current.user_en}"`;
+
+      const aiMsg = document.createElement("div");
+      aiMsg.className = "item-box";
+      aiMsg.innerHTML = `<strong>🧑🏽‍💼 Customer / Partner:</strong> ${current.ai_es}<small>${current.ai_en}</small>`;
+      rpChatHistory.appendChild(aiMsg);
+      rpChatHistory.scrollTop = rpChatHistory.scrollHeight;
+      speakSpanishTTS(current.ai_es);
+    }
+
+    rpScenarioSelect.addEventListener("change", initGuidedRoleplay);
+    document.getElementById("btn-rp-restart").addEventListener("click", initGuidedRoleplay);
+
+    document.getElementById("btn-rp-listen").addEventListener("click", () => {
+      const turns = GUIDED_ROLEPLAYS[rpScenarioKey];
+      if (rpTurnIndex < turns.length) speakSpanishTTS(turns[rpTurnIndex].user_es);
+    });
+
+    function advanceGuidedRoleplay(userSpokenText, accuracyPct) {
+      const turns = GUIDED_ROLEPLAYS[rpScenarioKey];
+      if (rpTurnIndex >= turns.length) return;
+      const current = turns[rpTurnIndex];
+
+      const userMsg = document.createElement("div");
+      userMsg.className = "item-box transcript";
+      userMsg.innerHTML = `<strong>🗣️ You (${accuracyPct}%):</strong> ${userSpokenText || current.user_es}`;
+      rpChatHistory.appendChild(userMsg);
+      rpChatHistory.scrollTop = rpChatHistory.scrollHeight;
+
+      rpTurnIndex++;
+      setTimeout(loadGuidedRoleplayTurn, 600);
+    }
+
+    document.getElementById("btn-rp-advance").addEventListener("click", () => {
+      advanceGuidedRoleplay(null, 100);
+    });
+
+    document.getElementById("btn-rp-speak").addEventListener("click", () => {
+      const turns = GUIDED_ROLEPLAYS[rpScenarioKey];
+      if (rpTurnIndex >= turns.length) return;
+      const target = turns[rpTurnIndex].user_es;
+      rpGateStatus.innerHTML = `<span style="color:#38bdf8;">🎙️ Listening for your turn...</span>`;
+
+      listenOnceForAccuracy(target, ({ spoken, pct, passed }) => {
+        if (passed) {
+          rpGateStatus.innerHTML = `✅ <strong>${pct}% Accuracy!</strong> Advancing automatically to Turn ${rpTurnIndex + 2}...`;
+          advanceGuidedRoleplay(spoken, pct);
+        } else {
+          rpGateStatus.innerHTML = `⚠️ <strong>${pct}% Accuracy</strong> (You said: "${spoken}"). Hit 90%+ or click Next Turn →`;
+        }
+      });
+    });
+
+    /**************************************************************
+     * 8. TAB 5: TONY MARSH VERB CUPS & CONJUGATION MATRIX
+     **************************************************************/
+    const cup1 = document.getElementById("cup-1");
+    const cup2 = document.getElementById("cup-2");
+    const cup3 = document.getElementById("cup-3");
+    const cupOutput = document.getElementById("cup-sentence-output");
+
+    function updateCupSentence() {
+      const c1 = cup1.value;
+      const c2 = cup2.value.split(" / ")[0];
+      const c3 = cup3.value;
+      cupOutput.textContent = `${c1} ${c2} ${c3}`;
+    }
+
+    [cup1, cup2, cup3].forEach((sel) => sel.addEventListener("change", updateCupSentence));
+
+    document.getElementById("btn-cup-speak-tts").addEventListener("click", () => {
+      speakSpanishTTS(cupOutput.textContent);
+    });
+
+    document.getElementById("btn-cup-practice").addEventListener("click", () => {
+      const target = cupOutput.textContent;
+      listenOnceForAccuracy(target, ({ spoken, pct, passed }) => {
+        alert(passed ? `✅ ${pct}% Accuracy!\nYou said: "${spoken}"` : `⚠️ ${pct}% Accuracy.\nYou said: "${spoken}"\nTarget: "${target}"`);
+      });
+    });
+
+    document.getElementById("btn-cup-save").addEventListener("click", () => {
+      saveCardToDeck({
+        spanish_term: cupOutput.textContent,
+        english_meaning: "Custom Verb Cup Sentence",
+        example_sentence: cupOutput.textContent,
+        category: "Power Verbs"
+      });
+      alert("Saved to Flashcard Studio!");
+    });
+
+    function renderVerbMatrix(v) {
+      document.getElementById("verb-title").textContent = `${v.infinitive} (${v.english_meaning})`;
+      const rows = [
+        { key: "yo", label: "yo", p: v.yo_present, pret: v.yo_preterite, imp: v.yo_imperfect },
+        { key: "tú", label: "tú", p: v.tu_present, pret: v.tu_preterite, imp: v.tu_imperfect },
+        { key: "él/ella/Ud.", label: "él / ella / Ud.", p: v.el_present, pret: v.el_preterite, imp: v.el_imperfect },
+        { key: "nosotros", label: "nosotros", p: v.nosotros_present, pret: v.nosotros_preterite, imp: v.nosotros_imperfect },
+        { key: "ellos/Uds.", label: "ellos / Uds.", p: v.ellos_present, pret: v.ellos_preterite, imp: v.ellos_imperfect }
+      ];
+      const hp = (v.highlight_pronoun || "").toLowerCase();
+      const ht = (v.highlight_tense || "").toLowerCase();
+
+      document.getElementById("verb-tbody").innerHTML = rows.map((r) => {
+        const matchRow = hp && hp.includes(r.key.split("/")[0]);
+        return `
+          <tr>
+            <td><strong>${r.label}</strong></td>
+            <td class="${matchRow && ht === 'present' ? 'highlight' : ''}">${r.p || "-"}</td>
+            <td class="${matchRow && ht === 'preterite' ? 'highlight' : ''}">${r.pret || "-"}</td>
+            <td class="${matchRow && ht === 'imperfect' ? 'highlight' : ''}">${r.imp || "-"}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    document.getElementById("verb-preset-select").addEventListener("change", (e) => {
+      const preset = VERB_PRESETS[e.target.value];
+      if (preset) renderVerbMatrix(preset);
+    });
+
+    /**************************************************************
+     * 9. TAB 6: EXPORT & IMPORT HUB
+     **************************************************************/
+    document.getElementById("btn-export-json").addEventListener("click", () => {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(getDeck(), null, 2));
+      const a = document.createElement("a");
+      a.href = dataStr;
+      a.download = "vozzi_flashcards.json";
+      a.click();
+    });
+
+    document.getElementById("btn-export-csv").addEventListener("click", () => {
+      const rows = [["Spanish", "English", "Example", "Category"]];
+      getDeck().forEach((c) => {
+        rows.push([
+          `"${(c.spanish_term || "").replace(/"/g, '""')}"`,
+          `"${(c.english_meaning || "").replace(/"/g, '""')}"`,
+          `"${(c.example_sentence || "").replace(/"/g, '""')}"`,
+          `"${(c.category || "").replace(/"/g, '""')}"`
+        ]);
+      });
+      const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(rows.map((e) => e.join(",")).join("\n"));
+      const a = document.createElement("a");
+      a.href = csvContent;
+      a.download = "vozzi_flashcards.csv";
+      a.click();
+    });
+
+    document.getElementById("btn-import-lines").addEventListener("click", () => {
+      const raw = document.getElementById("import-textarea").value.trim();
+      if (!raw) return;
+      const lines = raw.split("\n");
+      let count = 0;
+      lines.forEach((line) => {
+        const parts = line.split("|").map((s) => s.trim());
+        if (parts.length >= 2) {
+          saveCardToDeck({
+            spanish_term: parts[0],
+            english_meaning: parts[1],
+            example_sentence: parts[2] || parts[0],
+            category: "Custom Import"
+          });
+          count++;
+        }
+      });
+      document.getElementById("import-textarea").value = "";
+      alert(`Imported ${count} new flashcards and drills!`);
+    });
+
+    /**************************************************************
+     * 10. DUAL-ENGINE LIVE TUTOR + 1 FPS CAMERA (NEVER DROPS AT 0.5s)
+     **************************************************************/
+    const btnConnect = document.getElementById("btn-connect");
+    const btnCamera = document.getElementById("btn-camera");
+    const btnFlip = document.getElementById("btn-flip");
+    const btnAskObject = document.getElementById("btn-ask-object");
+    const btnEndRp = document.getElementById("btn-end-rp");
+    const btnToggleBlur = document.getElementById("btn-toggle-blur");
+    const textPromptInput = document.getElementById("text-prompt-input");
+    const btnSendText = document.getElementById("btn-send-text");
+
+    const statusDot = document.getElementById("status-dot");
+    const sessionStatus = document.getElementById("session-status");
+    const videoWrap = document.getElementById("video-wrap");
+    const videoEl = document.getElementById("camera-feed");
+    const videoPlaceholder = document.getElementById("video-placeholder");
+    const focusReticle = document.getElementById("focus-reticle");
+    const transcriptList = document.getElementById("transcript-list");
+    const grammarList = document.getElementById("grammar-list");
+    const rpBanner = document.getElementById("roleplay-banner");
+    const rpTitle = document.getElementById("rp-title");
+    const rpAi = document.getElementById("rp-ai");
+    const rpUser = document.getElementById("rp-user");
+
+    let isConnected = false;
+    let blurMode = false;
+    let hybridRecognizer = null;
+    let hybridChatHistory = [];
+    let activeRoleplayState = null;
+
+    let cameraStream = null;
+    let facingMode = "environment";
+    let latestJpegBase64 = null;
+    let cameraInterval = null;
+    const offscreenCanvas = document.createElement("canvas");
+    const ctx = offscreenCanvas.getContext("2d");
+
     btnToggleBlur.addEventListener("click", () => {
       blurMode = !blurMode;
       btnToggleBlur.textContent = `Blur Mode: ${blurMode ? "ON" : "OFF"}`;
@@ -704,12 +1517,9 @@ CORE BEHAVIORS:
       });
     });
 
-    /**************************************************************
-     * 5. WEBSOCKET & GEMINI LIVE API CONNECTION
-     **************************************************************/
     btnConnect.addEventListener("click", async () => {
       if (isConnected) {
-        disconnectSession();
+        stopLiveSession();
         return;
       }
 
@@ -720,188 +1530,155 @@ CORE BEHAVIORS:
       }
       localStorage.setItem("VOZZI_API_KEY", apiKey);
 
-      try {
-        btnConnect.disabled = true;
-        sessionStatus.textContent = "Connecting...";
+      isConnected = true;
+      statusDot.classList.add("live");
+      sessionStatus.textContent = "Live (Listening...)";
+      btnConnect.textContent = "End Session";
+      btnConnect.className = "danger";
+      btnCamera.disabled = false;
+      btnSendText.disabled = false;
 
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        await audioCtx.resume();
-
-        const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=${apiKey}`;
-        ws = new WebSocket(wsUrl);
-
-        ws.onopen = () => {
-          sendInitialSetup();
-        };
-
-        ws.onmessage = async (event) => {
-          const raw = event.data instanceof Blob ? await event.data.text() : event.data;
-          const msg = JSON.parse(raw);
-          handleServerMessage(msg);
-        };
-
-        ws.onerror = (err) => {
-          console.error("WebSocket Error:", err);
-          sessionStatus.textContent = "Connection Error";
-        };
-
-        ws.onclose = () => {
-          disconnectSession();
-        };
-      } catch (err) {
-        alert("Connection failed: " + err.message);
-        disconnectSession();
-      }
+      startContinuousVoiceEngine();
     });
 
-    function sendInitialSetup() {
-      const resumeContext = sessionHistorySummary.length > 0
-        ? `\n\nRECENT SESSION CONTEXT TO RESUME SMOOTHLY:\n${sessionHistorySummary.slice(-5).join("\n")}`
-        : "";
+    function startContinuousVoiceEngine() {
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRec) {
+        sessionStatus.textContent = "Live (Text + Camera Mode)";
+        return;
+      }
 
-      const setupPayload = {
-        setup: {
-          model: "models/gemini-2.0-flash-exp",
-          generationConfig: {
-            responseModalities: ["AUDIO"],
-            speechConfig: {
-              voiceConfig: {
-                prebuiltVoiceConfig: { voiceName: "Aoede" }
-              }
-            }
-          },
-          systemInstruction: {
-            parts: [{ text: VOZZI_SYSTEM_INSTRUCTION + resumeContext }]
-          },
-          tools: VOZZI_TOOLS
+      hybridRecognizer = new SpeechRec();
+      hybridRecognizer.lang = "es-MX";
+      hybridRecognizer.continuous = true;
+      hybridRecognizer.interimResults = false;
+
+      hybridRecognizer.onresult = (event) => {
+        const last = event.results[event.results.length - 1];
+        if (last.isFinal) {
+          const spokenText = last[0].transcript.trim();
+          if (spokenText) {
+            window.speechSynthesis.cancel(); // Instant barge-in!
+            processUserTurnWithGemini(spokenText, false);
+          }
         }
       };
-      ws.send(JSON.stringify(setupPayload));
-    }
 
-    async function handleServerMessage(msg) {
-      if (msg.setupComplete !== undefined && !isSetupComplete) {
-        isSetupComplete = true;
-        isConnected = true;
-        statusDot.classList.add("live");
-        sessionStatus.textContent = "Live (Listening...)";
-        btnConnect.disabled = false;
-        btnConnect.textContent = "End Session";
-        btnConnect.className = "danger";
-        btnCamera.disabled = false;
-        btnSendText.disabled = false;
-        await startMicrophone();
-        return;
-      }
-
-      if (msg.serverContent?.interrupted) {
-        stopAllPlayback();
-        return;
-      }
-
-      const parts = msg.serverContent?.modelTurn?.parts || [];
-      for (const part of parts) {
-        if (part.inlineData?.mimeType?.startsWith("audio/pcm")) {
-          playPcmChunk(part.inlineData.data);
+      hybridRecognizer.onend = () => {
+        // Keep continuous listening alive so it NEVER drops after 0.5 seconds!
+        if (isConnected && hybridRecognizer) {
+          try { hybridRecognizer.start(); } catch (_) {}
         }
-      }
+      };
 
-      if (msg.toolCall?.functionCalls) {
-        handleToolCalls(msg.toolCall.functionCalls);
+      try {
+        hybridRecognizer.start();
+      } catch (e) {
+        console.warn("Mic start warning:", e);
       }
     }
 
-    /**************************************************************
-     * 6. LIVE TOOL CALL HANDLER (ROLEPLAY, VERB MATRIX, GRAMMAR, CARDS)
-     **************************************************************/
-    function handleToolCalls(calls) {
-      const functionResponses = [];
+    async function processUserTurnWithGemini(userText, includeCameraFrame) {
+      if (!isConnected) return;
+      const apiKey = apiKeyInput.value.trim() || getStoredApiKey();
+      sessionStatus.textContent = "Vozzi is thinking...";
 
-      for (const call of calls) {
-        const { id, name, args } = call;
+      const systemPrompt = `
+You are Vozzi, an encouraging conversational Spanish tutor.
+${activeRoleplayState ? `CURRENT ACTIVE ROLEPLAY: "${activeRoleplayState.scene_title}" (You are playing: ${activeRoleplayState.ai_persona}, User is playing: ${activeRoleplayState.user_persona}). STAY STRICTLY IN CHARACTER in Spanish!` : ""}
 
-        if (name === "start_roleplay_scene") {
+Respond strictly in valid JSON matching this schema:
+{
+  "spoken_spanish": "Your natural Spanish spoken reply (stay in character if in roleplay)",
+  "english_hint": "English translation of your spoken_spanish reply",
+  "grammar_correction": null or { "user_said": "...", "natural_spanish": "...", "quick_rule": "..." },
+  "new_flashcard": null or { "spanish_term": "with el/la", "english_meaning": "...", "example_sentence": "...", "category": "Camera Object" },
+  "start_roleplay": null or { "scene_title": "...", "ai_persona": "...", "user_persona": "..." },
+  "end_roleplay": false
+}
+Rules:
+1. If the user asks to roleplay (e.g. "Can we roleplay..."), populate "start_roleplay" and make "spoken_spanish" your first in-character line!
+2. If the user says "End roleplay" or "Terminar", set "end_roleplay": true.
+3. If an image is attached or the user asks "¿Cómo se dice esto?", identify the object in Spanish with el/la and populate "new_flashcard".
+4. If the user made a Spanish grammar mistake, populate "grammar_correction" silently while keeping "spoken_spanish" natural.
+`;
+
+      const userParts = [{ text: userText }];
+      if ((includeCameraFrame || cameraStream) && latestJpegBase64) {
+        userParts.push({
+          inline_data: {
+            mime_type: "image/jpeg",
+            data: latestJpegBase64
+          }
+        });
+      }
+
+      hybridChatHistory.push({ role: "user", parts: userParts });
+      if (hybridChatHistory.length > 10) hybridChatHistory = hybridChatHistory.slice(-10);
+
+      try {
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              system_instruction: { parts: [{ text: systemPrompt }] },
+              contents: hybridChatHistory,
+              generationConfig: { responseMimeType: "application/json" }
+            })
+          }
+        );
+
+        const data = await res.json();
+        const rawJson = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!rawJson) throw new Error(data?.error?.message || "Empty response");
+
+        const parsed = JSON.parse(rawJson);
+        hybridChatHistory.push({ role: "model", parts: [{ text: parsed.spoken_spanish || "" }] });
+
+        // 1. Handle Roleplay State
+        if (parsed.start_roleplay && parsed.start_roleplay.scene_title) {
+          activeRoleplayState = parsed.start_roleplay;
           rpBanner.style.display = "flex";
-          rpTitle.textContent = args.scene_title;
-          rpAi.textContent = args.ai_persona;
-          rpUser.textContent = args.user_persona;
-          sessionHistorySummary.push(`Started Roleplay: ${args.scene_title} (AI: ${args.ai_persona}, User: ${args.user_persona})`);
-
-          logComprehensibleEntry(args.opening_line_spanish, `Roleplay started: ${args.scene_title}`);
-
-          functionResponses.push({
-            id,
-            name,
-            response: {
-              result: {
-                status: "Roleplay mode activated.",
-                instruction: `Speak your opening Spanish line ("${args.opening_line_spanish}") now and remain strictly in character as ${args.ai_persona} for every turn until the user ends the roleplay.`
-              }
-            }
-          });
-        } 
-        else if (name === "end_roleplay_scene") {
+          rpTitle.textContent = activeRoleplayState.scene_title;
+          rpAi.textContent = activeRoleplayState.ai_persona;
+          rpUser.textContent = activeRoleplayState.user_persona;
+        }
+        if (parsed.end_roleplay) {
+          activeRoleplayState = null;
           rpBanner.style.display = "none";
-          sessionHistorySummary.push(`Ended Roleplay. Takeaway: ${args.key_takeaway}`);
-          functionResponses.push({
-            id,
-            name,
-            response: {
-              result: {
-                status: "Roleplay ended.",
-                instruction: "Give the user warm verbal praise and share their key takeaway."
-              }
-            }
+        }
+
+        // 2. Log Comprehensible Input Subtitle
+        if (parsed.spoken_spanish) {
+          logComprehensibleEntry(parsed.spoken_spanish, parsed.english_hint || "");
+          speakSpanishTTS(parsed.spoken_spanish, () => {
+            if (isConnected) sessionStatus.textContent = "Live (Listening...)";
           });
-        } 
-        else if (name === "save_flashcard") {
-          saveFlashcardToStorage(args);
-          functionResponses.push({
-            id,
-            name,
-            response: { result: { saved: true, term: args.spanish_term } }
-          });
-        } 
-        else if (name === "log_grammar_correction") {
+        }
+
+        // 3. Log Silent Grammar Correction
+        if (parsed.grammar_correction && parsed.grammar_correction.natural_spanish) {
+          const g = parsed.grammar_correction;
           if (grammarList.children.length === 1 && !grammarList.children[0].classList.contains("item-box")) {
             grammarList.innerHTML = "";
           }
           const div = document.createElement("div");
           div.className = "item-box grammar";
-          div.innerHTML = `You said: <s>${args.user_said}</s> → <strong>${args.natural_spanish}</strong><small>${args.quick_rule}</small>`;
+          div.innerHTML = `You said: <s>${g.user_said}</s> → <strong>${g.natural_spanish}</strong><small>${g.quick_rule}</small>`;
           grammarList.prepend(div);
+        }
 
-          functionResponses.push({
-            id,
-            name,
-            response: {
-              result: {
-                logged: true,
-                instruction: "Displayed silently in UI. Continue the spoken conversation naturally without mentioning the error."
-              }
-            }
-          });
+        // 4. Save New Flashcard
+        if (parsed.new_flashcard && parsed.new_flashcard.spanish_term) {
+          saveCardToDeck(parsed.new_flashcard);
         }
-        else if (name === "show_verb_matrix") {
-          renderVerbMatrix(args);
-          functionResponses.push({
-            id,
-            name,
-            response: { result: { displayed: true, verb: args.infinitive } }
-          });
-        }
-        else if (name === "log_comprehensible_input") {
-          logComprehensibleEntry(args.spanish_sentence, args.english_hint);
-          functionResponses.push({
-            id,
-            name,
-            response: { result: { logged: true } }
-          });
-        }
-      }
 
-      if (functionResponses.length > 0 && ws?.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ toolResponse: { functionResponses } }));
+        sessionStatus.textContent = "Live (Speaking...)";
+      } catch (err) {
+        console.error("Gemini Turn Error:", err);
+        sessionStatus.textContent = "Live (Ready)";
       }
     }
 
@@ -914,51 +1691,13 @@ CORE BEHAVIORS:
       div.innerHTML = `<div class="blur-target"><strong>${spanish}</strong><small>${english}</small></div>`;
       div.addEventListener("click", () => div.classList.toggle("blurred"));
       transcriptList.prepend(div);
-      sessionHistorySummary.push(`Vozzi: ${spanish}`);
-    }
-
-    function renderVerbMatrix(v) {
-      verbTitle.textContent = `${v.infinitive} (${v.english_meaning})`;
-      const rows = [
-        { key: "yo", label: "yo", p: v.yo_present, pret: v.yo_preterite, imp: v.yo_imperfect },
-        { key: "tú", label: "tú", p: v.tu_present, pret: v.tu_preterite, imp: v.tu_imperfect },
-        { key: "él/ella/Ud.", label: "él / ella / Ud.", p: v.el_present, pret: v.el_preterite, imp: v.el_imperfect },
-        { key: "nosotros", label: "nosotros", p: v.nosotros_present, pret: v.nosotros_preterite, imp: v.nosotros_imperfect },
-        { key: "ellos/Uds.", label: "ellos / Uds.", p: v.ellos_present, pret: v.ellos_preterite, imp: v.ellos_imperfect }
-      ];
-
-      const hp = (v.highlight_pronoun || "").toLowerCase();
-      const ht = (v.highlight_tense || "").toLowerCase();
-
-      verbTbody.innerHTML = rows.map((r) => {
-        const matchRow = hp.includes(r.key.split("/")[0]);
-        return `
-          <tr>
-            <td><strong>${r.label}</strong></td>
-            <td class="${matchRow && ht === 'present' ? 'highlight' : ''}">${r.p || "-"}</td>
-            <td class="${matchRow && ht === 'preterite' ? 'highlight' : ''}">${r.pret || "-"}</td>
-            <td class="${matchRow && ht === 'imperfect' ? 'highlight' : ''}">${r.imp || "-"}</td>
-          </tr>
-        `;
-      }).join("");
-    }
-
-    // Text prompt sender
-    function sendTextPrompt(text) {
-      if (!text || ws?.readyState !== WebSocket.OPEN) return;
-      ws.send(JSON.stringify({
-        clientContent: {
-          turns: [{ role: "user", parts: [{ text }] }],
-          turnComplete: true
-        }
-      }));
     }
 
     btnSendText.addEventListener("click", () => {
       const val = textPromptInput.value.trim();
       if (!val) return;
-      sendTextPrompt(val);
       textPromptInput.value = "";
+      processUserTurnWithGemini(val, false);
     });
 
     textPromptInput.addEventListener("keydown", (e) => {
@@ -966,87 +1705,17 @@ CORE BEHAVIORS:
     });
 
     btnEndRp.addEventListener("click", () => {
+      activeRoleplayState = null;
       rpBanner.style.display = "none";
-      sendTextPrompt("End roleplay now and give me a quick summary.");
+      processUserTurnWithGemini("End roleplay and give me a quick summary.", false);
     });
 
     /**************************************************************
-     * 7. MICROPHONE CAPTURE & 24kHz AUDIO PLAYBACK
-     **************************************************************/
-    async function startMicrophone() {
-      micStream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true
-        }
-      });
-
-      const blob = new Blob([WORKLET_CODE], { type: "application/javascript" });
-      const workletUrl = URL.createObjectURL(blob);
-      await audioCtx.audioWorklet.addModule(workletUrl);
-
-      const source = audioCtx.createMediaStreamSource(micStream);
-      workletNode = new AudioWorkletNode(audioCtx, "pcm-recorder-processor");
-
-      workletNode.port.onmessage = (e) => {
-        if (!isConnected || ws?.readyState !== WebSocket.OPEN) return;
-        const base64Audio = arrayBufferToBase64(e.data);
-        sendRealtimeChunk("audio/pcm;rate=16000", base64Audio);
-      };
-
-      source.connect(workletNode);
-    }
-
-    function playPcmChunk(base64Data) {
-      if (!audioCtx) return;
-      const binary = atob(base64Data);
-      const bytes = new Uint8Array(binary.length);
-      for (let i = 0; i < binary.length; i++) {
-        bytes[i] = binary.charCodeAt(i);
-      }
-
-      const int16 = new Int16Array(bytes.buffer);
-      const float32 = new Float32Array(int16.length);
-      for (let i = 0; i < int16.length; i++) {
-        float32[i] = int16[i] / 32768.0;
-      }
-
-      const audioBuffer = audioCtx.createBuffer(1, float32.length, 24000);
-      audioBuffer.getChannelData(0).set(float32);
-
-      const source = audioCtx.createBufferSource();
-      source.buffer = audioBuffer;
-      source.connect(audioCtx.destination);
-
-      const now = audioCtx.currentTime;
-      if (nextPlayTime < now) nextPlayTime = now;
-      source.start(nextPlayTime);
-      nextPlayTime += audioBuffer.duration;
-
-      activeSources.push(source);
-      source.onended = () => {
-        activeSources = activeSources.filter((s) => s !== source);
-      };
-    }
-
-    function stopAllPlayback() {
-      activeSources.forEach((s) => {
-        try { s.stop(); } catch (_) {}
-      });
-      activeSources = [];
-      if (audioCtx) nextPlayTime = audioCtx.currentTime;
-    }
-
-    /**************************************************************
-     * 8. 1 FPS CAMERA STREAMER & TAP-TO-IDENTIFY RETICLE
+     * 11. 1 FPS CAMERA STREAMER & TAP-TO-IDENTIFY RETICLE
      **************************************************************/
     btnCamera.addEventListener("click", async () => {
-      if (cameraStream) {
-        stopCamera();
-      } else {
-        await startCamera();
-      }
+      if (cameraStream) stopCamera();
+      else await startCamera();
     });
 
     btnFlip.addEventListener("click", async () => {
@@ -1055,18 +1724,16 @@ CORE BEHAVIORS:
       await startCamera();
     });
 
-    function captureCurrentFrameNow() {
-      if (!videoEl.videoWidth || !isConnected) return false;
+    function captureFrameToBuffer() {
+      if (!videoEl.videoWidth) return false;
       const scale = 640 / videoEl.videoWidth;
       offscreenCanvas.width = 640;
       offscreenCanvas.height = videoEl.videoHeight * scale;
       ctx.drawImage(videoEl, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
-      const jpegBase64 = offscreenCanvas.toDataURL("image/jpeg", 0.65).split(",")[1];
-      sendRealtimeChunk("image/jpeg", jpegBase64);
+      latestJpegBase64 = offscreenCanvas.toDataURL("image/jpeg", 0.65).split(",")[1];
       return true;
     }
 
-    // Tap anywhere on the video feed to trigger Point & Ask
     videoWrap.addEventListener("click", (e) => {
       if (!cameraStream || !isConnected) return;
       const rect = videoWrap.getBoundingClientRect();
@@ -1075,14 +1742,17 @@ CORE BEHAVIORS:
       focusReticle.style.display = "block";
       setTimeout(() => (focusReticle.style.display = "none"), 1400);
 
-      if (captureCurrentFrameNow()) {
-        sendTextPrompt("¿Cómo se dice el objeto principal que te estoy mostrando en la cámara? Dime el nombre con su artículo (el o la), guárdalo en mis flashcards y hazme una pregunta corta usándolo.");
+      if (captureFrameToBuffer()) {
+        processUserTurnWithGemini(
+          "¿Cómo se dice el objeto principal que te estoy mostrando en la cámara? Incluye el artículo (el o la), guárdalo en mis flashcards y hazme una pregunta corta.",
+          true
+        );
       }
     });
 
     btnAskObject.addEventListener("click", () => {
-      if (captureCurrentFrameNow()) {
-        sendTextPrompt("¿Cómo se dice esto en español? Incluye el artículo (el o la) y guárdalo como flashcard.");
+      if (captureFrameToBuffer()) {
+        processUserTurnWithGemini("¿Cómo se dice esto en español? Incluye el artículo (el o la) y guárdalo como flashcard.", true);
       }
     });
 
@@ -1099,11 +1769,9 @@ CORE BEHAVIORS:
         btnFlip.style.display = "inline-block";
         btnAskObject.style.display = "inline-block";
 
-        cameraInterval = setInterval(() => {
-          captureCurrentFrameNow();
-        }, 1000);
+        cameraInterval = setInterval(captureFrameToBuffer, 1000);
       } catch (err) {
-        alert("Camera access failed: " + err.message);
+        alert("Camera error: " + err.message);
       }
     }
 
@@ -1122,59 +1790,27 @@ CORE BEHAVIORS:
       btnAskObject.style.display = "none";
     }
 
-    /**************************************************************
-     * 9. HELPERS & CLEANUP
-     **************************************************************/
-    function sendRealtimeChunk(mimeType, base64Data) {
-      if (ws?.readyState !== WebSocket.OPEN) return;
-      ws.send(JSON.stringify({
-        realtimeInput: {
-          mediaChunks: [{ mimeType, data: base64Data }]
-        }
-      }));
-    }
-
-    function arrayBufferToBase64(buffer) {
-      const bytes = new Uint8Array(buffer);
-      let binary = "";
-      for (let i = 0; i < bytes.byteLength; i++) {
-        binary += String.fromCharCode(bytes[i]);
-      }
-      return btoa(binary);
-    }
-
-    function disconnectSession() {
+    function stopLiveSession() {
       isConnected = false;
-      isSetupComplete = false;
       stopCamera();
-      stopAllPlayback();
-
-      if (workletNode) {
-        workletNode.disconnect();
-        workletNode = null;
+      window.speechSynthesis.cancel();
+      if (hybridRecognizer) {
+        try { hybridRecognizer.stop(); } catch (_) {}
+        hybridRecognizer = null;
       }
-      if (micStream) {
-        micStream.getTracks().forEach((t) => t.stop());
-        micStream = null;
-      }
-      if (audioCtx) {
-        audioCtx.close();
-        audioCtx = null;
-      }
-      if (ws) {
-        ws.close();
-        ws = null;
-      }
-
       statusDot.classList.remove("live");
       sessionStatus.textContent = "Disconnected";
-      btnConnect.disabled = false;
       btnConnect.textContent = "Start Live Session";
       btnConnect.className = "success";
       btnCamera.disabled = true;
       btnSendText.disabled = true;
       rpBanner.style.display = "none";
     }
+
+    // Boot up initial views
+    refreshAllCardViews();
+    initGuidedRoleplay();
+    renderVerbMatrix(VERB_PRESETS.estar);
   </script>
 </body>
 </html>
