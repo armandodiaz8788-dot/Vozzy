@@ -124,7 +124,7 @@
               Camera Off<br>
               <small>Tap <strong>Start Camera (1 FPS)</strong> below, then <strong>tap any object on screen</strong> to ask "¿Cómo se dice esto?"</small>
             </div>
-            <video id="camera-feed" playsinline webkit-playsinline autoplay muted></video>
+            <video id="camera-feed" playsinline webkit-playsinline muted></video>
             <div id="focus-reticle"></div>
           </div>
 
@@ -150,7 +150,7 @@
           </div>
           <div class="hint-box">
             <strong>How to use Live Tutor & Camera:</strong><br>
-            • <strong>Point & Ask Camera:</strong> Tap <em>Start Camera (1 FPS)</em>, point at any object, and <strong>tap the video screen</strong> (or click <em>¿Cómo se dice esto? 🔍</em>) to hear its Spanish name with <em>el/la</em> and auto-save a flashcard.<br>
+            • <strong>Point & Ask Camera:</strong> Tap <em>Start Camera (1 FPS)</em>, wait 1 second for the video to appear, and <strong>tap the object on screen</strong> (or tap <em>¿Cómo se dice esto? 🔍</em>) to hear its Spanish name with <em>el/la</em> and auto-save a flashcard.<br>
             • <strong>Voice Roleplay:</strong> Say or type <em>"Can we roleplay? You're a customer designing a kitchen and I'm the specialist."</em>
           </div>
         </div>
@@ -474,7 +474,7 @@
       ]
     };
 
-    /* 2. TAB NAVIGATION & STORAGE HELPERS */
+    /* 2. TAB NAVIGATION & STORAGE HELPERS (SUPPORTS BOTH AIza AND AQ. KEYS) */
     function switchTab(tabId) {
       document.querySelectorAll(".tab-btn").forEach((b) => b.classList.toggle("active", b.dataset.tab === tabId));
       document.querySelectorAll(".tab-panel").forEach((p) => p.classList.toggle("active", p.id === tabId));
@@ -487,10 +487,10 @@
     function getStoredApiKey() {
       const keys = ["VOZZI_API_KEY", "GEMINI_API_KEY", "gemini_api_key", "apiKey", "google_ai_key"];
       for (const k of keys) {
-        const val = localStorage.getItem(k);
-        if (val && val.trim().startsWith("AIza")) return val.trim();
+        const val = (localStorage.getItem(k) || "").trim();
+        if (val.length > 10) return val;
       }
-      return localStorage.getItem("VOZZI_API_KEY") || "";
+      return "";
     }
     if (getStoredApiKey()) apiKeyInput.value = getStoredApiKey();
 
@@ -529,7 +529,6 @@
     let lastSpokenSpanishText = "¡Hola! Estoy listo para practicar español contigo.";
     window._activeVozziUtterance = null;
 
-    // Must be called synchronously inside button click handlers to unlock mobile TTS & WebAudio
     function unlockMobileAudio() {
       try {
         if (!sharedAudioCtx) {
@@ -553,7 +552,7 @@
         const osc = sharedAudioCtx.createOscillator();
         const gain = sharedAudioCtx.createGain();
         osc.type = "sine";
-        osc.frequency.setValueAtTime(587.33, sharedAudioCtx.currentTime); // D5
+        osc.frequency.setValueAtTime(587.33, sharedAudioCtx.currentTime);
         gain.gain.setValueAtTime(0.08, sharedAudioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, sharedAudioCtx.currentTime + 0.18);
         osc.connect(gain);
@@ -581,7 +580,6 @@
         if (onEnd) onEnd();
       };
 
-      // Watchdog guarantees UI never gets stuck if mobile browser drops onend
       const estDurationMs = Math.max(3500, Math.min(18000, text.length * 95));
       const watchdog = setTimeout(done, estDurationMs);
 
@@ -591,11 +589,10 @@
         }
       } catch (_) {}
 
-      // 80ms delay after cancel() prevents Android Chrome from killing the new utterance
       setTimeout(() => {
         try {
           const u = new SpeechSynthesisUtterance(text);
-          window._activeVozziUtterance = u; // Prevent mobile garbage collection mid-speech
+          window._activeVozziUtterance = u;
           u.lang = "es-MX";
           u.rate = 0.96;
           u.volume = 1.0;
@@ -616,7 +613,6 @@
       }, 80);
     }
 
-    // Pre-warm voices list on mobile
     if ("speechSynthesis" in window) {
       window.speechSynthesis.getVoices();
       window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
@@ -912,7 +908,7 @@
       alert(`Imported ${count} cards!`);
     });
 
-    /* 6. FAST LIVE TUTOR & CAMERA ENGINE (ZERO THINKING HANG + GUARANTEED AUDIO) */
+    /* 6. LIVE TUTOR & CAMERA ENGINE (PAUSES 1 FPS ON TAP + SUPPORTS AIza & AQ. KEYS) */
     const btnConnect = document.getElementById("btn-connect");
     const btnPtt = document.getElementById("btn-ptt");
     const btnCamera = document.getElementById("btn-camera");
@@ -934,6 +930,7 @@
     const rpBanner = document.getElementById("roleplay-banner");
 
     let isConnected = false, isBusyThinking = false, isSpeakingNow = false, blurMode = false;
+    let isCameraStarting = false;
     let hybridRecognizer = null, hybridChatHistory = [], activeRoleplayState = null;
     let cameraStream = null, cameraInterval = null, facingMode = "environment", latestJpegBase64 = null;
     const offscreenCanvas = document.createElement("canvas"), ctx = offscreenCanvas.getContext("2d");
@@ -996,7 +993,7 @@
       stopContinuousMic();
       hybridRecognizer = new SR();
       hybridRecognizer.lang = "es-MX";
-      hybridRecognizer.continuous = false; // Single-utterance bursts release Android audio focus cleanly!
+      hybridRecognizer.continuous = false;
       hybridRecognizer.interimResults = false;
 
       hybridRecognizer.onstart = () => {
@@ -1029,15 +1026,74 @@
       } catch (_) {}
     }
 
+    function pauseCameraInterval() {
+      if (cameraInterval) {
+        clearInterval(cameraInterval);
+        cameraInterval = null;
+      }
+    }
+
+    function resumeCameraInterval() {
+      pauseCameraInterval();
+      if (cameraStream) {
+        cameraInterval = setInterval(captureFrameToBuffer, 1000);
+      }
+    }
+
+    async function callGeminiModel(modelName, apiKey, payloadObj) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 14000);
+
+      try {
+        const isAqToken = apiKey.startsWith("AQ.");
+        const url = isAqToken
+          ? `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`
+          : `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+        const headers = { "Content-Type": "application/json" };
+        if (isAqToken) {
+          headers["x-goog-api-key"] = apiKey;
+        }
+
+        let res = await fetch(url, {
+          method: "POST",
+          headers,
+          signal: controller.signal,
+          body: JSON.stringify(payloadObj)
+        });
+
+        // If AQ. token in x-goog-api-key was rejected, try ?key= parameter as fallback
+        if (!res.ok && isAqToken) {
+          res = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              signal: controller.signal,
+              body: JSON.stringify(payloadObj)
+            }
+          );
+        }
+
+        clearTimeout(timer);
+        return await res.json();
+      } catch (err) {
+        clearTimeout(timer);
+        throw err;
+      }
+    }
+
     async function processUserTurnWithGemini(userText, includeCameraImage) {
+      if (isBusyThinking) return; // Prevent overlapping tap requests!
+
       const apiKey = apiKeyInput.value.trim() || getStoredApiKey();
       if (!apiKey) {
         alert("Paste your Google AI Studio API key in the top bar first!");
         return;
       }
 
-      // Stop mic immediately so Android releases the speaker channel before TTS plays
       isBusyThinking = true;
+      pauseCameraInterval(); // Pause 1 FPS timer during API request so it never collides!
       stopContinuousMic();
       sessionStatus.textContent = includeCameraImage ? "📸 Identifying Object..." : "⚡ Vozzi Responding...";
 
@@ -1065,64 +1121,65 @@ Rules:
 
       const requestContents = [...hybridChatHistory, { role: "user", parts: currentTurnParts }];
       const modelsToTry = [
-        { name: "gemini-2.5-flash", noThinking: true },
-        { name: "gemini-2.0-flash", noThinking: false }
+        { name: "gemini-2.5-flash", useThinkingZero: true },
+        { name: "gemini-2.0-flash", useThinkingZero: false },
+        { name: "gemini-1.5-flash", useThinkingZero: false }
       ];
 
       let parsed = null;
       let lastError = "";
 
       for (const m of modelsToTry) {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 12000);
         try {
           const genConfig = {
             responseMimeType: "application/json",
             temperature: 0.7
           };
-          if (m.noThinking) {
-            genConfig.thinkingConfig = { thinkingBudget: 0 }; // Prevents 10s thinking hang!
+          if (m.useThinkingZero) {
+            genConfig.thinkingConfig = { thinkingBudget: 0 };
           }
 
-          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m.name}:generateContent?key=${apiKey}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            signal: controller.signal,
-            body: JSON.stringify({
-              system_instruction: { parts: [{ text: sysPrompt }] },
-              contents: requestContents,
-              generationConfig: genConfig
-            })
+          const data = await callGeminiModel(m.name, apiKey, {
+            system_instruction: { parts: [{ text: sysPrompt }] },
+            contents: requestContents,
+            generationConfig: genConfig
           });
-          clearTimeout(timer);
 
-          const data = await res.json();
           if (data.error) {
             lastError = data.error.message;
             continue;
           }
 
-          // Skip any 'thought' parts and grab the actual JSON text part
           const partsList = data?.candidates?.[0]?.content?.parts || [];
           const textPart = partsList.find((p) => !p.thought && p.text) || partsList[partsList.length - 1];
           let rawText = (textPart?.text || "").trim();
           if (!rawText) continue;
 
-          // Strip markdown code fences if present
           rawText = rawText.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/, "").trim();
+          const firstBrace = rawText.indexOf("{");
+          const lastBrace = rawText.lastIndexOf("}");
+          if (firstBrace !== -1 && lastBrace !== -1) {
+            rawText = rawText.slice(firstBrace, lastBrace + 1);
+          }
+
           parsed = JSON.parse(rawText);
           if (parsed) break;
         } catch (err) {
-          clearTimeout(timer);
-          lastError = err.name === "AbortError" ? "Request timed out (12s)" : err.message;
+          lastError = err.name === "AbortError" ? "Request timed out (14s)" : err.message;
         }
       }
 
       isBusyThinking = false;
+      resumeCameraInterval(); // Restart the 1 FPS camera timer now that the request finished!
 
       if (!parsed) {
         sessionStatus.textContent = "⚠️ API Error";
-        logComprehensibleEntry("⚠️ No se pudo conectar con Gemini", lastError || "Verify your API key in the top bar.");
+        const errHint = lastError.includes("API key not valid") || apiKey.startsWith("AQ.")
+          ? `Google rejected the "${apiKey.slice(0, 6)}..." key (${lastError}). In Google AI Studio, copy a key that starts with "AIzaSy...".`
+          : lastError || "Check your API key in the top bar.";
+        document.getElementById("live-reply-es").textContent = "⚠️ Error de API";
+        document.getElementById("live-reply-en").textContent = errHint;
+        logComprehensibleEntry("⚠️ Error de API", errHint);
         if (isConnected) setTimeout(() => startContinuousMic(), 800);
         return;
       }
@@ -1157,7 +1214,6 @@ Rules:
         renderVerbMatrix(VERB_PRESETS[parsed.verb_lookup]);
       }
 
-      // Update live banner & log immediately, then play chime + Spanish TTS
       document.getElementById("live-reply-es").textContent = spanishReply;
       document.getElementById("live-reply-en").textContent = englishHint;
       logComprehensibleEntry(spanishReply, englishHint);
@@ -1166,7 +1222,6 @@ Rules:
       isSpeakingNow = true;
       sessionStatus.textContent = "🔊 Vozzi Speaking...";
 
-      // Wait 120ms so Android audio hardware finishes releasing mic before TTS starts
       setTimeout(() => {
         speakSpanishTTS(spanishReply, () => {
           isSpeakingNow = false;
@@ -1212,29 +1267,41 @@ Rules:
       processUserTurnWithGemini("End roleplay and summarize how I did.", false);
     });
 
-    /* 7. 1 FPS CAMERA STREAMER & TAP-TO-IDENTIFY RETICLE */
+    /* 7. 1 FPS CAMERA STREAMER & TAP-TO-IDENTIFY (NO PLAY() INTERRUPT OR TIMER COLLISION) */
     function captureFrameToBuffer() {
+      if (!cameraStream) return false;
       const vw = videoEl.videoWidth || 640;
       const vh = videoEl.videoHeight || 480;
-      if (!cameraStream || videoEl.readyState < 2) return false;
+      if (videoEl.readyState < 1) return Boolean(latestJpegBase64);
 
-      const scale = 480 / vw; // Compact 480px width for fast mobile upload
-      offscreenCanvas.width = 480;
-      offscreenCanvas.height = Math.round(vh * scale);
-      ctx.drawImage(videoEl, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
-      latestJpegBase64 = offscreenCanvas.toDataURL("image/jpeg", 0.6).split(",")[1];
-
-      camFpsPill.style.display = "block";
-      camFpsPill.textContent = "📸 1 FPS Vision Active";
-      return true;
+      try {
+        const scale = 480 / vw;
+        offscreenCanvas.width = 480;
+        offscreenCanvas.height = Math.round(vh * scale);
+        ctx.drawImage(videoEl, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
+        const dataUrl = offscreenCanvas.toDataURL("image/jpeg", 0.6);
+        if (dataUrl && dataUrl.includes(",")) {
+          latestJpegBase64 = dataUrl.split(",")[1];
+        }
+        camFpsPill.style.display = "block";
+        camFpsPill.textContent = "📸 1 FPS Vision Active";
+        return Boolean(latestJpegBase64);
+      } catch (_) {
+        return Boolean(latestJpegBase64);
+      }
     }
 
     function triggerCameraObjectIdentify(clientX, clientY) {
-      unlockMobileAudio(); // Unlock mobile speech synchronously on tap!
+      unlockMobileAudio();
       if (!cameraStream) {
         alert("Tap 'Start Camera (1 FPS)' first so Vozzi can see the object!");
         return;
       }
+      if (isBusyThinking) return;
+
+      // Pause the 1 FPS interval immediately so it never collides with your manual tap!
+      pauseCameraInterval();
+
       if (clientX !== null && clientY !== null) {
         const r = videoWrap.getBoundingClientRect();
         focusReticle.style.left = `${clientX - r.left}px`;
@@ -1242,13 +1309,25 @@ Rules:
         focusReticle.style.display = "block";
         setTimeout(() => (focusReticle.style.display = "none"), 1400);
       }
-      if (captureFrameToBuffer()) {
+
+      captureFrameToBuffer();
+      if (latestJpegBase64) {
         processUserTurnWithGemini(
           "¿Cómo se dice el objeto principal que te estoy mostrando en la cámara? Dime su nombre en español con su artículo (el o la), guárdalo en 'new_flashcard' y hazme una pregunta corta.",
           true
         );
       } else {
-        alert("Camera is still warming up—wait 1 second and tap the object again.");
+        setTimeout(() => {
+          captureFrameToBuffer();
+          if (latestJpegBase64) {
+            processUserTurnWithGemini(
+              "¿Cómo se dice el objeto principal que te estoy mostrando en la cámara? Dime su nombre en español con su artículo (el o la), guárdalo en 'new_flashcard' y hazme una pregunta corta.",
+              true
+            );
+          } else {
+            resumeCameraInterval();
+          }
+        }, 350);
       }
     }
 
@@ -1263,31 +1342,59 @@ Rules:
 
     btnCamera.addEventListener("click", async () => {
       unlockMobileAudio();
+      if (isCameraStarting) return;
       if (cameraStream) stopCamera();
       else await startCamera();
     });
 
     btnFlip.addEventListener("click", async () => {
       unlockMobileAudio();
+      if (isCameraStarting) return;
       facingMode = facingMode === "environment" ? "user" : "environment";
       stopCamera();
       await startCamera();
     });
 
     async function startCamera() {
+      if (isCameraStarting) return;
+      isCameraStarting = true;
+      btnCamera.disabled = true;
+
       try {
+        stopCamera();
+        let stream = null;
         try {
-          cameraStream = await navigator.mediaDevices.getUserMedia({
+          stream = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: { ideal: facingMode }, width: { ideal: 640 }, height: { ideal: 480 } },
             audio: false
           });
         } catch (_) {
-          cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+          stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         }
 
-        videoEl.srcObject = cameraStream;
+        cameraStream = stream;
+        videoEl.srcObject = stream;
         videoEl.muted = true;
-        await videoEl.play();
+
+        // Wait cleanly for video metadata and swallow harmless mobile play() interrupt warnings
+        await new Promise((resolve) => {
+          let resolved = false;
+          const finish = () => {
+            if (!resolved) {
+              resolved = true;
+              resolve();
+            }
+          };
+          videoEl.onloadedmetadata = () => {
+            const p = videoEl.play();
+            if (p !== undefined) {
+              p.then(finish).catch(finish);
+            } else {
+              finish();
+            }
+          };
+          setTimeout(finish, 800);
+        });
 
         videoPlaceholder.style.display = "none";
         camFpsPill.style.display = "block";
@@ -1296,21 +1403,26 @@ Rules:
         btnFlip.style.display = "inline-block";
         btnAskObject.style.display = "inline-block";
 
-        setTimeout(captureFrameToBuffer, 300);
-        cameraInterval = setInterval(captureFrameToBuffer, 1000);
+        captureFrameToBuffer();
+        resumeCameraInterval();
       } catch (err) {
-        alert("Camera error: " + err.message);
+        sessionStatus.textContent = "Camera Error";
+      } finally {
+        isCameraStarting = false;
+        btnCamera.disabled = false;
       }
     }
 
     function stopCamera() {
-      if (cameraInterval) clearInterval(cameraInterval);
-      cameraInterval = null;
+      pauseCameraInterval();
       if (cameraStream) {
         cameraStream.getTracks().forEach((t) => t.stop());
         cameraStream = null;
       }
-      videoEl.srcObject = null;
+      try {
+        videoEl.pause();
+        videoEl.srcObject = null;
+      } catch (_) {}
       videoPlaceholder.style.display = "block";
       camFpsPill.style.display = "none";
       btnCamera.textContent = "Start Camera (1 FPS)";
