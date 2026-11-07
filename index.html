@@ -474,7 +474,7 @@
       ]
     };
 
-    /* 2. TAB NAVIGATION & STORAGE HELPERS (SUPPORTS BOTH AIza AND AQ. KEYS) */
+    /* 2. TAB NAVIGATION & STORAGE HELPERS */
     function switchTab(tabId) {
       document.querySelectorAll(".tab-btn").forEach((b) => b.classList.toggle("active", b.dataset.tab === tabId));
       document.querySelectorAll(".tab-panel").forEach((p) => p.classList.toggle("active", p.id === tabId));
@@ -483,6 +483,7 @@
 
     const apiKeyInput = document.getElementById("api-key-input");
     const btnSaveKey = document.getElementById("btn-save-key");
+    let discoveredModelsCache = null;
 
     function getStoredApiKey() {
       const keys = ["VOZZI_API_KEY", "GEMINI_API_KEY", "gemini_api_key", "apiKey", "google_ai_key"];
@@ -499,6 +500,7 @@
       if (!val) return alert("Please paste your Google AI Studio API Key.");
       localStorage.setItem("VOZZI_API_KEY", val);
       localStorage.setItem("GEMINI_API_KEY", val);
+      discoveredModelsCache = null; // Clear model cache so ListModels runs fresh with new key
       btnSaveKey.textContent = "Saved ✓";
       setTimeout(() => (btnSaveKey.textContent = "Save Key"), 1500);
     });
@@ -908,7 +910,7 @@
       alert(`Imported ${count} cards!`);
     });
 
-    /* 6. LIVE TUTOR & CAMERA ENGINE (PAUSES 1 FPS ON TAP + SUPPORTS AIza & AQ. KEYS) */
+    /* 6. LIVE TUTOR & CAMERA ENGINE WITH AUTO-MODEL DISCOVERY (ListModels) */
     const btnConnect = document.getElementById("btn-connect");
     const btnPtt = document.getElementById("btn-ptt");
     const btnCamera = document.getElementById("btn-camera");
@@ -1040,40 +1042,74 @@
       }
     }
 
+    // Automatically queries ModelService.ListModels so we use the exact model names enabled on your key!
+    async function getAvailableGeminiModels(apiKey) {
+      if (discoveredModelsCache && discoveredModelsCache.length > 0) {
+        return discoveredModelsCache;
+      }
+      const fallbackList = [
+        "gemini-2.5-flash",
+        "gemini-2.0-flash",
+        "gemini-flash-latest",
+        "gemini-2.5-pro"
+      ];
+      try {
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`,
+          { headers: { "x-goog-api-key": apiKey } }
+        );
+        const data = await res.json();
+        if (data?.models && Array.isArray(data.models)) {
+          const valid = data.models
+            .filter((m) => {
+              const methods = m.supportedGenerationMethods || [];
+              const name = (m.name || "").toLowerCase();
+              return (
+                methods.includes("generateContent") &&
+                name.includes("gemini") &&
+                !name.includes("embedding") &&
+                !name.includes("imagen") &&
+                !name.includes("veo") &&
+                !name.includes("aqa") &&
+                !name.includes("tts")
+              );
+            })
+            .map((m) => m.name.replace(/^models\//, ""));
+
+          // Sort flash models first for speed and vision support
+          valid.sort((a, b) => {
+            const aFlash = a.includes("flash") && !a.includes("8b") ? 0 : 1;
+            const bFlash = b.includes("flash") && !b.includes("8b") ? 0 : 1;
+            if (aFlash !== bFlash) return aFlash - bFlash;
+            return b.localeCompare(a);
+          });
+
+          if (valid.length > 0) {
+            discoveredModelsCache = valid.slice(0, 5);
+            return discoveredModelsCache;
+          }
+        }
+      } catch (_) {}
+      return fallbackList;
+    }
+
     async function callGeminiModel(modelName, apiKey, payloadObj) {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 14000);
 
       try {
-        const isAqToken = apiKey.startsWith("AQ.");
-        const url = isAqToken
-          ? `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`
-          : `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`;
+        const cleanModel = modelName.replace(/^models\//, "");
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${cleanModel}:generateContent?key=${encodeURIComponent(apiKey)}`;
 
-        const headers = { "Content-Type": "application/json" };
-        if (isAqToken) {
-          headers["x-goog-api-key"] = apiKey;
-        }
-
-        let res = await fetch(url, {
+        const res = await fetch(url, {
           method: "POST",
-          headers,
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": apiKey
+          },
           signal: controller.signal,
           body: JSON.stringify(payloadObj)
         });
-
-        // If AQ. token in x-goog-api-key was rejected, try ?key= parameter as fallback
-        if (!res.ok && isAqToken) {
-          res = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              signal: controller.signal,
-              body: JSON.stringify(payloadObj)
-            }
-          );
-        }
 
         clearTimeout(timer);
         return await res.json();
@@ -1084,7 +1120,7 @@
     }
 
     async function processUserTurnWithGemini(userText, includeCameraImage) {
-      if (isBusyThinking) return; // Prevent overlapping tap requests!
+      if (isBusyThinking) return;
 
       const apiKey = apiKeyInput.value.trim() || getStoredApiKey();
       if (!apiKey) {
@@ -1093,13 +1129,13 @@
       }
 
       isBusyThinking = true;
-      pauseCameraInterval(); // Pause 1 FPS timer during API request so it never collides!
+      pauseCameraInterval();
       stopContinuousMic();
       sessionStatus.textContent = includeCameraImage ? "📸 Identifying Object..." : "⚡ Vozzi Responding...";
 
       const sysPrompt = `You are Vozzi, an encouraging, natural conversational Spanish tutor.
 ${activeRoleplayState ? `ACTIVE ROLEPLAY: "${activeRoleplayState.scene_title}" (You are: ${activeRoleplayState.ai_persona}, User is: ${activeRoleplayState.user_persona}). STAY STRICTLY IN CHARACTER in Spanish for every turn!` : ""}
-Respond ONLY with a valid JSON object matching this exact structure:
+Respond ONLY with a valid JSON object matching this exact structure (no markdown fences):
 {
   "spoken_spanish": "Your natural Spanish spoken reply (if identifying a camera object, clearly state its Spanish name with 'el' or 'la' and ask a short follow-up question)",
   "english_hint": "English translation of your spoken_spanish reply",
@@ -1114,39 +1150,29 @@ Rules:
 - If an image is provided or the user asks how to say something, set "new_flashcard" to {"spanish_term":"el/la ...","english_meaning":"...","example_sentence":"...","category":"Camera Object"}.
 - If the user asks to roleplay, set "start_roleplay" to {"scene_title":"...","ai_persona":"...","user_persona":"..."} and make "spoken_spanish" your first in-character line.`;
 
-      const currentTurnParts = [{ text: userText }];
+      const currentTurnParts = [{ text: `${sysPrompt}\n\nUser message: ${userText}` }];
       if ((includeCameraImage || cameraStream) && latestJpegBase64) {
         currentTurnParts.push({ inline_data: { mime_type: "image/jpeg", data: latestJpegBase64 } });
       }
 
       const requestContents = [...hybridChatHistory, { role: "user", parts: currentTurnParts }];
-      const modelsToTry = [
-        { name: "gemini-2.5-flash", useThinkingZero: true },
-        { name: "gemini-2.0-flash", useThinkingZero: false },
-        { name: "gemini-1.5-flash", useThinkingZero: false }
-      ];
+      const modelsToTry = await getAvailableGeminiModels(apiKey);
 
       let parsed = null;
-      let lastError = "";
+      const errorLog = [];
 
-      for (const m of modelsToTry) {
+      for (const modelName of modelsToTry) {
         try {
-          const genConfig = {
-            responseMimeType: "application/json",
-            temperature: 0.7
-          };
-          if (m.useThinkingZero) {
-            genConfig.thinkingConfig = { thinkingBudget: 0 };
-          }
-
-          const data = await callGeminiModel(m.name, apiKey, {
-            system_instruction: { parts: [{ text: sysPrompt }] },
+          // Standard universal payload with zero experimental fields that could trigger 400 errors
+          const data = await callGeminiModel(modelName, apiKey, {
             contents: requestContents,
-            generationConfig: genConfig
+            generationConfig: {
+              temperature: 0.6
+            }
           });
 
           if (data.error) {
-            lastError = data.error.message;
+            errorLog.push(`${modelName}: ${data.error.message}`);
             continue;
           }
 
@@ -1159,27 +1185,30 @@ Rules:
           const firstBrace = rawText.indexOf("{");
           const lastBrace = rawText.lastIndexOf("}");
           if (firstBrace !== -1 && lastBrace !== -1) {
-            rawText = rawText.slice(firstBrace, lastBrace + 1);
+            try {
+              parsed = JSON.parse(rawText.slice(firstBrace, lastBrace + 1));
+            } catch (_) {
+              parsed = { spoken_spanish: rawText, english_hint: "" };
+            }
+          } else {
+            parsed = { spoken_spanish: rawText, english_hint: "" };
           }
 
-          parsed = JSON.parse(rawText);
           if (parsed) break;
         } catch (err) {
-          lastError = err.name === "AbortError" ? "Request timed out (14s)" : err.message;
+          errorLog.push(`${modelName}: ${err.message}`);
         }
       }
 
       isBusyThinking = false;
-      resumeCameraInterval(); // Restart the 1 FPS camera timer now that the request finished!
+      resumeCameraInterval();
 
       if (!parsed) {
         sessionStatus.textContent = "⚠️ API Error";
-        const errHint = lastError.includes("API key not valid") || apiKey.startsWith("AQ.")
-          ? `Google rejected the "${apiKey.slice(0, 6)}..." key (${lastError}). In Google AI Studio, copy a key that starts with "AIzaSy...".`
-          : lastError || "Check your API key in the top bar.";
+        const firstErr = errorLog[0] || "Check your API key in the top bar.";
         document.getElementById("live-reply-es").textContent = "⚠️ Error de API";
-        document.getElementById("live-reply-en").textContent = errHint;
-        logComprehensibleEntry("⚠️ Error de API", errHint);
+        document.getElementById("live-reply-en").textContent = firstErr;
+        logComprehensibleEntry("⚠️ Error de API", firstErr);
         if (isConnected) setTimeout(() => startContinuousMic(), 800);
         return;
       }
@@ -1189,7 +1218,7 @@ Rules:
 
       hybridChatHistory.push({ role: "user", parts: [{ text: userText }] });
       hybridChatHistory.push({ role: "model", parts: [{ text: spanishReply }] });
-      if (hybridChatHistory.length > 10) hybridChatHistory = hybridChatHistory.slice(-10);
+      if (hybridChatHistory.length > 8) hybridChatHistory = hybridChatHistory.slice(-8);
 
       if (parsed.start_roleplay?.scene_title) {
         activeRoleplayState = parsed.start_roleplay;
@@ -1267,7 +1296,7 @@ Rules:
       processUserTurnWithGemini("End roleplay and summarize how I did.", false);
     });
 
-    /* 7. 1 FPS CAMERA STREAMER & TAP-TO-IDENTIFY (NO PLAY() INTERRUPT OR TIMER COLLISION) */
+    /* 7. 1 FPS CAMERA STREAMER & TAP-TO-IDENTIFY */
     function captureFrameToBuffer() {
       if (!cameraStream) return false;
       const vw = videoEl.videoWidth || 640;
@@ -1299,7 +1328,6 @@ Rules:
       }
       if (isBusyThinking) return;
 
-      // Pause the 1 FPS interval immediately so it never collides with your manual tap!
       pauseCameraInterval();
 
       if (clientX !== null && clientY !== null) {
@@ -1376,7 +1404,6 @@ Rules:
         videoEl.srcObject = stream;
         videoEl.muted = true;
 
-        // Wait cleanly for video metadata and swallow harmless mobile play() interrupt warnings
         await new Promise((resolve) => {
           let resolved = false;
           const finish = () => {
