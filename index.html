@@ -7,97 +7,19 @@
   <title>Vozzi & Speak Pro Ultra – Live Spanish Suite</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --panel: #1e293b;
-      --panel-alt: #020617;
-      --border: #334155;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --primary: #3b82f6;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --accent: #8b5cf6;
-      --pink: #ec4899;
+      --bg: #0f172a; --panel: #1e293b; --panel-alt: #020617; --border: #334155;
+      --text: #f8fafc; --muted: #94a3b8; --primary: #3b82f6; --success: #10b981;
+      --warning: #f59e0b; --danger: #ef4444; --accent: #8b5cf6;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
-      padding-bottom: 60px;
-    }
-
-    /* Top Header */
-    header {
-      background: var(--panel);
-      border-bottom: 1px solid var(--border);
-      padding: 12px 20px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .brand {
-      font-size: 1.3rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      color: #60a5fa;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .status-dot {
-      width: 11px;
-      height: 11px;
-      border-radius: 50%;
-      background: var(--muted);
-      display: inline-block;
-    }
-    .status-dot.live {
-      background: var(--success);
-      box-shadow: 0 0 10px var(--success);
-    }
-
-    .key-bar {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    input[type="password"], input[type="text"], select, textarea {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 0.88rem;
-      font-family: inherit;
-    }
-
-    button {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 0.88rem;
-      transition: opacity 0.15s, transform 0.1s;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
+    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; padding-bottom: 60px; }
+    header { background: var(--panel); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; }
+    .brand { font-size: 1.3rem; font-weight: 800; color: #60a5fa; display: flex; align-items: center; gap: 10px; }
+    .status-dot { width: 11px; height: 11px; border-radius: 50%; background: var(--muted); display: inline-block; }
+    .status-dot.live { background: var(--success); box-shadow: 0 0 10px var(--success); }
+    .key-bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    input[type="password"], input[type="text"], select, textarea { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 6px; font-size: 0.88rem; font-family: inherit; }
+    button { background: var(--primary); color: #fff; border: none; padding: 8px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.88rem; transition: opacity 0.15s, transform 0.1s; display: inline-flex; align-items: center; gap: 6px; }
     button:hover { opacity: 0.92; }
     button:active { transform: scale(0.98); }
     button:disabled { opacity: 0.45; cursor: not-allowed; }
@@ -106,287 +28,57 @@
     button.warning { background: var(--warning); color: #000; }
     button.danger { background: var(--danger); }
     button.accent { background: var(--accent); }
-
-    /* Navigation Tabs */
-    .nav-tabs {
-      max-width: 1160px;
-      margin: 14px auto 0;
-      padding: 0 16px;
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 6px;
-    }
-    .tab-btn {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      padding: 9px 15px;
-      border-radius: 8px;
-      white-space: nowrap;
-      font-size: 0.88rem;
-    }
-    .tab-btn.active {
-      background: var(--primary);
-      color: #fff;
-      border-color: #60a5fa;
-    }
-
-    /* Active Roleplay Banner */
-    #roleplay-banner {
-      display: none;
-      background: linear-gradient(90deg, #1d4ed8, #0369a1);
-      padding: 12px 20px;
-      font-size: 0.92rem;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #38bdf8;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    /* Main Containers */
-    .tab-panel {
-      display: none;
-      max-width: 1160px;
-      margin: 16px auto;
-      padding: 0 16px;
-    }
+    .nav-tabs { max-width: 1160px; margin: 14px auto 0; padding: 0 16px 6px; display: flex; gap: 8px; overflow-x: auto; }
+    .tab-btn { background: var(--panel); border: 1px solid var(--border); color: var(--muted); padding: 9px 15px; border-radius: 8px; white-space: nowrap; font-size: 0.88rem; }
+    .tab-btn.active { background: var(--primary); color: #fff; border-color: #60a5fa; }
+    #roleplay-banner { display: none; background: linear-gradient(90deg, #1d4ed8, #0369a1); padding: 12px 20px; font-size: 0.92rem; justify-content: space-between; align-items: center; border-bottom: 1px solid #38bdf8; gap: 10px; flex-wrap: wrap; }
+    .tab-panel { display: none; max-width: 1160px; margin: 16px auto; padding: 0 16px; }
     .tab-panel.active { display: block; }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1.05fr 0.95fr;
-      gap: 20px;
-    }
-    @media (max-width: 860px) {
-      .grid-2 { grid-template-columns: 1fr; }
-    }
-
-    .col {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .card h2 {
-      font-size: 1rem;
-      color: #cbd5e1;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    /* Camera Viewfinder & Reticle */
-    .video-wrap {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 4 / 3;
-      background: var(--panel-alt);
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: crosshair;
-    }
+    .grid-2 { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 20px; }
+    @media (max-width: 860px) { .grid-2 { grid-template-columns: 1fr; } }
+    .col { display: flex; flex-direction: column; gap: 20px; }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .card h2 { font-size: 1rem; color: #cbd5e1; border-bottom: 1px solid var(--border); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .video-wrap { position: relative; width: 100%; aspect-ratio: 4 / 3; background: var(--panel-alt); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: crosshair; }
     video { width: 100%; height: 100%; object-fit: cover; }
-    .video-placeholder {
-      position: absolute;
-      color: var(--muted);
-      font-size: 0.88rem;
-      text-align: center;
-      padding: 20px;
-      pointer-events: none;
-    }
-    #focus-reticle {
-      position: absolute;
-      width: 68px;
-      height: 68px;
-      border: 2px solid #38bdf8;
-      border-radius: 50%;
-      box-shadow: 0 0 12px rgba(56, 189, 248, 0.8);
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      display: none;
-    }
-
+    .video-placeholder { position: absolute; color: var(--muted); font-size: 0.88rem; text-align: center; padding: 20px; pointer-events: none; }
+    #focus-reticle { position: absolute; width: 68px; height: 68px; border: 2px solid #38bdf8; border-radius: 50%; box-shadow: 0 0 12px rgba(56, 189, 248, 0.8); transform: translate(-50%, -50%); pointer-events: none; display: none; }
     .controls { display: flex; flex-wrap: wrap; gap: 8px; }
     .quick-bar { display: flex; gap: 8px; }
     .quick-bar input { flex: 1; }
-
-    /* Scroll Lists */
-    .scroll-list {
-      max-height: 260px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .item-box {
-      background: var(--bg);
-      border-left: 4px solid var(--primary);
-      padding: 10px 12px;
-      border-radius: 6px;
-      font-size: 0.88rem;
-    }
+    .scroll-list { max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+    .item-box { background: var(--bg); border-left: 4px solid var(--primary); padding: 10px 12px; border-radius: 6px; font-size: 0.88rem; }
     .item-box.grammar { border-left-color: var(--warning); }
     .item-box.transcript { border-left-color: var(--success); cursor: pointer; }
     .item-box.blurred .blur-target { filter: blur(6px); user-select: none; }
     .item-box small { color: var(--muted); display: block; margin-top: 4px; }
-
-    /* 3D Flashcard Studio */
-    .flashcard-3d-stage {
-      perspective: 1000px;
-      width: 100%;
-      height: 220px;
-      margin: 6px 0;
-      cursor: pointer;
-    }
-    .flashcard-3d-inner {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      text-align: center;
-      transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
-      transform-style: preserve-3d;
-    }
-    .flashcard-3d-stage.flipped .flashcard-3d-inner {
-      transform: rotateY(180deg);
-    }
-    .flashcard-face {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      backface-visibility: hidden;
-      border-radius: 12px;
-      border: 2px solid var(--border);
-      background: linear-gradient(145deg, #0f172a, #1e293b);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      gap: 8px;
-    }
-    .flashcard-face.back {
-      transform: rotateY(180deg);
-      border-color: var(--primary);
-      background: linear-gradient(145deg, #1e293b, #0f172a);
-    }
-    .flashcard-term { font-size: 1.65rem; font-weight: 800; color: #f8fafc; }
+    .flashcard-3d-stage { perspective: 1000px; width: 100%; height: 220px; margin: 6px 0; cursor: pointer; }
+    .flashcard-3d-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
+    .flashcard-3d-stage.flipped .flashcard-3d-inner { transform: rotateY(180deg); }
+    .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 12px; border: 2px solid var(--border); background: linear-gradient(145deg, #0f172a, #1e293b); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; gap: 8px; }
+    .flashcard-face.back { transform: rotateY(180deg); border-color: var(--primary); background: linear-gradient(145deg, #1e293b, #0f172a); }
+    .flashcard-term { font-size: 1.6rem; font-weight: 800; color: #f8fafc; }
     .flashcard-example { font-size: 0.95rem; color: #93c5fd; font-style: italic; }
-    .badge {
-      font-size: 0.72rem;
-      padding: 3px 8px;
-      border-radius: 99px;
-      background: var(--border);
-      color: var(--text);
-    }
-
-    /* Progressive Fading Drills & 90% Gate */
-    .drill-stage-box {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 20px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .drill-spanish {
-      font-size: 1.45rem;
-      font-weight: 700;
-      color: #60a5fa;
-      letter-spacing: 0.3px;
-    }
-    .drill-english {
-      font-size: 0.98rem;
-      color: var(--muted);
-    }
-    .accuracy-meter {
-      height: 10px;
-      background: var(--border);
-      border-radius: 99px;
-      overflow: hidden;
-      margin-top: 6px;
-    }
-    .accuracy-fill {
-      height: 100%;
-      width: 0%;
-      background: var(--success);
-      transition: width 0.3s ease;
-    }
-
-    /* Verb Cups & Conjugation Matrix */
-    .cups-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-    @media (max-width: 640px) {
-      .cups-grid { grid-template-columns: 1fr; }
-    }
-    .cup-card {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-top: 4px solid var(--primary);
-      border-radius: 8px;
-      padding: 10px;
-    }
+    .badge { font-size: 0.72rem; padding: 3px 8px; border-radius: 99px; background: var(--border); color: var(--text); }
+    .drill-stage-box { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 18px; text-align: center; display: flex; flex-direction: column; gap: 12px; }
+    .drill-spanish { font-size: 1.4rem; font-weight: 700; color: #60a5fa; }
+    .drill-english { font-size: 0.95rem; color: var(--muted); }
+    .accuracy-meter { height: 10px; background: var(--border); border-radius: 99px; overflow: hidden; margin-top: 4px; }
+    .accuracy-fill { height: 100%; width: 0%; background: var(--success); transition: width 0.3s ease; }
+    .cups-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    @media (max-width: 640px) { .cups-grid { grid-template-columns: 1fr; } }
+    .cup-card { background: var(--bg); border: 1px solid var(--border); border-top: 4px solid var(--primary); border-radius: 8px; padding: 10px; }
     .cup-card h4 { font-size: 0.85rem; color: #93c5fd; margin-bottom: 8px; }
     .cup-card select { width: 100%; }
-
-    table.verb-matrix {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.84rem;
-      background: var(--bg);
-      border-radius: 6px;
-      overflow: hidden;
-    }
-    table.verb-matrix th, table.verb-matrix td {
-      border: 1px solid var(--border);
-      padding: 7px 8px;
-      text-align: left;
-    }
+    table.verb-matrix { width: 100%; border-collapse: collapse; font-size: 0.84rem; background: var(--bg); border-radius: 6px; overflow: hidden; }
+    table.verb-matrix th, table.verb-matrix td { border: 1px solid var(--border); padding: 7px 8px; text-align: left; }
     table.verb-matrix th { background: var(--panel-alt); color: #93c5fd; }
-    table.verb-matrix td.highlight {
-      background: rgba(245, 158, 11, 0.25);
-      border: 1px solid var(--warning);
-      font-weight: 700;
-      color: #fde68a;
-    }
-
-    .hint-box {
-      font-size: 0.82rem;
-      color: var(--muted);
-      background: rgba(15, 23, 42, 0.6);
-      padding: 10px;
-      border-radius: 6px;
-    }
+    table.verb-matrix td.highlight { background: rgba(245, 158, 11, 0.25); border: 1px solid var(--warning); font-weight: 700; color: #fde68a; }
+    .hint-box { font-size: 0.82rem; color: var(--muted); background: rgba(15, 23, 42, 0.6); padding: 10px; border-radius: 6px; }
   </style>
 </head>
 <body>
 
-  <!-- Header & Smart API Key Bar -->
   <header>
     <div class="brand">
       <span id="status-dot" class="status-dot"></span>
@@ -398,7 +90,6 @@
     </div>
   </header>
 
-  <!-- Active Roleplay Banner -->
   <div id="roleplay-banner">
     <div>
       <strong>🎭 Active Roleplay:</strong> <span id="rp-title"></span>
@@ -407,7 +98,6 @@
     <button id="btn-end-rp" class="danger" style="padding: 5px 10px; font-size: 0.8rem;">End Scene</button>
   </div>
 
-  <!-- Multi-Tab Navigation Bar -->
   <nav class="nav-tabs">
     <button class="tab-btn active" data-tab="tab-live">🎙️ Live Tutor & Camera</button>
     <button class="tab-btn" data-tab="tab-drills">🎯 Fading Drills (90% Gate)</button>
@@ -417,9 +107,7 @@
     <button class="tab-btn" data-tab="tab-export">📦 Import / Export Hub</button>
   </nav>
 
-  <!-- =========================================================
-       TAB 1: LIVE VOICE TUTOR & 1 FPS POINT-AND-ASK CAMERA
-       ========================================================= -->
+  <!-- TAB 1: LIVE TUTOR & CAMERA -->
   <section id="tab-live" class="tab-panel active">
     <div class="grid-2">
       <div class="col">
@@ -428,8 +116,7 @@
             <span>Live Voice & Point-and-Ask Camera</span>
             <span id="session-status" style="font-size: 0.82rem; color: var(--muted);">Disconnected</span>
           </h2>
-
-          <div class="video-wrap" id="video-wrap" title="Tap anywhere on the video to identify an object in Spanish">
+          <div class="video-wrap" id="video-wrap" title="Tap any object on video to identify it in Spanish">
             <div id="video-placeholder" class="video-placeholder">
               Camera Off<br>
               <small>Start camera and <strong>tap any object on screen</strong> to ask "¿Cómo se dice esto?"</small>
@@ -437,23 +124,21 @@
             <video id="camera-feed" playsinline autoplay muted></video>
             <div id="focus-reticle"></div>
           </div>
-
           <div class="controls">
             <button id="btn-connect" class="success">Start Live Session</button>
             <button id="btn-camera" class="secondary" disabled>Start Camera (1 FPS)</button>
             <button id="btn-flip" class="secondary" style="display:none;">Flip Camera</button>
             <button id="btn-ask-object" class="accent" style="display:none;">¿Cómo se dice esto?</button>
           </div>
-
           <div class="quick-bar">
             <input type="text" id="text-prompt-input" placeholder="Type a message or say 'Can we roleplay...'" />
             <button id="btn-send-text" class="secondary" disabled>Send</button>
           </div>
-
           <div class="hint-box">
-            <strong>Dual-Engine Live Protection Active:</strong><br>
-            • Connects via WebSocket Live API and automatically falls back to Hybrid Continuous Voice + Gemini 2.5 Flash if your mobile carrier or key blocks raw sockets—so your session <strong>never drops after 0.5s</strong>.<br>
-            • <strong>Voice Roleplay:</strong> Say <em>"Can we roleplay? You're a customer designing a kitchen and I'm the specialist."</em>
+            <strong>Everything you can do live:</strong><br>
+            • <strong>Voice Roleplay:</strong> Say <em>"Can we roleplay? You're a customer designing a kitchen and I'm the specialist."</em><br>
+            • <strong>Point & Ask Camera:</strong> Start the camera and tap any object on the screen (or click <em>¿Cómo se dice esto?</em>) to name it with <em>el/la</em> and save a flashcard.<br>
+            • <strong>Live Verb Matrix:</strong> Ask <em>"How do I conjugate poner?"</em> to update the matrix automatically.
           </div>
         </div>
 
@@ -464,7 +149,7 @@
           </h2>
           <div id="transcript-list" class="scroll-list">
             <div style="color: var(--muted); font-size: 0.84rem;">
-              Live Spanish responses and English hints appear here. Toggle <strong>Blur Mode</strong> to train your ear first.
+              Spanish responses and English hints appear here. Toggle <strong>Blur Mode</strong> to test listening first (tap any blurred line to reveal).
             </div>
           </div>
         </div>
@@ -474,7 +159,7 @@
         <div class="card">
           <h2>
             <span>Silent Grammar Drawer</span>
-            <small style="font-weight: normal; color: var(--muted);">Auto-logged without interrupting you</small>
+            <small style="font-weight: normal; color: var(--muted);">Auto-logged without interrupting speech</small>
           </h2>
           <div id="grammar-list" class="scroll-list">
             <div style="color: var(--muted); font-size: 0.84rem;">
@@ -485,8 +170,8 @@
 
         <div class="card">
           <h2>
-            <span>Recent Saved Cards (<span id="live-card-count">0</span>)</span>
-            <button class="secondary" style="padding: 4px 8px; font-size: 0.75rem;" onclick="switchTab('tab-flashcards')">Open Studio →</button>
+            <span>Recent Saved Flashcards (<span id="live-card-count">0</span>)</span>
+            <button class="secondary" style="padding: 4px 8px; font-size: 0.75rem;" onclick="switchTab('tab-flashcards')">Open 3D Studio →</button>
           </h2>
           <div id="live-flashcards-preview" class="scroll-list"></div>
         </div>
@@ -494,41 +179,31 @@
     </div>
   </section>
 
-  <!-- =========================================================
-       TAB 2: PROGRESSIVE FADING DRILLS & 90% ACCURACY GATE
-       ========================================================= -->
+  <!-- TAB 2: PROGRESSIVE FADING DRILLS -->
   <section id="tab-drills" class="tab-panel">
     <div class="card">
       <h2>
         <span>🎯 Progressive Fading Drills (Strict 90% Accuracy Gate)</span>
-        <div style="display:flex; gap:8px; align-items:center;">
-          <select id="drill-level-select">
-            <option value="ALL">All Curriculum Levels</option>
-            <option value="Level 4: Connectors & Lo Que" selected>Level 4: Connectors, "Lo Que" & Power Verbs</option>
-            <option value="Level 3: Kitchen & Customer Service">Level 3: Kitchen Design & Customer Service</option>
-            <option value="Level 2: Cognates Mastery">Level 2: Cognates (-ción / -ico / -mente)</option>
-            <option value="Level 1: Core Everyday">Level 1: Core Everyday & Survival</option>
-          </select>
-        </div>
+        <select id="drill-level-select">
+          <option value="ALL">All Curriculum Levels</option>
+          <option value="Level 4: Connectors & Lo Que" selected>Level 4: Connectors, "Lo Que" & Power Verbs</option>
+          <option value="Level 3: Kitchen & Customer Service">Level 3: Kitchen Design & Customer Service</option>
+          <option value="Level 2: Cognates Mastery">Level 2: Cognates (-ción / -ico / -mente)</option>
+          <option value="Level 1: Core Everyday">Level 1: Core Everyday & Survival</option>
+        </select>
       </h2>
-
       <div class="drill-stage-box">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
           <span class="badge" id="drill-category-badge">Level 4</span>
           <span class="badge" id="drill-fade-badge" style="background:var(--primary);">Stage 1/3: Full Text</span>
-          <span class="badge" id="drill-progress-badge">Card 1 of 20</span>
+          <span class="badge" id="drill-progress-badge">Drill 1</span>
         </div>
-
-        <div class="drill-spanish" id="drill-spanish-display">Además, eso es exactamente lo que necesitas.</div>
-        <div class="drill-english" id="drill-english-display">"Furthermore, that is exactly what you need."</div>
-
-        <div class="accuracy-meter">
-          <div class="accuracy-fill" id="drill-accuracy-bar"></div>
-        </div>
+        <div class="drill-spanish" id="drill-spanish-display"></div>
+        <div class="drill-english" id="drill-english-display"></div>
+        <div class="accuracy-meter"><div class="accuracy-fill" id="drill-accuracy-bar"></div></div>
         <div id="drill-feedback-text" style="font-size:0.88rem; color:var(--muted);">
-          Tap <strong>🎤 Speak Drill</strong> and hit <strong>90%+ accuracy</strong> to advance through the 3 fading stages!
+          Tap <strong>🎤 Speak Drill</strong> and score <strong>90%+ accuracy</strong> to unlock the next fading stage!
         </div>
-
         <div class="controls" style="justify-content:center; margin-top:6px;">
           <button id="btn-drill-listen" class="secondary">🔊 Listen (Native TTS)</button>
           <button id="btn-drill-speak" class="success">🎤 Speak Drill (90% Gate)</button>
@@ -539,9 +214,7 @@
     </div>
   </section>
 
-  <!-- =========================================================
-       TAB 3: 3D FLASHCARD STUDIO
-       ========================================================= -->
+  <!-- TAB 3: 3D FLASHCARD STUDIO -->
   <section id="tab-flashcards" class="tab-panel">
     <div class="grid-2">
       <div class="card">
@@ -553,30 +226,28 @@
             <option value="Power Verbs">Power Verbs</option>
             <option value="Level 3: Kitchen & Customer Service">Kitchen & Customer Service</option>
             <option value="Level 2: Cognates Mastery">Cognates Mastery</option>
+            <option value="Level 1: Core Everyday">Core Everyday</option>
             <option value="Camera Object">Camera Sightings</option>
           </select>
         </h2>
-
-        <div class="flashcard-3d-stage" id="flashcard-3d" title="Tap card to flip 3D">
+        <div class="flashcard-3d-stage" id="flashcard-3d">
           <div class="flashcard-3d-inner">
             <div class="flashcard-face front">
               <span class="badge" id="fc-front-cat">Category</span>
-              <div class="flashcard-term" id="fc-front-term">el gabinete de cocina</div>
-              <div class="flashcard-example" id="fc-front-ex">"Vamos a medir el gabinete de cocina."</div>
-              <small style="color:var(--muted); margin-top:8px;">(Tap card to flip ↻)</small>
+              <div class="flashcard-term" id="fc-front-term"></div>
+              <div class="flashcard-example" id="fc-front-ex"></div>
+              <small style="color:var(--muted); margin-top:8px;">(Tap card to flip 3D ↻)</small>
             </div>
             <div class="flashcard-face back">
               <span class="badge" style="background:var(--primary);">English Meaning</span>
-              <div class="flashcard-term" id="fc-back-meaning" style="color:#38bdf8;">the kitchen cabinet</div>
-              <div class="flashcard-example" id="fc-back-ex">"Vamos a medir el gabinete de cocina."</div>
+              <div class="flashcard-term" id="fc-back-meaning" style="color:#38bdf8;"></div>
+              <div class="flashcard-example" id="fc-back-ex"></div>
             </div>
           </div>
         </div>
-
         <div id="fc-voice-result" style="text-align:center; font-size:0.86rem; color:var(--muted);">
-          Practice pronunciation right on the card with native TTS or voice testing.
+          Tap 🔊 Pronounce to hear native audio or 🎤 Voice Test to check your pronunciation.
         </div>
-
         <div class="controls" style="justify-content:center;">
           <button id="btn-fc-prev" class="secondary">← Prev</button>
           <button id="btn-fc-tts" class="primary">🔊 Pronounce</button>
@@ -598,6 +269,7 @@
           <option value="Power Verbs">Power Verbs</option>
           <option value="Level 3: Kitchen & Customer Service">Kitchen & Customer Service</option>
           <option value="Level 2: Cognates Mastery">Cognates Mastery</option>
+          <option value="Level 1: Core Everyday">Core Everyday</option>
           <option value="Camera Object">Camera Sightings</option>
         </select>
         <button id="btn-add-fc" class="success">＋ Save to Deck</button>
@@ -605,9 +277,7 @@
     </div>
   </section>
 
-  <!-- =========================================================
-       TAB 4: MULTI-TURN GUIDED ROLEPLAY STUDIO
-       ========================================================= -->
+  <!-- TAB 4: MULTI-TURN GUIDED ROLEPLAY STUDIO -->
   <section id="tab-roleplay" class="tab-panel">
     <div class="card">
       <h2>
@@ -618,17 +288,14 @@
           <option value="bistro">Scenario 3: Bistro Dinner & Mocktail Ordering</option>
         </select>
       </h2>
-
-      <div id="rp-chat-history" class="scroll-list" style="max-height:300px; background:var(--bg); padding:12px; border-radius:8px;"></div>
-
+      <div id="rp-chat-history" class="scroll-list" style="max-height:280px; background:var(--bg); padding:12px; border-radius:8px;"></div>
       <div class="drill-stage-box" style="padding:14px;">
         <div style="font-size:0.82rem; color:var(--muted);">Your Target Spanish Response (Turn <span id="rp-turn-num">1</span>):</div>
-        <div class="drill-spanish" id="rp-target-es" style="font-size:1.2rem;">¡Buenas tardes! ¿En qué le puedo ayudar hoy con el diseño de su cocina?</div>
-        <div class="drill-english" id="rp-target-en">"Good afternoon! How can I help you today with your kitchen design?"</div>
-        <div id="rp-gate-status" style="font-size:0.85rem; color:var(--muted);">Speak with ≥90% accuracy (or click Advance) to continue to the next turn without stalling!</div>
-
+        <div class="drill-spanish" id="rp-target-es" style="font-size:1.2rem;"></div>
+        <div class="drill-english" id="rp-target-en"></div>
+        <div id="rp-gate-status" style="font-size:0.85rem; color:var(--muted);">Speak with ≥90% accuracy (or click Next Turn) to advance through all turns!</div>
         <div class="controls" style="justify-content:center;">
-          <button id="btn-rp-listen" class="secondary">🔊 Hear AI / Target</button>
+          <button id="btn-rp-listen" class="secondary">🔊 Hear Target Line</button>
           <button id="btn-rp-speak" class="success">🎤 Speak My Turn (90% Gate)</button>
           <button id="btn-rp-advance" class="accent">Next Turn →</button>
           <button id="btn-rp-restart" class="secondary">Restart Scene</button>
@@ -637,17 +304,14 @@
     </div>
   </section>
 
-  <!-- =========================================================
-       TAB 5: TONY MARSH 1-2-3 VERB CUPS & CONJUGATION MATRIX
-       ========================================================= -->
+  <!-- TAB 5: TONY MARSH 1-2-3 VERB CUPS & CONJUGATION MATRIX -->
   <section id="tab-verbs" class="tab-panel">
     <div class="grid-2">
       <div class="card">
         <h2>
           <span>🥤 Tony Marsh 1-2-3 Verb Cups Builder</span>
-          <small style="color:var(--muted); font-weight:normal;">Build fluent multi-verb sentences effortlessly</small>
+          <small style="color:var(--muted); font-weight:normal;">Stack Connector + Power Verb + Infinitive</small>
         </h2>
-
         <div class="cups-grid">
           <div class="cup-card">
             <h4>Cup 1: Subject / Connector</h4>
@@ -662,8 +326,9 @@
           <div class="cup-card">
             <h4>Cup 2: Power Verb</h4>
             <select id="cup-2">
-              <option value="quiero / necesito">quiero / necesito (want / need to)</option>
-              <option value="puedo / debo">puedo / debo (can / must)</option>
+              <option value="quiero">quiero (want to)</option>
+              <option value="necesito">necesito (need to)</option>
+              <option value="puedo">puedo (can)</option>
               <option value="voy a">voy a (am going to)</option>
               <option value="acabo de">acabo de (just finished)</option>
               <option value="vuelvo a">vuelvo a (do again)</option>
@@ -675,14 +340,13 @@
               <option value="medir el espacio de la cocina.">medir el espacio de la cocina.</option>
               <option value="confirmar su número de pedido.">confirmar su número de pedido.</option>
               <option value="preparar lo que me pediste.">preparar lo que me pediste.</option>
-              <option value="compartir las ideas con el cliente.">compartir las ideas con el cliente.</option>
+              <option value="compartir el diseño con el cliente.">compartir el diseño con el cliente.</option>
               <option value="practicar español todos los días.">practicar español todos los días.</option>
             </select>
           </div>
         </div>
-
         <div class="drill-stage-box" style="margin-top:8px;">
-          <div class="drill-spanish" id="cup-sentence-output" style="font-size:1.25rem;">Además, yo quiero medir el espacio de la cocina.</div>
+          <div class="drill-spanish" id="cup-sentence-output" style="font-size:1.22rem;">Además, yo quiero medir el espacio de la cocina.</div>
           <div class="controls" style="justify-content:center;">
             <button id="btn-cup-speak-tts" class="primary">🔊 Hear Sentence</button>
             <button id="btn-cup-practice" class="success">🎤 Practice Speaking</button>
@@ -693,9 +357,9 @@
 
       <div class="card">
         <h2>
-          <span>Live Verb Matrix: <strong id="verb-title" style="color:#60a5fa;">estar (temporary / location)</strong></span>
+          <span>Live Verb Matrix: <strong id="verb-title" style="color:#60a5fa;">estar</strong></span>
           <select id="verb-preset-select">
-            <option value="estar">estar (to be - state/loc)</option>
+            <option value="estar">estar (to be - state/location)</option>
             <option value="ser">ser (to be - identity)</option>
             <option value="tener">tener (to have)</option>
             <option value="poder">poder (can / to be able)</option>
@@ -706,14 +370,9 @@
           </select>
         </h2>
         <div style="overflow-x: auto;">
-          <table class="verb-matrix" id="verb-table">
+          <table class="verb-matrix">
             <thead>
-              <tr>
-                <th>Pronoun</th>
-                <th>Present</th>
-                <th>Preterite (Past)</th>
-                <th>Imperfect</th>
-              </tr>
+              <tr><th>Pronoun</th><th>Present</th><th>Preterite (Past)</th><th>Imperfect</th></tr>
             </thead>
             <tbody id="verb-tbody"></tbody>
           </table>
@@ -722,27 +381,20 @@
     </div>
   </section>
 
-  <!-- =========================================================
-       TAB 6: EXPORT & CUSTOM IMPORT HUB
-       ========================================================= -->
+  <!-- TAB 6: EXPORT & IMPORT HUB -->
   <section id="tab-export" class="tab-panel">
     <div class="grid-2">
       <div class="card">
         <h2><span>📤 Export & Share Hub</span></h2>
-        <p style="font-size:0.88rem; color:var(--muted);">
-          Download your complete flashcard deck and custom study phrases as JSON or CSV for backup or Anki import.
-        </p>
+        <p style="font-size:0.88rem; color:var(--muted);">Download your flashcard deck and custom study phrases as JSON or CSV.</p>
         <div class="controls">
           <button id="btn-export-json" class="primary">⬇️ Export Deck (.JSON)</button>
           <button id="btn-export-csv" class="success">⬇️ Export Spreadsheet (.CSV)</button>
         </div>
       </div>
-
       <div class="card">
         <h2><span>📥 Import Custom Study Module</span></h2>
-        <p style="font-size:0.84rem; color:var(--muted);">
-          Paste lines formatted as <code>Spanish | English | Example</code> (one per line) to add directly to your Flashcards and Fading Drills:
-        </p>
+        <p style="font-size:0.84rem; color:var(--muted);">Paste lines formatted as <code>Spanish | English | Example</code> (one per line):</p>
         <textarea id="import-textarea" rows="4" placeholder="Su pedido está listo | Your order is ready | Hola, su pedido está listo para recoger."></textarea>
         <button id="btn-import-lines" class="accent">＋ Import Lines into App</button>
       </div>
@@ -750,196 +402,72 @@
   </section>
 
   <script>
-    /**************************************************************
-     * 1. PRE-LOADED SPEAK PRO ULTRA + VOZZI CURRICULUM DECK
-     **************************************************************/
+    /* 1. CURRICULUM DECK, VERBS, AND GUIDED ROLEPLAY DATA */
     const DEFAULT_FLASHCARDS = [
-      // Level 4: Connectors, "Lo Que" & Power Verbs
       { spanish_term: "además", english_meaning: "furthermore / besides", example_sentence: "Además, tenemos entrega a domicilio.", category: "Level 4: Connectors & Lo Que" },
       { spanish_term: "sin embargo", english_meaning: "however / nevertheless", example_sentence: "Es pequeño; sin embargo, tiene mucho espacio.", category: "Level 4: Connectors & Lo Que" },
       { spanish_term: "por lo tanto", english_meaning: "therefore", example_sentence: "Ya medimos todo; por lo tanto, podemos empezar.", category: "Level 4: Connectors & Lo Que" },
-      { spanish_term: "lo que necesitas", english_meaning: "what you need (that which you need)", example_sentence: "Esto es exactamente lo que necesitas para tu cocina.", category: "Level 4: Connectors & Lo Que" },
+      { spanish_term: "lo que necesitas", english_meaning: "what you need", example_sentence: "Esto es exactamente lo que necesitas para tu cocina.", category: "Level 4: Connectors & Lo Que" },
       { spanish_term: "lo que me dijiste", english_meaning: "what you told me", example_sentence: "Entiendo muy bien lo que me dijiste ayer.", category: "Level 4: Connectors & Lo Que" },
       { spanish_term: "lo que más me gusta", english_meaning: "what I like the most", example_sentence: "Lo que más me gusta es el diseño moderno.", category: "Level 4: Connectors & Lo Que" },
       { spanish_term: "acabo de + infinitivo", english_meaning: "I just (did something)", example_sentence: "Acabo de revisar el inventario en el sistema.", category: "Power Verbs" },
       { spanish_term: "volver a + infinitivo", english_meaning: "to do (something) again", example_sentence: "Voy a volver a medir la pared para estar seguro.", category: "Power Verbs" },
       { spanish_term: "dejar de + infinitivo", english_meaning: "to stop doing (something)", example_sentence: "No voy a dejar de practicar español cada día.", category: "Power Verbs" },
-      // Level 3: Kitchen Design & Customer Service
-      { spanish_term: "¿En qué le puedo ayudar hoy?", english_meaning: "How can I help you today? (formal)", example_sentence: "¡Bienvenido! ¿En qué le puedo ayudar hoy?", category: "Level 3: Kitchen & Customer Service" },
+      { spanish_term: "¿En qué le puedo ayudar hoy?", english_meaning: "How can I help you today?", example_sentence: "¡Bienvenido! ¿En qué le puedo ayudar hoy?", category: "Level 3: Kitchen & Customer Service" },
       { spanish_term: "¿Cuál es su número de pedido?", english_meaning: "What is your order number?", example_sentence: "Para buscarlo, ¿cuál es su número de pedido?", category: "Level 3: Kitchen & Customer Service" },
-      { spanish_term: "¿Me podría confirmar su dirección?", english_meaning: "Could you confirm your address for me?", example_sentence: "Antes de enviar, ¿me podría confirmar su dirección?", category: "Level 3: Kitchen & Customer Service" },
+      { spanish_term: "¿Me podría confirmar su dirección?", english_meaning: "Could you confirm your address?", example_sentence: "Antes de enviar, ¿me podría confirmar su dirección?", category: "Level 3: Kitchen & Customer Service" },
       { spanish_term: "Su pedido está listo", english_meaning: "Your order is ready", example_sentence: "Buenas tardes, su pedido está listo para recoger.", category: "Level 3: Kitchen & Customer Service" },
       { spanish_term: "el gabinete de cocina", english_meaning: "the kitchen cabinet", example_sentence: "Este gabinete de cocina tiene cierre suave.", category: "Level 3: Kitchen & Customer Service" },
       { spanish_term: "la encimera", english_meaning: "the countertop", example_sentence: "La encimera de cuarzo es muy resistente.", category: "Level 3: Kitchen & Customer Service" },
       { spanish_term: "las medidas", english_meaning: "the measurements", example_sentence: "Necesitamos las medidas exactas de la pared.", category: "Level 3: Kitchen & Customer Service" },
       { spanish_term: "el cajón", english_meaning: "the drawer", example_sentence: "El cajón interior organiza los cubiertos.", category: "Level 3: Kitchen & Customer Service" },
       { spanish_term: "la sartén de hierro fundido", english_meaning: "the cast-iron frying pan", example_sentence: "Esta sartén de hierro fundido dura toda la vida.", category: "Level 3: Kitchen & Customer Service" },
-      // Level 2: Cognates Mastery
-      { spanish_term: "la reservación", english_meaning: "the reservation (-tion → -ción)", example_sentence: "Tengo una reservación para dos personas a las cinco y media.", category: "Level 2: Cognates Mastery" },
-      { spanish_term: "sarcástico", english_meaning: "sarcastic (-ic → -ico)", example_sentence: "Él tiene un sentido del humor un poco sarcástico.", category: "Level 2: Cognates Mastery" },
-      { spanish_term: "exactamente", english_meaning: "exactly (-ly → -mente)", example_sentence: "Eso es exactamente lo que estaba buscando.", category: "Level 2: Cognates Mastery" },
-      { spanish_term: "la posibilidad", english_meaning: "the possibility (-ty → -dad)", example_sentence: "Hay una buena posibilidad de entregarlo mañana.", category: "Level 2: Cognates Mastery" },
-      // Level 1: Core Everyday
+      { spanish_term: "la reservación", english_meaning: "the reservation (-tion -> -ción)", example_sentence: "Tengo una reservación para dos personas a las cinco y media.", category: "Level 2: Cognates Mastery" },
+      { spanish_term: "sarcástico", english_meaning: "sarcastic (-ic -> -ico)", example_sentence: "Él tiene un sentido del humor un poco sarcástico.", category: "Level 2: Cognates Mastery" },
+      { spanish_term: "exactamente", english_meaning: "exactly (-ly -> -mente)", example_sentence: "Eso es exactamente lo que estaba buscando.", category: "Level 2: Cognates Mastery" },
+      { spanish_term: "la posibilidad", english_meaning: "the possibility (-ty -> -dad)", example_sentence: "Hay una buena posibilidad de entregarlo mañana.", category: "Level 2: Cognates Mastery" },
       { spanish_term: "ahora mismo", english_meaning: "right now", example_sentence: "Lo voy a verificar en la computadora ahora mismo.", category: "Level 1: Core Everyday" },
       { spanish_term: "compartir", english_meaning: "to share", example_sentence: "Te voy a compartir el plano del diseño por correo.", category: "Level 1: Core Everyday" },
       { spanish_term: "dímelo", english_meaning: "tell it to me (di + me + lo)", example_sentence: "Si tienes alguna duda con las medidas, dímelo.", category: "Level 1: Core Everyday" }
     ];
 
     const VERB_PRESETS = {
-      estar: {
-        infinitive: "estar", english_meaning: "to be (temporary / location)",
-        yo_present: "estoy", yo_preterite: "estuve", yo_imperfect: "estaba",
-        tu_present: "estás", tu_preterite: "estuviste", tu_imperfect: "estabas",
-        el_present: "está", el_preterite: "estuvo", el_imperfect: "estaba",
-        nosotros_present: "estamos", nosotros_preterite: "estuvimos", nosotros_imperfect: "estábamos",
-        ellos_present: "están", ellos_preterite: "estuvieron", ellos_imperfect: "estaban"
-      },
-      ser: {
-        infinitive: "ser", english_meaning: "to be (identity / permanent)",
-        yo_present: "soy", yo_preterite: "fui", yo_imperfect: "era",
-        tu_present: "eres", tu_preterite: "fuiste", tu_imperfect: "eras",
-        el_present: "es", el_preterite: "fue", el_imperfect: "era",
-        nosotros_present: "somos", nosotros_preterite: "fuimos", nosotros_imperfect: "éramos",
-        ellos_present: "son", ellos_preterite: "fueron", ellos_imperfect: "eran"
-      },
-      tener: {
-        infinitive: "tener", english_meaning: "to have",
-        yo_present: "tengo", yo_preterite: "tuve", yo_imperfect: "tenía",
-        tu_present: "tienes", tu_preterite: "tuviste", tu_imperfect: "tenías",
-        el_present: "tiene", el_preterite: "tuvo", el_imperfect: "tenía",
-        nosotros_present: "tenemos", nosotros_preterite: "tuvimos", nosotros_imperfect: "teníamos",
-        ellos_present: "tienen", ellos_preterite: "tuvieron", ellos_imperfect: "tenían"
-      },
-      poder: {
-        infinitive: "poder", english_meaning: "can / to be able to",
-        yo_present: "puedo", yo_preterite: "pude", yo_imperfect: "podía",
-        tu_present: "puedes", tu_preterite: "pudiste", tu_imperfect: "podías",
-        el_present: "puede", el_preterite: "pudo", el_imperfect: "podía",
-        nosotros_present: "podemos", nosotros_preterite: "pudimos", nosotros_imperfect: "podíamos",
-        ellos_present: "pueden", ellos_preterite: "pudieron", ellos_imperfect: "podían"
-      },
-      poner: {
-        infinitive: "poner", english_meaning: "to put / place",
-        yo_present: "pongo", yo_preterite: "puse", yo_imperfect: "ponía",
-        tu_present: "pones", tu_preterite: "pusiste", tu_imperfect: "ponías",
-        el_present: "pone", el_preterite: "puso", el_imperfect: "ponía",
-        nosotros_present: "ponemos", nosotros_preterite: "pusimos", nosotros_imperfect: "poníamos",
-        ellos_present: "ponen", ellos_preterite: "pusieron", ellos_imperfect: "ponían"
-      },
-      hacer: {
-        infinitive: "hacer", english_meaning: "to do / make",
-        yo_present: "hago", yo_preterite: "hice", yo_imperfect: "hacía",
-        tu_present: "haces", tu_preterite: "hiciste", tu_imperfect: "hacías",
-        el_present: "hace", el_preterite: "hizo", el_imperfect: "hacía",
-        nosotros_present: "hacemos", nosotros_preterite: "hicimos", nosotros_imperfect: "hacíamos",
-        ellos_present: "hacen", ellos_preterite: "hicieron", ellos_imperfect: "hacían"
-      },
-      ir: {
-        infinitive: "ir", english_meaning: "to go",
-        yo_present: "voy", yo_preterite: "fui", yo_imperfect: "iba",
-        tu_present: "vas", tu_preterite: "fuiste", tu_imperfect: "ibas",
-        el_present: "va", el_preterite: "fue", el_imperfect: "iba",
-        nosotros_present: "vamos", nosotros_preterite: "fuimos", nosotros_imperfect: "íbamos",
-        ellos_present: "van", ellos_preterite: "fueron", ellos_imperfect: "iban"
-      },
-      compartir: {
-        infinitive: "compartir", english_meaning: "to share (regular -ir)",
-        yo_present: "comparto", yo_preterite: "compartí", yo_imperfect: "compartía",
-        tu_present: "compartes", tu_preterite: "compartiste", tu_imperfect: "compartías",
-        el_present: "comparte", el_preterite: "compartió", el_imperfect: "compartía",
-        nosotros_present: "compartimos", nosotros_preterite: "compartimos", nosotros_imperfect: "compartíamos",
-        ellos_present: "comparten", ellos_preterite: "compartieron", ellos_imperfect: "compartían"
-      }
+      estar: { infinitive: "estar", english_meaning: "to be (temporary/location)", yo_present: "estoy", yo_preterite: "estuve", yo_imperfect: "estaba", tu_present: "estás", tu_preterite: "estuviste", tu_imperfect: "estabas", el_present: "está", el_preterite: "estuvo", el_imperfect: "estaba", nosotros_present: "estamos", nosotros_preterite: "estuvimos", nosotros_imperfect: "estábamos", ellos_present: "están", ellos_preterite: "estuvieron", ellos_imperfect: "estaban" },
+      ser: { infinitive: "ser", english_meaning: "to be (identity/permanent)", yo_present: "soy", yo_preterite: "fui", yo_imperfect: "era", tu_present: "eres", tu_preterite: "fuiste", tu_imperfect: "eras", el_present: "es", el_preterite: "fue", el_imperfect: "era", nosotros_present: "somos", nosotros_preterite: "fuimos", nosotros_imperfect: "éramos", ellos_present: "son", ellos_preterite: "fueron", ellos_imperfect: "eran" },
+      tener: { infinitive: "tener", english_meaning: "to have", yo_present: "tengo", yo_preterite: "tuve", yo_imperfect: "tenía", tu_present: "tienes", tu_preterite: "tuviste", tu_imperfect: "tenías", el_present: "tiene", el_preterite: "tuvo", el_imperfect: "tenía", nosotros_present: "tenemos", nosotros_preterite: "tuvimos", nosotros_imperfect: "teníamos", ellos_present: "tienen", ellos_preterite: "tuvieron", ellos_imperfect: "tenían" },
+      poder: { infinitive: "poder", english_meaning: "can / to be able to", yo_present: "puedo", yo_preterite: "pude", yo_imperfect: "podía", tu_present: "puedes", tu_preterite: "pudiste", tu_imperfect: "podías", el_present: "puede", el_preterite: "pudo", el_imperfect: "podía", nosotros_present: "podemos", nosotros_preterite: "pudimos", nosotros_imperfect: "podíamos", ellos_present: "pueden", ellos_preterite: "pudieron", ellos_imperfect: "podían" },
+      poner: { infinitive: "poner", english_meaning: "to put / place", yo_present: "pongo", yo_preterite: "puse", yo_imperfect: "ponía", tu_present: "pones", tu_preterite: "pusiste", tu_imperfect: "ponías", el_present: "pone", el_preterite: "puso", el_imperfect: "ponía", nosotros_present: "ponemos", nosotros_preterite: "pusimos", nosotros_imperfect: "poníamos", ellos_present: "ponen", ellos_preterite: "pusieron", ellos_imperfect: "ponían" },
+      hacer: { infinitive: "hacer", english_meaning: "to do / make", yo_present: "hago", yo_preterite: "hice", yo_imperfect: "hacía", tu_present: "haces", tu_preterite: "hiciste", tu_imperfect: "hacías", el_present: "hace", el_preterite: "hizo", el_imperfect: "hacía", nosotros_present: "hacemos", nosotros_preterite: "hicimos", nosotros_imperfect: "hacíamos", ellos_present: "hacen", ellos_preterite: "hicieron", ellos_imperfect: "hacían" },
+      ir: { infinitive: "ir", english_meaning: "to go", yo_present: "voy", yo_preterite: "fui", yo_imperfect: "iba", tu_present: "vas", tu_preterite: "fuiste", tu_imperfect: "ibas", el_present: "va", el_preterite: "fue", el_imperfect: "iba", nosotros_present: "vamos", nosotros_preterite: "fuimos", nosotros_imperfect: "íbamos", ellos_present: "van", ellos_preterite: "fueron", ellos_imperfect: "iban" },
+      compartir: { infinitive: "compartir", english_meaning: "to share", yo_present: "comparto", yo_preterite: "compartí", yo_imperfect: "compartía", tu_present: "compartes", tu_preterite: "compartiste", tu_imperfect: "compartías", el_present: "comparte", el_preterite: "compartió", el_imperfect: "compartía", nosotros_present: "compartimos", nosotros_preterite: "compartimos", nosotros_imperfect: "compartíamos", ellos_present: "comparten", ellos_preterite: "compartieron", ellos_imperfect: "compartían" }
     };
 
     const GUIDED_ROLEPLAYS = {
       kitchen: [
-        {
-          ai_es: "¡Hola! Buenas tardes. Queremos renovar nuestra cocina pero no sabemos por dónde empezar.",
-          ai_en: "Hello! Good afternoon. We want to renovate our kitchen but don't know where to start.",
-          user_es: "¡Buenas tardes! ¿En qué le puedo ayudar hoy con el diseño de su cocina?",
-          user_en: "Good afternoon! How can I help you today with your kitchen design?"
-        },
-        {
-          ai_es: "Tenemos una pared de tres metros y queremos gabinetes blancos con muchos cajones.",
-          ai_en: "We have a three-meter wall and we want white cabinets with lots of drawers.",
-          user_es: "Perfecto, eso es exactamente lo que podemos planear en el sistema.",
-          user_en: "Perfect, that is exactly what we can plan in the system."
-        },
-        {
-          ai_es: "¿Cuánto tiempo tarda la entrega de los gabinetes y la encimera?",
-          ai_en: "How long does the delivery of the cabinets and countertop take?",
-          user_es: "Además de revisar el inventario, ¿me podría confirmar su dirección?",
-          user_en: "Besides checking the inventory, could you confirm your address for me?"
-        },
-        {
-          ai_es: "Sí, claro. Aquí tiene mi código postal y las medidas exactas.",
-          ai_en: "Yes, of course. Here is my zip code and the exact measurements.",
-          user_es: "Excelente, su pedido está listo para programar la entrega.",
-          user_en: "Excellent, your order is ready to schedule the delivery."
-        }
+        { ai_es: "¡Hola! Buenas tardes. Queremos renovar nuestra cocina pero no sabemos por dónde empezar.", ai_en: "Hello! Good afternoon. We want to renovate our kitchen but don't know where to start.", user_es: "¡Buenas tardes! ¿En qué le puedo ayudar hoy con el diseño de su cocina?", user_en: "Good afternoon! How can I help you today with your kitchen design?" },
+        { ai_es: "Tenemos una pared de tres metros y queremos gabinetes blancos con muchos cajones.", ai_en: "We have a three-meter wall and we want white cabinets with lots of drawers.", user_es: "Perfecto, eso es exactamente lo que podemos planear en el sistema.", user_en: "Perfect, that is exactly what we can plan in the system." },
+        { ai_es: "¿Cuánto tiempo tarda la entrega de los gabinetes y la encimera?", ai_en: "How long does the delivery of the cabinets and countertop take?", user_es: "Además de revisar el inventario, ¿me podría confirmar su dirección?", user_en: "Besides checking the inventory, could you confirm your address for me?" },
+        { ai_es: "Sí, claro. Aquí tiene mi código postal y las medidas exactas.", ai_en: "Yes, of course. Here is my zip code and the exact measurements.", user_es: "Excelente, su pedido está listo para programar la entrega.", user_en: "Excellent, your order is ready to schedule the delivery." }
       ],
       order: [
-        {
-          ai_es: "Hola, vengo a recoger unos artículos para mi casa.",
-          ai_en: "Hi, I'm coming to pick up some items for my house.",
-          user_es: "¡Bienvenido! Para buscarlo ahora mismo, ¿cuál es su número de pedido?",
-          user_en: "Welcome! To look it up right now, what is your order number?"
-        },
-        {
-          ai_es: "Aquí lo tengo en mi teléfono, termina en cuatro-ocho-dos.",
-          ai_en: "I have it here on my phone, it ends in 4-8-2.",
-          user_es: "Muchas gracias, acabo de verificarlo y su pedido está listo.",
-          user_en: "Thank you very much, I just verified it and your order is ready."
-        },
-        {
-          ai_es: "¡Qué rápido! ¿Necesita que firme algo?",
-          ai_en: "How fast! Do you need me to sign anything?",
-          user_es: "Solo firme aquí por favor y que tenga un excelente día.",
-          user_en: "Just sign here please and have an excellent day."
-        }
+        { ai_es: "Hola, vengo a recoger unos artículos para mi casa.", ai_en: "Hi, I'm coming to pick up some items for my house.", user_es: "¡Bienvenido! Para buscarlo ahora mismo, ¿cuál es su número de pedido?", user_en: "Welcome! To look it up right now, what is your order number?" },
+        { ai_es: "Aquí lo tengo en mi teléfono, termina en cuatro-ocho-dos.", ai_en: "I have it here on my phone, it ends in 4-8-2.", user_es: "Muchas gracias, acabo de verificarlo y su pedido está listo.", user_en: "Thank you very much, I just verified it and your order is ready." },
+        { ai_es: "¡Qué rápido! ¿Necesita que firme algo?", ai_en: "How fast! Do you need me to sign anything?", user_es: "Solo firme aquí por favor y que tenga un excelente día.", user_en: "Just sign here please and have an excellent day." }
       ],
       bistro: [
-        {
-          ai_es: "¡Bonsoir y bienvenidos al bistró! ¿Tienen una reservación para esta tarde?",
-          ai_en: "Good evening and welcome to the bistro! Do you have a reservation for this evening?",
-          user_es: "Sí, tenemos una reservación para dos personas a las cinco y media.",
-          user_en: "Yes, we have a reservation for two people at 5:30."
-        },
-        {
-          ai_es: "Excelente, pasen por aquí. ¿Les gustaría empezar con algo de beber?",
-          ai_en: "Excellent, come this way. Would you like to start with something to drink?",
-          user_es: "Para empezar, queremos dos bebidas sin alcohol y ver el menú de mariscos.",
-          user_en: "To start, we want two non-alcoholic drinks and to see the seafood menu."
-        },
-        {
-          ai_es: "¡Por supuesto! Nuestro salmón con verduras está delicioso hoy.",
-          ai_en: "Of course! Our salmon with vegetables is delicious today.",
-          user_es: "Eso es exactamente lo que vamos a pedir, muchas gracias.",
-          user_en: "That is exactly what we are going to order, thank you very much."
-        }
+        { ai_es: "¡Bienvenidos al bistró! ¿Tienen una reservación para esta tarde?", ai_en: "Welcome to the bistro! Do you have a reservation for this evening?", user_es: "Sí, tenemos una reservación para dos personas a las cinco y media.", user_en: "Yes, we have a reservation for two people at 5:30." },
+        { ai_es: "Excelente, pasen por aquí. ¿Les gustaría empezar con algo de beber?", ai_en: "Excellent, come this way. Would you like to start with something to drink?", user_es: "Para empezar, queremos dos bebidas sin alcohol y ver el menú de mariscos.", user_en: "To start, we want two non-alcoholic drinks and to see the seafood menu." },
+        { ai_es: "¡Por supuesto! Nuestro salmón con verduras está delicioso hoy.", ai_en: "Of course! Our salmon with vegetables is delicious today.", user_es: "Eso es exactamente lo que vamos a pedir, muchas gracias.", user_en: "That is exactly what we are going to order, thank you very much." }
       ]
     };
 
-    /**************************************************************
-     * 2. TAB NAVIGATION & INITIALIZATION
-     **************************************************************/
+    /* 2. TAB NAVIGATION & STORAGE HELPERS */
     function switchTab(tabId) {
-      document.querySelectorAll(".tab-btn").forEach((b) => {
-        b.classList.toggle("active", b.dataset.tab === tabId);
-      });
-      document.querySelectorAll(".tab-panel").forEach((p) => {
-        p.classList.toggle("active", p.id === tabId);
-      });
+      document.querySelectorAll(".tab-btn").forEach((b) => b.classList.toggle("active", b.dataset.tab === tabId));
+      document.querySelectorAll(".tab-panel").forEach((p) => p.classList.toggle("active", p.id === tabId));
     }
+    document.querySelectorAll(".tab-btn").forEach((btn) => btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
 
-    document.querySelectorAll(".tab-btn").forEach((btn) => {
-      btn.addEventListener("click", () => switchTab(btn.dataset.tab));
-    });
-
-    /**************************************************************
-     * 3. API KEY & PERSISTENT DECK STORAGE
-     **************************************************************/
     const apiKeyInput = document.getElementById("api-key-input");
     const btnSaveKey = document.getElementById("btn-save-key");
 
@@ -951,13 +479,11 @@
       }
       return localStorage.getItem("VOZZI_API_KEY") || "";
     }
-
-    const initialKey = getStoredApiKey();
-    if (initialKey) apiKeyInput.value = initialKey;
+    if (getStoredApiKey()) apiKeyInput.value = getStoredApiKey();
 
     btnSaveKey.addEventListener("click", () => {
       const val = apiKeyInput.value.trim();
-      if (!val) return alert("Please paste a valid Google AI Studio API Key starting with AIza...");
+      if (!val) return alert("Please paste your Google AI Studio API Key.");
       localStorage.setItem("VOZZI_API_KEY", val);
       localStorage.setItem("GEMINI_API_KEY", val);
       btnSaveKey.textContent = "Saved ✓";
@@ -965,17 +491,12 @@
     });
 
     function getDeck() {
-      const raw = localStorage.getItem("VOZZI_FLASHCARDS_V5");
-      if (!raw) {
-        localStorage.setItem("VOZZI_FLASHCARDS_V5", JSON.stringify(DEFAULT_FLASHCARDS));
-        return [...DEFAULT_FLASHCARDS];
-      }
       try {
-        const parsed = JSON.parse(raw);
-        return parsed.length > 0 ? parsed : [...DEFAULT_FLASHCARDS];
-      } catch (_) {
-        return [...DEFAULT_FLASHCARDS];
-      }
+        const parsed = JSON.parse(localStorage.getItem("VOZZI_FLASHCARDS_V5") || "[]");
+        if (parsed.length > 0) return parsed;
+      } catch (_) {}
+      localStorage.setItem("VOZZI_FLASHCARDS_V5", JSON.stringify(DEFAULT_FLASHCARDS));
+      return [...DEFAULT_FLASHCARDS];
     }
 
     function saveCardToDeck(card) {
@@ -983,270 +504,161 @@
       deck.unshift({
         spanish_term: card.spanish_term,
         english_meaning: card.english_meaning,
-        example_sentence: card.example_sentence || "",
+        example_sentence: card.example_sentence || card.spanish_term,
         category: card.category || "Camera Object"
       });
       localStorage.setItem("VOZZI_FLASHCARDS_V5", JSON.stringify(deck));
       refreshAllCardViews();
     }
 
-    /**************************************************************
-     * 4. SPEECH SYNTHESIS (TTS) & 90% ACCURACY SPEECH GATE
-     **************************************************************/
-    function speakSpanishTTS(text, onEndCallback) {
-      if (!("speechSynthesis" in window)) {
-        if (onEndCallback) onEndCallback();
-        return;
-      }
+    /* 3. NATIVE TTS & 90% ACCURACY SPEECH GATE */
+    function speakSpanishTTS(text, onEnd) {
+      if (!("speechSynthesis" in window)) { if (onEnd) onEnd(); return; }
       window.speechSynthesis.cancel();
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = "es-MX";
-      utter.rate = 0.96;
-      const voices = window.speechSynthesis.getVoices();
-      const esVoice = voices.find((v) => v.lang.includes("es-MX") || v.lang.includes("es-US") || v.lang.startsWith("es"));
-      if (esVoice) utter.voice = esVoice;
-      if (onEndCallback) utter.onend = onEndCallback;
-      window.speechSynthesis.speak(utter);
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "es-MX";
+      u.rate = 0.96;
+      const v = window.speechSynthesis.getVoices().find((x) => x.lang.includes("es-MX") || x.lang.includes("es-US") || x.lang.startsWith("es"));
+      if (v) u.voice = v;
+      if (onEnd) u.onend = onEnd;
+      window.speechSynthesis.speak(u);
     }
 
-    function normalizeText(str) {
-      return (str || "")
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[¿?¡!.,;:"]/g, "")
-        .trim();
+    function normalizeText(s) {
+      return (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[¿?¡!.,;:"]/g, "").trim();
     }
 
     function calculateSimilarityPercent(spoken, target) {
-      const a = normalizeText(spoken);
-      const b = normalizeText(target);
+      const a = normalizeText(spoken), b = normalizeText(target);
       if (!a || !b) return 0;
       if (a === b) return 100;
-
-      // Levenshtein distance
-      const matrix = Array.from({ length: a.length + 1 }, () => Array(b.length + 1).fill(0));
-      for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
-      for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
+      const m = Array.from({ length: a.length + 1 }, () => Array(b.length + 1).fill(0));
+      for (let i = 0; i <= a.length; i++) m[i][0] = i;
+      for (let j = 0; j <= b.length; j++) m[0][j] = j;
       for (let i = 1; i <= a.length; i++) {
         for (let j = 1; j <= b.length; j++) {
-          const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-          matrix[i][j] = Math.min(
-            matrix[i - 1][j] + 1,
-            matrix[i][j - 1] + 1,
-            matrix[i - 1][j - 1] + cost
-          );
+          m[i][j] = Math.min(m[i - 1][j] + 1, m[i][j - 1] + 1, m[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
         }
       }
-      const distance = matrix[a.length][b.length];
       const maxLen = Math.max(a.length, b.length);
-      return Math.max(0, Math.round(((maxLen - distance) / maxLen) * 100));
+      return Math.max(0, Math.round(((maxLen - m[a.length][b.length]) / maxLen) * 100));
     }
 
     function listenOnceForAccuracy(targetSpanish, onResult) {
-      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRec) {
-        alert("Speech recognition requires Chrome, Edge, or Safari.");
-        return;
-      }
-      const rec = new SpeechRec();
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) return alert("Speech recognition requires Chrome, Edge, or Safari.");
+      const rec = new SR();
       rec.lang = "es-MX";
       rec.interimResults = false;
-      rec.maxAlternatives = 1;
-
       rec.onresult = (e) => {
         const spoken = e.results[0][0].transcript;
         const pct = calculateSimilarityPercent(spoken, targetSpanish);
         onResult({ spoken, pct, passed: pct >= 90 });
       };
-      rec.onerror = (err) => {
-        onResult({ spoken: "", pct: 0, passed: false, error: err.error });
-      };
+      rec.onerror = (err) => onResult({ spoken: "", pct: 0, passed: false, error: err.error });
       rec.start();
     }
 
-    /**************************************************************
-     * 5. TAB 2: PROGRESSIVE FADING DRILLS LOGIC
-     **************************************************************/
-    let drillIndex = 0;
-    let drillFadeStage = 1; // 1 = Full, 2 = 50% Cloze, 3 = Blank Recall
-
+    /* 4. PROGRESSIVE FADING DRILLS & 3D FLASHCARD STUDIO */
+    let drillIndex = 0, drillFadeStage = 1, studioIndex = 0;
     const drillLevelSelect = document.getElementById("drill-level-select");
-    const drillCategoryBadge = document.getElementById("drill-category-badge");
-    const drillFadeBadge = document.getElementById("drill-fade-badge");
-    const drillProgressBadge = document.getElementById("drill-progress-badge");
-    const drillSpanishDisplay = document.getElementById("drill-spanish-display");
-    const drillEnglishDisplay = document.getElementById("drill-english-display");
-    const drillAccuracyBar = document.getElementById("drill-accuracy-bar");
-    const drillFeedbackText = document.getElementById("drill-feedback-text");
+    const studioCatFilter = document.getElementById("studio-category-filter");
+    const fcStage = document.getElementById("flashcard-3d");
+
+    fcStage.addEventListener("click", () => fcStage.classList.toggle("flipped"));
 
     function getFilteredDrills() {
-      const deck = getDeck();
-      const lvl = drillLevelSelect.value;
-      return lvl === "ALL" ? deck : deck.filter((c) => c.category === lvl);
-    }
-
-    function applyProgressiveFade(sentence, stage) {
-      if (stage === 1) return sentence;
-      const words = sentence.split(" ");
-      if (stage === 2) {
-        return words.map((w, idx) => (idx % 2 === 1 ? "____" : w)).join(" ");
-      }
-      return words.map((w) => "____").join(" ");
+      const d = getDeck(), lvl = drillLevelSelect.value;
+      return lvl === "ALL" ? d : d.filter((c) => c.category === lvl);
     }
 
     function renderCurrentDrill() {
       const list = getFilteredDrills();
-      if (list.length === 0) return;
+      if (!list.length) return;
       if (drillIndex >= list.length) drillIndex = 0;
       const item = list[drillIndex];
-      const targetSentence = item.example_sentence || item.spanish_term;
+      const sent = item.example_sentence || item.spanish_term;
+      const words = sent.split(" ");
+      const faded = drillFadeStage === 1 ? sent : drillFadeStage === 2 ? words.map((w, i) => (i % 2 === 1 ? "____" : w)).join(" ") : words.map(() => "____").join(" ");
 
-      drillCategoryBadge.textContent = item.category;
-      drillFadeBadge.textContent =
-        drillFadeStage === 1 ? "Stage 1/3: Full Text" :
-        drillFadeStage === 2 ? "Stage 2/3: 50% Faded" : "Stage 3/3: Blind Recall";
-      drillProgressBadge.textContent = `Drill ${drillIndex + 1} of ${list.length}`;
-
-      drillSpanishDisplay.textContent = applyProgressiveFade(targetSentence, drillFadeStage);
-      drillEnglishDisplay.textContent = `${item.spanish_term} — "${item.english_meaning}"`;
+      document.getElementById("drill-category-badge").textContent = item.category;
+      document.getElementById("drill-fade-badge").textContent = `Stage ${drillFadeStage}/3`;
+      document.getElementById("drill-progress-badge").textContent = `Drill ${drillIndex + 1} of ${list.length}`;
+      document.getElementById("drill-spanish-display").textContent = faded;
+      document.getElementById("drill-english-display").textContent = `${item.spanish_term} — "${item.english_meaning}"`;
     }
 
-    drillLevelSelect.addEventListener("change", () => {
-      drillIndex = 0;
-      drillFadeStage = 1;
-      renderCurrentDrill();
-    });
-
+    drillLevelSelect.addEventListener("change", () => { drillIndex = 0; drillFadeStage = 1; renderCurrentDrill(); });
     document.getElementById("btn-drill-listen").addEventListener("click", () => {
       const list = getFilteredDrills();
-      if (!list.length) return;
-      const item = list[drillIndex];
-      speakSpanishTTS(item.example_sentence || item.spanish_term);
+      if (list.length) speakSpanishTTS(list[drillIndex].example_sentence || list[drillIndex].spanish_term);
     });
-
-    document.getElementById("btn-drill-fade").addEventListener("click", () => {
-      drillFadeStage = drillFadeStage === 3 ? 1 : drillFadeStage + 1;
-      renderCurrentDrill();
-    });
-
-    document.getElementById("btn-drill-next").addEventListener("click", () => {
-      drillIndex++;
-      drillFadeStage = 1;
-      drillAccuracyBar.style.width = "0%";
-      renderCurrentDrill();
-    });
-
+    document.getElementById("btn-drill-fade").addEventListener("click", () => { drillFadeStage = drillFadeStage === 3 ? 1 : drillFadeStage + 1; renderCurrentDrill(); });
+    document.getElementById("btn-drill-next").addEventListener("click", () => { drillIndex++; drillFadeStage = 1; renderCurrentDrill(); });
     document.getElementById("btn-drill-speak").addEventListener("click", () => {
       const list = getFilteredDrills();
       if (!list.length) return;
-      const item = list[drillIndex];
-      const target = item.example_sentence || item.spanish_term;
-
-      drillFeedbackText.innerHTML = `<span style="color:#38bdf8;">🎙️ Listening... Speak the Spanish sentence clearly!</span>`;
+      const target = list[drillIndex].example_sentence || list[drillIndex].spanish_term;
+      const fb = document.getElementById("drill-feedback-text");
+      fb.innerHTML = `<span style="color:#38bdf8;">🎙️ Listening...</span>`;
       listenOnceForAccuracy(target, ({ spoken, pct, passed, error }) => {
-        if (error) {
-          drillFeedbackText.textContent = `Mic status: ${error}. Tap Speak Drill to try again.`;
-          return;
-        }
-        drillAccuracyBar.style.width = `${pct}%`;
-        drillAccuracyBar.style.background = passed ? "var(--success)" : "var(--warning)";
-
+        if (error) { fb.textContent = `Mic status: ${error}. Try again.`; return; }
+        const bar = document.getElementById("drill-accuracy-bar");
+        bar.style.width = `${pct}%`;
+        bar.style.background = passed ? "var(--success)" : "var(--warning)";
         if (passed) {
-          drillFeedbackText.innerHTML = `✅ <strong>${pct}% Accuracy!</strong> You said: <em>"${spoken}"</em> — Gate Passed! Advancing...`;
-          setTimeout(() => {
-            if (drillFadeStage < 3) {
-              drillFadeStage++;
-            } else {
-              drillFadeStage = 1;
-              drillIndex++;
-            }
-            renderCurrentDrill();
-          }, 1100);
+          fb.innerHTML = `✅ <strong>${pct}% Accuracy!</strong> "${spoken}" — Advancing...`;
+          setTimeout(() => { if (drillFadeStage < 3) drillFadeStage++; else { drillFadeStage = 1; drillIndex++; } renderCurrentDrill(); }, 1000);
         } else {
-          drillFeedbackText.innerHTML = `⚠️ <strong>${pct}% Accuracy</strong> (Need 90%+). You said: <em>"${spoken}"</em>. Try again!`;
+          fb.innerHTML = `⚠️ <strong>${pct}%</strong> (Need 90%+). You said: "${spoken}". Try again!`;
         }
       });
     });
 
-    /**************************************************************
-     * 6. TAB 3: 3D FLASHCARD STUDIO LOGIC
-     **************************************************************/
-    let studioIndex = 0;
-    const fcStage = document.getElementById("flashcard-3d");
-    const studioCatFilter = document.getElementById("studio-category-filter");
-
-    fcStage.addEventListener("click", () => fcStage.classList.toggle("flipped"));
-
     function getStudioList() {
-      const deck = getDeck();
-      const cat = studioCatFilter.value;
-      return cat === "ALL" ? deck : deck.filter((c) => c.category === cat);
+      const d = getDeck(), c = studioCatFilter.value;
+      return c === "ALL" ? d : d.filter((x) => x.category === c);
     }
 
     function refreshAllCardViews() {
       const deck = getDeck();
       document.getElementById("studio-total-count").textContent = deck.length;
       document.getElementById("live-card-count").textContent = deck.length;
-
-      // Render Live Preview
-      const previewEl = document.getElementById("live-flashcards-preview");
-      previewEl.innerHTML = "";
+      const prev = document.getElementById("live-flashcards-preview");
+      prev.innerHTML = "";
       deck.slice(0, 8).forEach((c) => {
         const d = document.createElement("div");
         d.className = "item-box";
         d.innerHTML = `<strong>${c.spanish_term}</strong> — ${c.english_meaning}<small>"${c.example_sentence || ""}"</small>`;
-        previewEl.appendChild(d);
+        prev.appendChild(d);
       });
 
-      // Render 3D Card
       const list = getStudioList();
-      if (!list.length) return;
-      if (studioIndex >= list.length) studioIndex = 0;
-      const card = list[studioIndex];
-      fcStage.classList.remove("flipped");
-      document.getElementById("fc-front-cat").textContent = `${card.category || "Vocab"} (${studioIndex + 1}/${list.length})`;
-      document.getElementById("fc-front-term").textContent = card.spanish_term;
-      document.getElementById("fc-front-ex").textContent = `"${card.example_sentence || ""}"`;
-      document.getElementById("fc-back-meaning").textContent = card.english_meaning;
-      document.getElementById("fc-back-ex").textContent = `"${card.example_sentence || ""}"`;
-
+      if (list.length) {
+        if (studioIndex >= list.length) studioIndex = 0;
+        const card = list[studioIndex];
+        fcStage.classList.remove("flipped");
+        document.getElementById("fc-front-cat").textContent = `${card.category} (${studioIndex + 1}/${list.length})`;
+        document.getElementById("fc-front-term").textContent = card.spanish_term;
+        document.getElementById("fc-front-ex").textContent = `"${card.example_sentence || ""}"`;
+        document.getElementById("fc-back-meaning").textContent = card.english_meaning;
+        document.getElementById("fc-back-ex").textContent = `"${card.example_sentence || ""}"`;
+      }
       renderCurrentDrill();
     }
 
-    studioCatFilter.addEventListener("change", () => {
-      studioIndex = 0;
-      refreshAllCardViews();
-    });
-
-    document.getElementById("btn-fc-prev").addEventListener("click", () => {
-      const list = getStudioList();
-      studioIndex = (studioIndex - 1 + list.length) % list.length;
-      refreshAllCardViews();
-    });
-
-    document.getElementById("btn-fc-next").addEventListener("click", () => {
-      const list = getStudioList();
-      studioIndex = (studioIndex + 1) % list.length;
-      refreshAllCardViews();
-    });
-
-    document.getElementById("btn-fc-tts").addEventListener("click", () => {
-      const list = getStudioList();
-      if (!list.length) return;
-      speakSpanishTTS(list[studioIndex].spanish_term);
-    });
-
+    studioCatFilter.addEventListener("change", () => { studioIndex = 0; refreshAllCardViews(); });
+    document.getElementById("btn-fc-prev").addEventListener("click", () => { const l = getStudioList(); studioIndex = (studioIndex - 1 + l.length) % l.length; refreshAllCardViews(); });
+    document.getElementById("btn-fc-next").addEventListener("click", () => { const l = getStudioList(); studioIndex = (studioIndex + 1) % l.length; refreshAllCardViews(); });
+    document.getElementById("btn-fc-tts").addEventListener("click", () => { const l = getStudioList(); if (l.length) speakSpanishTTS(l[studioIndex].spanish_term); });
     document.getElementById("btn-fc-voice").addEventListener("click", () => {
-      const list = getStudioList();
-      if (!list.length) return;
-      const target = list[studioIndex].spanish_term;
+      const l = getStudioList();
+      if (!l.length) return;
+      const target = l[studioIndex].spanish_term;
       const resEl = document.getElementById("fc-voice-result");
-      resEl.innerHTML = `<span style="color:#38bdf8;">🎙️ Say "${target}" now...</span>`;
+      resEl.innerHTML = `<span style="color:#38bdf8;">🎙️ Say "${target}"...</span>`;
       listenOnceForAccuracy(target, ({ spoken, pct, passed }) => {
-        resEl.innerHTML = passed
-          ? `✅ <strong>${pct}%!</strong> "${spoken}" — Spot on!`
-          : `⚠️ <strong>${pct}%</strong> (You said "${spoken}"). Tap 🔊 Pronounce and try again!`;
+        resEl.innerHTML = passed ? `✅ <strong>${pct}%!</strong> "${spoken}"` : `⚠️ <strong>${pct}%</strong> (You said "${spoken}"). Try again!`;
       });
     });
 
@@ -1256,31 +668,23 @@
       const ex = document.getElementById("new-fc-ex").value.trim();
       const cat = document.getElementById("new-fc-cat").value;
       if (!es || !en) return alert("Enter both Spanish and English!");
-      saveCardToDeck({ spanish_term: es, english_meaning: en, example_sentence: ex, category: cat });
+      saveCardToDeck({ spanish_term: es, english_meaning: en, example_sentence: ex || es, category: cat });
       document.getElementById("new-fc-es").value = "";
       document.getElementById("new-fc-en").value = "";
       document.getElementById("new-fc-ex").value = "";
     });
 
     document.getElementById("btn-reset-default-deck").addEventListener("click", () => {
-      if (confirm("Restore the full default Speak Pro Ultra + Vozzi deck?")) {
+      if (confirm("Restore default curriculum flashcards?")) {
         localStorage.setItem("VOZZI_FLASHCARDS_V5", JSON.stringify(DEFAULT_FLASHCARDS));
         refreshAllCardViews();
       }
     });
 
-    /**************************************************************
-     * 7. TAB 4: MULTI-TURN GUIDED ROLEPLAY STATE MACHINE
-     **************************************************************/
-    let rpScenarioKey = "kitchen";
-    let rpTurnIndex = 0;
-
+    /* 5. GUIDED ROLEPLAY, VERB CUPS, MATRIX, & EXPORT HUB */
+    let rpScenarioKey = "kitchen", rpTurnIndex = 0;
     const rpScenarioSelect = document.getElementById("rp-scenario-select");
     const rpChatHistory = document.getElementById("rp-chat-history");
-    const rpTurnNum = document.getElementById("rp-turn-num");
-    const rpTargetEs = document.getElementById("rp-target-es");
-    const rpTargetEn = document.getElementById("rp-target-en");
-    const rpGateStatus = document.getElementById("rp-gate-status");
 
     function initGuidedRoleplay() {
       rpScenarioKey = rpScenarioSelect.value;
@@ -1292,188 +696,133 @@
     function loadGuidedRoleplayTurn() {
       const turns = GUIDED_ROLEPLAYS[rpScenarioKey];
       if (rpTurnIndex >= turns.length) {
-        rpTargetEs.textContent = "🎉 ¡Escena completada con éxito!";
-        rpTargetEn.textContent = "You completed every turn of this roleplay!";
-        rpGateStatus.innerHTML = `<span style="color:var(--success);">Click Restart Scene or choose another scenario above.</span>`;
+        document.getElementById("rp-target-es").textContent = "🎉 ¡Escena completada con éxito!";
+        document.getElementById("rp-target-en").textContent = "You finished every turn!";
         return;
       }
-
-      const current = turns[rpTurnIndex];
-      rpTurnNum.textContent = `${rpTurnIndex + 1} of ${turns.length}`;
-      rpTargetEs.textContent = current.user_es;
-      rpTargetEn.textContent = `"${current.user_en}"`;
-
+      const cur = turns[rpTurnIndex];
+      document.getElementById("rp-turn-num").textContent = `${rpTurnIndex + 1}/${turns.length}`;
+      document.getElementById("rp-target-es").textContent = cur.user_es;
+      document.getElementById("rp-target-en").textContent = `"${cur.user_en}"`;
       const aiMsg = document.createElement("div");
       aiMsg.className = "item-box";
-      aiMsg.innerHTML = `<strong>🧑🏽‍💼 Customer / Partner:</strong> ${current.ai_es}<small>${current.ai_en}</small>`;
+      aiMsg.innerHTML = `<strong>🧑🏽‍💼 Partner:</strong> ${cur.ai_es}<small>${cur.ai_en}</small>`;
       rpChatHistory.appendChild(aiMsg);
       rpChatHistory.scrollTop = rpChatHistory.scrollHeight;
-      speakSpanishTTS(current.ai_es);
+      speakSpanishTTS(cur.ai_es);
+    }
+
+    function advanceGuidedRoleplay(spoken, pct) {
+      const turns = GUIDED_ROLEPLAYS[rpScenarioKey];
+      if (rpTurnIndex >= turns.length) return;
+      const uMsg = document.createElement("div");
+      uMsg.className = "item-box transcript";
+      uMsg.innerHTML = `<strong>🗣️ You (${pct}%):</strong> ${spoken || turns[rpTurnIndex].user_es}`;
+      rpChatHistory.appendChild(uMsg);
+      rpTurnIndex++;
+      setTimeout(loadGuidedRoleplayTurn, 500);
     }
 
     rpScenarioSelect.addEventListener("change", initGuidedRoleplay);
     document.getElementById("btn-rp-restart").addEventListener("click", initGuidedRoleplay);
-
+    document.getElementById("btn-rp-advance").addEventListener("click", () => advanceGuidedRoleplay(null, 100));
     document.getElementById("btn-rp-listen").addEventListener("click", () => {
       const turns = GUIDED_ROLEPLAYS[rpScenarioKey];
       if (rpTurnIndex < turns.length) speakSpanishTTS(turns[rpTurnIndex].user_es);
     });
-
-    function advanceGuidedRoleplay(userSpokenText, accuracyPct) {
-      const turns = GUIDED_ROLEPLAYS[rpScenarioKey];
-      if (rpTurnIndex >= turns.length) return;
-      const current = turns[rpTurnIndex];
-
-      const userMsg = document.createElement("div");
-      userMsg.className = "item-box transcript";
-      userMsg.innerHTML = `<strong>🗣️ You (${accuracyPct}%):</strong> ${userSpokenText || current.user_es}`;
-      rpChatHistory.appendChild(userMsg);
-      rpChatHistory.scrollTop = rpChatHistory.scrollHeight;
-
-      rpTurnIndex++;
-      setTimeout(loadGuidedRoleplayTurn, 600);
-    }
-
-    document.getElementById("btn-rp-advance").addEventListener("click", () => {
-      advanceGuidedRoleplay(null, 100);
-    });
-
     document.getElementById("btn-rp-speak").addEventListener("click", () => {
       const turns = GUIDED_ROLEPLAYS[rpScenarioKey];
       if (rpTurnIndex >= turns.length) return;
-      const target = turns[rpTurnIndex].user_es;
-      rpGateStatus.innerHTML = `<span style="color:#38bdf8;">🎙️ Listening for your turn...</span>`;
-
-      listenOnceForAccuracy(target, ({ spoken, pct, passed }) => {
+      const status = document.getElementById("rp-gate-status");
+      status.innerHTML = `<span style="color:#38bdf8;">🎙️ Listening...</span>`;
+      listenOnceForAccuracy(turns[rpTurnIndex].user_es, ({ spoken, pct, passed }) => {
         if (passed) {
-          rpGateStatus.innerHTML = `✅ <strong>${pct}% Accuracy!</strong> Advancing automatically to Turn ${rpTurnIndex + 2}...`;
+          status.innerHTML = `✅ <strong>${pct}%!</strong> Advancing...`;
           advanceGuidedRoleplay(spoken, pct);
         } else {
-          rpGateStatus.innerHTML = `⚠️ <strong>${pct}% Accuracy</strong> (You said: "${spoken}"). Hit 90%+ or click Next Turn →`;
+          status.innerHTML = `⚠️ <strong>${pct}%</strong> (Said: "${spoken}"). Try again or click Next Turn →`;
         }
       });
     });
 
-    /**************************************************************
-     * 8. TAB 5: TONY MARSH VERB CUPS & CONJUGATION MATRIX
-     **************************************************************/
-    const cup1 = document.getElementById("cup-1");
-    const cup2 = document.getElementById("cup-2");
-    const cup3 = document.getElementById("cup-3");
-    const cupOutput = document.getElementById("cup-sentence-output");
-
-    function updateCupSentence() {
-      const c1 = cup1.value;
-      const c2 = cup2.value.split(" / ")[0];
-      const c3 = cup3.value;
-      cupOutput.textContent = `${c1} ${c2} ${c3}`;
-    }
-
-    [cup1, cup2, cup3].forEach((sel) => sel.addEventListener("change", updateCupSentence));
-
-    document.getElementById("btn-cup-speak-tts").addEventListener("click", () => {
-      speakSpanishTTS(cupOutput.textContent);
-    });
-
+    const cup1 = document.getElementById("cup-1"), cup2 = document.getElementById("cup-2"), cup3 = document.getElementById("cup-3"), cupOut = document.getElementById("cup-sentence-output");
+    [cup1, cup2, cup3].forEach((s) => s.addEventListener("change", () => { cupOut.textContent = `${cup1.value} ${cup2.value} ${cup3.value}`; }));
+    document.getElementById("btn-cup-speak-tts").addEventListener("click", () => speakSpanishTTS(cupOut.textContent));
     document.getElementById("btn-cup-practice").addEventListener("click", () => {
-      const target = cupOutput.textContent;
-      listenOnceForAccuracy(target, ({ spoken, pct, passed }) => {
-        alert(passed ? `✅ ${pct}% Accuracy!\nYou said: "${spoken}"` : `⚠️ ${pct}% Accuracy.\nYou said: "${spoken}"\nTarget: "${target}"`);
-      });
+      listenOnceForAccuracy(cupOut.textContent, ({ spoken, pct, passed }) => alert(`${passed ? "✅" : "⚠️"} ${pct}% Accuracy!\nYou said: "${spoken}"`));
     });
-
     document.getElementById("btn-cup-save").addEventListener("click", () => {
-      saveCardToDeck({
-        spanish_term: cupOutput.textContent,
-        english_meaning: "Custom Verb Cup Sentence",
-        example_sentence: cupOutput.textContent,
-        category: "Power Verbs"
-      });
-      alert("Saved to Flashcard Studio!");
+      saveCardToDeck({ spanish_term: cupOut.textContent, english_meaning: "Verb Cup Sentence", example_sentence: cupOut.textContent, category: "Power Verbs" });
+      alert("Saved to Flashcards!");
     });
 
     function renderVerbMatrix(v) {
       document.getElementById("verb-title").textContent = `${v.infinitive} (${v.english_meaning})`;
       const rows = [
-        { key: "yo", label: "yo", p: v.yo_present, pret: v.yo_preterite, imp: v.yo_imperfect },
-        { key: "tú", label: "tú", p: v.tu_present, pret: v.tu_preterite, imp: v.tu_imperfect },
-        { key: "él/ella/Ud.", label: "él / ella / Ud.", p: v.el_present, pret: v.el_preterite, imp: v.el_imperfect },
-        { key: "nosotros", label: "nosotros", p: v.nosotros_present, pret: v.nosotros_preterite, imp: v.nosotros_imperfect },
-        { key: "ellos/Uds.", label: "ellos / Uds.", p: v.ellos_present, pret: v.ellos_preterite, imp: v.ellos_imperfect }
+        { k: "yo", l: "yo", p: v.yo_present, pr: v.yo_preterite, im: v.yo_imperfect },
+        { k: "tú", l: "tú", p: v.tu_present, pr: v.tu_preterite, im: v.tu_imperfect },
+        { k: "él", l: "él / ella / Ud.", p: v.el_present, pr: v.el_preterite, im: v.el_imperfect },
+        { k: "nosotros", l: "nosotros", p: v.nosotros_present, pr: v.nosotros_preterite, im: v.nosotros_imperfect },
+        { k: "ellos", l: "ellos / Uds.", p: v.ellos_present, pr: v.ellos_preterite, im: v.ellos_imperfect }
       ];
-      const hp = (v.highlight_pronoun || "").toLowerCase();
-      const ht = (v.highlight_tense || "").toLowerCase();
-
+      const hp = (v.highlight_pronoun || "").toLowerCase(), ht = (v.highlight_tense || "").toLowerCase();
       document.getElementById("verb-tbody").innerHTML = rows.map((r) => {
-        const matchRow = hp && hp.includes(r.key.split("/")[0]);
-        return `
-          <tr>
-            <td><strong>${r.label}</strong></td>
-            <td class="${matchRow && ht === 'present' ? 'highlight' : ''}">${r.p || "-"}</td>
-            <td class="${matchRow && ht === 'preterite' ? 'highlight' : ''}">${r.pret || "-"}</td>
-            <td class="${matchRow && ht === 'imperfect' ? 'highlight' : ''}">${r.imp || "-"}</td>
-          </tr>
-        `;
+        const m = hp && hp.includes(r.k);
+        return `<tr><td><strong>${r.l}</strong></td><td class="${m && ht === 'present' ? 'highlight' : ''}">${r.p || "-"}</td><td class="${m && ht === 'preterite' ? 'highlight' : ''}">${r.pr || "-"}</td><td class="${m && ht === 'imperfect' ? 'highlight' : ''}">${r.im || "-"}</td></tr>`;
       }).join("");
     }
+    document.getElementById("verb-preset-select").addEventListener("change", (e) => { if (VERB_PRESETS[e.target.value]) renderVerbMatrix(VERB_PRESETS[e.target.value]); });
 
-    document.getElementById("verb-preset-select").addEventListener("change", (e) => {
-      const preset = VERB_PRESETS[e.target.value];
-      if (preset) renderVerbMatrix(preset);
-    });
-
-    /**************************************************************
-     * 9. TAB 6: EXPORT & IMPORT HUB
-     **************************************************************/
     document.getElementById("btn-export-json").addEventListener("click", () => {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(getDeck(), null, 2));
       const a = document.createElement("a");
-      a.href = dataStr;
+      a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(getDeck(), null, 2));
       a.download = "vozzi_flashcards.json";
       a.click();
     });
-
     document.getElementById("btn-export-csv").addEventListener("click", () => {
       const rows = [["Spanish", "English", "Example", "Category"]];
-      getDeck().forEach((c) => {
-        rows.push([
-          `"${(c.spanish_term || "").replace(/"/g, '""')}"`,
-          `"${(c.english_meaning || "").replace(/"/g, '""')}"`,
-          `"${(c.example_sentence || "").replace(/"/g, '""')}"`,
-          `"${(c.category || "").replace(/"/g, '""')}"`
-        ]);
-      });
-      const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(rows.map((e) => e.join(",")).join("\n"));
+      getDeck().forEach((c) => rows.push([`"${c.spanish_term}"`, `"${c.english_meaning}"`, `"${c.example_sentence || ""}"`, `"${c.category || ""}"`]));
       const a = document.createElement("a");
-      a.href = csvContent;
+      a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(rows.map((r) => r.join(",")).join("\n"));
       a.download = "vozzi_flashcards.csv";
       a.click();
     });
-
     document.getElementById("btn-import-lines").addEventListener("click", () => {
-      const raw = document.getElementById("import-textarea").value.trim();
-      if (!raw) return;
-      const lines = raw.split("\n");
+      const lines = document.getElementById("import-textarea").value.trim().split("\n");
       let count = 0;
-      lines.forEach((line) => {
-        const parts = line.split("|").map((s) => s.trim());
-        if (parts.length >= 2) {
-          saveCardToDeck({
-            spanish_term: parts[0],
-            english_meaning: parts[1],
-            example_sentence: parts[2] || parts[0],
-            category: "Custom Import"
-          });
-          count++;
-        }
+      lines.forEach((l) => {
+        const p = l.split("|").map((s) => s.trim());
+        if (p.length >= 2) { saveCardToDeck({ spanish_term: p[0], english_meaning: p[1], example_sentence: p[2] || p[0], category: "Level 4: Connectors & Lo Que" }); count++; }
       });
       document.getElementById("import-textarea").value = "";
-      alert(`Imported ${count} new flashcards and drills!`);
+      alert(`Imported ${count} cards!`);
     });
 
-    /**************************************************************
-     * 10. DUAL-ENGINE LIVE TUTOR + 1 FPS CAMERA (NEVER DROPS AT 0.5s)
-     **************************************************************/
+    /* 6. DUAL-ENGINE LIVE TUTOR (WEBSOCKET PCM + AUTOMATIC CONTINUOUS FALLBACK) */
+    const WORKLET_CODE = `
+      class PcmRecorderProcessor extends AudioWorkletProcessor {
+        constructor() { super(); this.buffer = new Int16Array(2048); this.writeIndex = 0; this.ratio = sampleRate / 16000; this.acc = 0; }
+        process(inputs) {
+          const ch = inputs[0]?.[0]; if (!ch) return true;
+          for (let i = 0; i < ch.length; i++) {
+            this.acc += 1;
+            if (this.acc >= this.ratio) {
+              this.acc -= this.ratio;
+              const s = Math.max(-1, Math.min(1, ch[i]));
+              this.buffer[this.writeIndex++] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+              if (this.writeIndex >= this.buffer.length) {
+                const copy = new Int16Array(this.buffer);
+                this.port.postMessage(copy.buffer, [copy.buffer]);
+                this.writeIndex = 0;
+              }
+            }
+          }
+          return true;
+        }
+      }
+      registerProcessor('pcm-recorder-processor', PcmRecorderProcessor);
+    `;
+
     const btnConnect = document.getElementById("btn-connect");
     const btnCamera = document.getElementById("btn-camera");
     const btnFlip = document.getElementById("btn-flip");
@@ -1482,7 +831,6 @@
     const btnToggleBlur = document.getElementById("btn-toggle-blur");
     const textPromptInput = document.getElementById("text-prompt-input");
     const btnSendText = document.getElementById("btn-send-text");
-
     const statusDot = document.getElementById("status-dot");
     const sessionStatus = document.getElementById("session-status");
     const videoWrap = document.getElementById("video-wrap");
@@ -1492,203 +840,224 @@
     const transcriptList = document.getElementById("transcript-list");
     const grammarList = document.getElementById("grammar-list");
     const rpBanner = document.getElementById("roleplay-banner");
-    const rpTitle = document.getElementById("rp-title");
-    const rpAi = document.getElementById("rp-ai");
-    const rpUser = document.getElementById("rp-user");
 
-    let isConnected = false;
-    let blurMode = false;
-    let hybridRecognizer = null;
-    let hybridChatHistory = [];
-    let activeRoleplayState = null;
-
-    let cameraStream = null;
-    let facingMode = "environment";
-    let latestJpegBase64 = null;
-    let cameraInterval = null;
-    const offscreenCanvas = document.createElement("canvas");
-    const ctx = offscreenCanvas.getContext("2d");
+    let isConnected = false, liveMode = "NONE", blurMode = false;
+    let ws = null, audioCtx = null, micStream = null, workletNode = null, nextPlayTime = 0, activeSources = [];
+    let hybridRecognizer = null, hybridChatHistory = [], activeRoleplayState = null;
+    let cameraStream = null, cameraInterval = null, facingMode = "environment", latestJpegBase64 = null;
+    const offscreenCanvas = document.createElement("canvas"), ctx = offscreenCanvas.getContext("2d");
 
     btnToggleBlur.addEventListener("click", () => {
       blurMode = !blurMode;
       btnToggleBlur.textContent = `Blur Mode: ${blurMode ? "ON" : "OFF"}`;
-      document.querySelectorAll("#transcript-list .item-box.transcript").forEach((el) => {
-        el.classList.toggle("blurred", blurMode);
-      });
+      document.querySelectorAll("#transcript-list .item-box.transcript").forEach((el) => el.classList.toggle("blurred", blurMode));
     });
 
     btnConnect.addEventListener("click", async () => {
-      if (isConnected) {
-        stopLiveSession();
-        return;
-      }
-
+      if (isConnected) { stopLiveSession(); return; }
       const apiKey = apiKeyInput.value.trim() || getStoredApiKey();
-      if (!apiKey) {
-        alert("Paste your Google AI Studio API key in the top bar first!");
-        return;
-      }
+      if (!apiKey) return alert("Paste your Google AI Studio API key in the top bar first!");
       localStorage.setItem("VOZZI_API_KEY", apiKey);
 
       isConnected = true;
       statusDot.classList.add("live");
-      sessionStatus.textContent = "Live (Listening...)";
       btnConnect.textContent = "End Session";
       btnConnect.className = "danger";
       btnCamera.disabled = false;
       btnSendText.disabled = false;
+      sessionStatus.textContent = "Connecting Live Audio...";
 
-      startContinuousVoiceEngine();
+      startWebSocketWithFallback(apiKey);
     });
 
-    function startContinuousVoiceEngine() {
-      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRec) {
-        sessionStatus.textContent = "Live (Text + Camera Mode)";
-        return;
-      }
-
-      hybridRecognizer = new SpeechRec();
-      hybridRecognizer.lang = "es-MX";
-      hybridRecognizer.continuous = true;
-      hybridRecognizer.interimResults = false;
-
-      hybridRecognizer.onresult = (event) => {
-        const last = event.results[event.results.length - 1];
-        if (last.isFinal) {
-          const spokenText = last[0].transcript.trim();
-          if (spokenText) {
-            window.speechSynthesis.cancel(); // Instant barge-in!
-            processUserTurnWithGemini(spokenText, false);
-          }
-        }
-      };
-
-      hybridRecognizer.onend = () => {
-        // Keep continuous listening alive so it NEVER drops after 0.5 seconds!
-        if (isConnected && hybridRecognizer) {
-          try { hybridRecognizer.start(); } catch (_) {}
-        }
-      };
-
+    function startWebSocketWithFallback(apiKey) {
+      let setupDone = false;
       try {
-        hybridRecognizer.start();
-      } catch (e) {
-        console.warn("Mic start warning:", e);
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        audioCtx.resume();
+        const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;
+        ws = new WebSocket(wsUrl);
+
+        ws.onopen = () => {
+          ws.send(JSON.stringify({
+            setup: {
+              model: "models/gemini-2.0-flash-live-001",
+              generationConfig: { responseModalities: ["AUDIO"] },
+              systemInstruction: { parts: [{ text: "You are Vozzi, an adaptive Spanish tutor. Speak clear Spanish. If asked to roleplay, stay strictly in character." }] }
+            }
+          }));
+        };
+
+        ws.onmessage = async (ev) => {
+          const raw = ev.data instanceof Blob ? await ev.data.text() : ev.data;
+          const msg = JSON.parse(raw);
+          if (msg.setupComplete !== undefined && !setupDone) {
+            setupDone = true;
+            liveMode = "WS";
+            sessionStatus.textContent = "Live (WebSocket Audio)";
+            await startPcmMicrophone();
+            return;
+          }
+          if (msg.serverContent?.interrupted) {
+            activeSources.forEach((s) => { try { s.stop(); } catch (_) {} });
+            activeSources = [];
+            if (audioCtx) nextPlayTime = audioCtx.currentTime;
+          }
+          const parts = msg.serverContent?.modelTurn?.parts || [];
+          for (const p of parts) {
+            if (p.inlineData?.mimeType?.startsWith("audio/pcm")) playPcmChunk(p.inlineData.data);
+          }
+        };
+
+        ws.onclose = () => {
+          if (isConnected && liveMode !== "HYBRID") {
+            console.log("WebSocket closed early; switching seamlessly to Continuous Hybrid Live Mode.");
+            activateHybridFallback();
+          }
+        };
+        ws.onerror = () => {
+          if (isConnected && liveMode !== "HYBRID") activateHybridFallback();
+        };
+      } catch (_) {
+        activateHybridFallback();
       }
     }
 
-    async function processUserTurnWithGemini(userText, includeCameraFrame) {
+    async function startPcmMicrophone() {
+      try {
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const blob = new Blob([WORKLET_CODE], { type: "application/javascript" });
+        const url = URL.createObjectURL(blob);
+        await audioCtx.audioWorklet.addModule(url);
+        const src = audioCtx.createMediaStreamSource(micStream);
+        workletNode = new AudioWorkletNode(audioCtx, "pcm-recorder-processor");
+        workletNode.port.onmessage = (e) => {
+          if (ws?.readyState === WebSocket.OPEN) {
+            const bytes = new Uint8Array(e.data);
+            let bin = "";
+            for (let i = 0; i < bytes.byteLength; i++) bin += String.fromCharCode(bytes[i]);
+            ws.send(JSON.stringify({ realtimeInput: { mediaChunks: [{ mimeType: "audio/pcm;rate=16000", data: btoa(bin) }] } }));
+          }
+        };
+        src.connect(workletNode);
+      } catch (_) {
+        activateHybridFallback();
+      }
+    }
+
+    function playPcmChunk(b64) {
+      if (!audioCtx) return;
+      const bin = atob(b64), bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      const i16 = new Int16Array(bytes.buffer), f32 = new Float32Array(i16.length);
+      for (let i = 0; i < i16.length; i++) f32[i] = i16[i] / 32768.0;
+      const buf = audioCtx.createBuffer(1, f32.length, 24000);
+      buf.getChannelData(0).set(f32);
+      const src = audioCtx.createBufferSource();
+      src.buffer = buf;
+      src.connect(audioCtx.destination);
+      if (nextPlayTime < audioCtx.currentTime) nextPlayTime = audioCtx.currentTime;
+      src.start(nextPlayTime);
+      nextPlayTime += buf.duration;
+      activeSources.push(src);
+    }
+
+    function activateHybridFallback() {
+      if (!isConnected) return;
+      liveMode = "HYBRID";
+      sessionStatus.textContent = "Live (Continuous Voice)";
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) { sessionStatus.textContent = "Live (Text + Camera Mode)"; return; }
+      hybridRecognizer = new SR();
+      hybridRecognizer.lang = "es-MX";
+      hybridRecognizer.continuous = true;
+      hybridRecognizer.interimResults = false;
+      hybridRecognizer.onresult = (ev) => {
+        const last = ev.results[ev.results.length - 1];
+        if (last.isFinal && last[0].transcript.trim()) {
+          window.speechSynthesis.cancel();
+          processUserTurnWithGemini(last[0].transcript.trim(), false);
+        }
+      };
+      hybridRecognizer.onend = () => {
+        if (isConnected && liveMode === "HYBRID" && hybridRecognizer) {
+          try { hybridRecognizer.start(); } catch (_) {}
+        }
+      };
+      try { hybridRecognizer.start(); } catch (_) {}
+    }
+
+    async function processUserTurnWithGemini(userText, forceImage) {
       if (!isConnected) return;
       const apiKey = apiKeyInput.value.trim() || getStoredApiKey();
       sessionStatus.textContent = "Vozzi is thinking...";
 
-      const systemPrompt = `
-You are Vozzi, an encouraging conversational Spanish tutor.
-${activeRoleplayState ? `CURRENT ACTIVE ROLEPLAY: "${activeRoleplayState.scene_title}" (You are playing: ${activeRoleplayState.ai_persona}, User is playing: ${activeRoleplayState.user_persona}). STAY STRICTLY IN CHARACTER in Spanish!` : ""}
-
-Respond strictly in valid JSON matching this schema:
+      const sysPrompt = `You are Vozzi, an adaptive Spanish tutor.
+${activeRoleplayState ? `ACTIVE ROLEPLAY: "${activeRoleplayState.scene_title}" (AI: ${activeRoleplayState.ai_persona}, User: ${activeRoleplayState.user_persona}). STAY STRICTLY IN CHARACTER in Spanish!` : ""}
+Return valid JSON matching:
 {
-  "spoken_spanish": "Your natural Spanish spoken reply (stay in character if in roleplay)",
-  "english_hint": "English translation of your spoken_spanish reply",
+  "spoken_spanish": "Natural Spanish reply",
+  "english_hint": "English translation",
   "grammar_correction": null or { "user_said": "...", "natural_spanish": "...", "quick_rule": "..." },
   "new_flashcard": null or { "spanish_term": "with el/la", "english_meaning": "...", "example_sentence": "...", "category": "Camera Object" },
   "start_roleplay": null or { "scene_title": "...", "ai_persona": "...", "user_persona": "..." },
-  "end_roleplay": false
-}
-Rules:
-1. If the user asks to roleplay (e.g. "Can we roleplay..."), populate "start_roleplay" and make "spoken_spanish" your first in-character line!
-2. If the user says "End roleplay" or "Terminar", set "end_roleplay": true.
-3. If an image is attached or the user asks "¿Cómo se dice esto?", identify the object in Spanish with el/la and populate "new_flashcard".
-4. If the user made a Spanish grammar mistake, populate "grammar_correction" silently while keeping "spoken_spanish" natural.
-`;
+  "end_roleplay": false,
+  "verb_lookup": null or "estar"
+}`;
 
-      const userParts = [{ text: userText }];
-      if ((includeCameraFrame || cameraStream) && latestJpegBase64) {
-        userParts.push({
-          inline_data: {
-            mime_type: "image/jpeg",
-            data: latestJpegBase64
-          }
-        });
+      const parts = [{ text: userText }];
+      if ((forceImage || cameraStream) && latestJpegBase64) {
+        parts.push({ inline_data: { mime_type: "image/jpeg", data: latestJpegBase64 } });
       }
-
-      hybridChatHistory.push({ role: "user", parts: userParts });
+      hybridChatHistory.push({ role: "user", parts });
       if (hybridChatHistory.length > 10) hybridChatHistory = hybridChatHistory.slice(-10);
 
       try {
-        const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              system_instruction: { parts: [{ text: systemPrompt }] },
-              contents: hybridChatHistory,
-              generationConfig: { responseMimeType: "application/json" }
-            })
-          }
-        );
-
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            system_instruction: { parts: [{ text: sysPrompt }] },
+            contents: hybridChatHistory,
+            generationConfig: { responseMimeType: "application/json" }
+          })
+        });
         const data = await res.json();
-        const rawJson = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!rawJson) throw new Error(data?.error?.message || "Empty response");
-
-        const parsed = JSON.parse(rawJson);
+        const parsed = JSON.parse(data?.candidates?.[0]?.content?.parts?.[0]?.text || "{}");
         hybridChatHistory.push({ role: "model", parts: [{ text: parsed.spoken_spanish || "" }] });
 
-        // 1. Handle Roleplay State
-        if (parsed.start_roleplay && parsed.start_roleplay.scene_title) {
+        if (parsed.start_roleplay?.scene_title) {
           activeRoleplayState = parsed.start_roleplay;
           rpBanner.style.display = "flex";
-          rpTitle.textContent = activeRoleplayState.scene_title;
-          rpAi.textContent = activeRoleplayState.ai_persona;
-          rpUser.textContent = activeRoleplayState.user_persona;
+          document.getElementById("rp-title").textContent = activeRoleplayState.scene_title;
+          document.getElementById("rp-ai").textContent = activeRoleplayState.ai_persona;
+          document.getElementById("rp-user").textContent = activeRoleplayState.user_persona;
         }
-        if (parsed.end_roleplay) {
-          activeRoleplayState = null;
-          rpBanner.style.display = "none";
-        }
-
-        // 2. Log Comprehensible Input Subtitle
+        if (parsed.end_roleplay) { activeRoleplayState = null; rpBanner.style.display = "none"; }
         if (parsed.spoken_spanish) {
           logComprehensibleEntry(parsed.spoken_spanish, parsed.english_hint || "");
-          speakSpanishTTS(parsed.spoken_spanish, () => {
-            if (isConnected) sessionStatus.textContent = "Live (Listening...)";
-          });
+          speakSpanishTTS(parsed.spoken_spanish, () => { if (isConnected) sessionStatus.textContent = "Live (Listening...)"; });
         }
-
-        // 3. Log Silent Grammar Correction
-        if (parsed.grammar_correction && parsed.grammar_correction.natural_spanish) {
+        if (parsed.grammar_correction?.natural_spanish) {
           const g = parsed.grammar_correction;
-          if (grammarList.children.length === 1 && !grammarList.children[0].classList.contains("item-box")) {
-            grammarList.innerHTML = "";
-          }
+          if (grammarList.children.length === 1 && !grammarList.children[0].classList.contains("item-box")) grammarList.innerHTML = "";
           const div = document.createElement("div");
           div.className = "item-box grammar";
           div.innerHTML = `You said: <s>${g.user_said}</s> → <strong>${g.natural_spanish}</strong><small>${g.quick_rule}</small>`;
           grammarList.prepend(div);
         }
-
-        // 4. Save New Flashcard
-        if (parsed.new_flashcard && parsed.new_flashcard.spanish_term) {
-          saveCardToDeck(parsed.new_flashcard);
-        }
-
-        sessionStatus.textContent = "Live (Speaking...)";
-      } catch (err) {
-        console.error("Gemini Turn Error:", err);
+        if (parsed.new_flashcard?.spanish_term) saveCardToDeck(parsed.new_flashcard);
+        if (parsed.verb_lookup && VERB_PRESETS[parsed.verb_lookup]) renderVerbMatrix(VERB_PRESETS[parsed.verb_lookup]);
+      } catch (e) {
         sessionStatus.textContent = "Live (Ready)";
       }
     }
 
-    function logComprehensibleEntry(spanish, english) {
-      if (transcriptList.children.length === 1 && !transcriptList.children[0].classList.contains("item-box")) {
-        transcriptList.innerHTML = "";
-      }
+    function logComprehensibleEntry(es, en) {
+      if (transcriptList.children.length === 1 && !transcriptList.children[0].classList.contains("item-box")) transcriptList.innerHTML = "";
       const div = document.createElement("div");
       div.className = `item-box transcript ${blurMode ? "blurred" : ""}`;
-      div.innerHTML = `<div class="blur-target"><strong>${spanish}</strong><small>${english}</small></div>`;
+      div.innerHTML = `<div class="blur-target"><strong>${es}</strong><small>${en}</small></div>`;
       div.addEventListener("click", () => div.classList.toggle("blurred"));
       transcriptList.prepend(div);
     }
@@ -1699,31 +1068,10 @@ Rules:
       textPromptInput.value = "";
       processUserTurnWithGemini(val, false);
     });
+    textPromptInput.addEventListener("keydown", (e) => { if (e.key === "Enter") btnSendText.click(); });
+    btnEndRp.addEventListener("click", () => { activeRoleplayState = null; rpBanner.style.display = "none"; processUserTurnWithGemini("End roleplay and summarize.", false); });
 
-    textPromptInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") btnSendText.click();
-    });
-
-    btnEndRp.addEventListener("click", () => {
-      activeRoleplayState = null;
-      rpBanner.style.display = "none";
-      processUserTurnWithGemini("End roleplay and give me a quick summary.", false);
-    });
-
-    /**************************************************************
-     * 11. 1 FPS CAMERA STREAMER & TAP-TO-IDENTIFY RETICLE
-     **************************************************************/
-    btnCamera.addEventListener("click", async () => {
-      if (cameraStream) stopCamera();
-      else await startCamera();
-    });
-
-    btnFlip.addEventListener("click", async () => {
-      facingMode = facingMode === "environment" ? "user" : "environment";
-      stopCamera();
-      await startCamera();
-    });
-
+    /* 7. 1 FPS CAMERA STREAMER & TAP-TO-IDENTIFY RETICLE */
     function captureFrameToBuffer() {
       if (!videoEl.videoWidth) return false;
       const scale = 640 / videoEl.videoWidth;
@@ -1731,57 +1079,48 @@ Rules:
       offscreenCanvas.height = videoEl.videoHeight * scale;
       ctx.drawImage(videoEl, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
       latestJpegBase64 = offscreenCanvas.toDataURL("image/jpeg", 0.65).split(",")[1];
+      if (liveMode === "WS" && ws?.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ realtimeInput: { mediaChunks: [{ mimeType: "image/jpeg", data: latestJpegBase64 }] } }));
+      }
       return true;
     }
 
     videoWrap.addEventListener("click", (e) => {
       if (!cameraStream || !isConnected) return;
-      const rect = videoWrap.getBoundingClientRect();
-      focusReticle.style.left = `${e.clientX - rect.left}px`;
-      focusReticle.style.top = `${e.clientY - rect.top}px`;
+      const r = videoWrap.getBoundingClientRect();
+      focusReticle.style.left = `${e.clientX - r.left}px`;
+      focusReticle.style.top = `${e.clientY - r.top}px`;
       focusReticle.style.display = "block";
       setTimeout(() => (focusReticle.style.display = "none"), 1400);
-
       if (captureFrameToBuffer()) {
-        processUserTurnWithGemini(
-          "¿Cómo se dice el objeto principal que te estoy mostrando en la cámara? Incluye el artículo (el o la), guárdalo en mis flashcards y hazme una pregunta corta.",
-          true
-        );
+        processUserTurnWithGemini("¿Cómo se dice el objeto principal que te muestro en la cámara? Incluye el artículo (el o la) y guárdalo en mis flashcards.", true);
       }
     });
 
     btnAskObject.addEventListener("click", () => {
-      if (captureFrameToBuffer()) {
-        processUserTurnWithGemini("¿Cómo se dice esto en español? Incluye el artículo (el o la) y guárdalo como flashcard.", true);
-      }
+      if (captureFrameToBuffer()) processUserTurnWithGemini("¿Cómo se dice esto en español? Incluye el artículo (el o la) y guárdalo como flashcard.", true);
     });
+
+    btnCamera.addEventListener("click", async () => { if (cameraStream) stopCamera(); else await startCamera(); });
+    btnFlip.addEventListener("click", async () => { facingMode = facingMode === "environment" ? "user" : "environment"; stopCamera(); await startCamera(); });
 
     async function startCamera() {
       try {
-        cameraStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode, width: { ideal: 640 }, height: { ideal: 480 } },
-          audio: false
-        });
+        cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode, width: { ideal: 640 }, height: { ideal: 480 } }, audio: false });
         videoEl.srcObject = cameraStream;
         videoPlaceholder.style.display = "none";
         btnCamera.textContent = "Stop Camera";
         btnCamera.className = "danger";
         btnFlip.style.display = "inline-block";
         btnAskObject.style.display = "inline-block";
-
         cameraInterval = setInterval(captureFrameToBuffer, 1000);
-      } catch (err) {
-        alert("Camera error: " + err.message);
-      }
+      } catch (err) { alert("Camera error: " + err.message); }
     }
 
     function stopCamera() {
       if (cameraInterval) clearInterval(cameraInterval);
       cameraInterval = null;
-      if (cameraStream) {
-        cameraStream.getTracks().forEach((t) => t.stop());
-        cameraStream = null;
-      }
+      if (cameraStream) { cameraStream.getTracks().forEach((t) => t.stop()); cameraStream = null; }
       videoEl.srcObject = null;
       videoPlaceholder.style.display = "block";
       btnCamera.textContent = "Start Camera (1 FPS)";
@@ -1792,12 +1131,14 @@ Rules:
 
     function stopLiveSession() {
       isConnected = false;
+      liveMode = "NONE";
       stopCamera();
       window.speechSynthesis.cancel();
-      if (hybridRecognizer) {
-        try { hybridRecognizer.stop(); } catch (_) {}
-        hybridRecognizer = null;
-      }
+      if (hybridRecognizer) { try { hybridRecognizer.stop(); } catch (_) {} hybridRecognizer = null; }
+      if (workletNode) { workletNode.disconnect(); workletNode = null; }
+      if (micStream) { micStream.getTracks().forEach((t) => t.stop()); micStream = null; }
+      if (audioCtx) { audioCtx.close(); audioCtx = null; }
+      if (ws) { ws.close(); ws = null; }
       statusDot.classList.remove("live");
       sessionStatus.textContent = "Disconnected";
       btnConnect.textContent = "Start Live Session";
@@ -1807,7 +1148,6 @@ Rules:
       rpBanner.style.display = "none";
     }
 
-    // Boot up initial views
     refreshAllCardViews();
     initGuidedRoleplay();
     renderVerbMatrix(VERB_PRESETS.estar);
