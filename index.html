@@ -39,10 +39,11 @@
     .col { display: flex; flex-direction: column; gap: 20px; }
     .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
     .card h2 { font-size: 1rem; color: #cbd5e1; border-bottom: 1px solid var(--border); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .video-wrap { position: relative; width: 100%; aspect-ratio: 4 / 3; background: var(--panel-alt); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: crosshair; }
-    video { width: 100%; height: 100%; object-fit: cover; }
-    .video-placeholder { position: absolute; color: var(--muted); font-size: 0.88rem; text-align: center; padding: 20px; pointer-events: none; }
-    #focus-reticle { position: absolute; width: 68px; height: 68px; border: 2px solid #38bdf8; border-radius: 50%; box-shadow: 0 0 12px rgba(56, 189, 248, 0.8); transform: translate(-50%, -50%); pointer-events: none; display: none; }
+    .video-wrap { position: relative; width: 100%; min-height: 260px; aspect-ratio: 4 / 3; background: var(--panel-alt); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: crosshair; }
+    video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .video-placeholder { position: absolute; color: var(--muted); font-size: 0.88rem; text-align: center; padding: 20px; pointer-events: none; z-index: 2; }
+    #cam-fps-pill { position: absolute; top: 10px; left: 10px; background: rgba(16, 185, 129, 0.88); color: #fff; font-size: 0.75rem; font-weight: 700; padding: 3px 9px; border-radius: 99px; display: none; z-index: 3; pointer-events: none; }
+    #focus-reticle { position: absolute; width: 68px; height: 68px; border: 2px solid #38bdf8; border-radius: 50%; box-shadow: 0 0 12px rgba(56, 189, 248, 0.9); transform: translate(-50%, -50%); pointer-events: none; display: none; z-index: 4; }
     .controls { display: flex; flex-wrap: wrap; gap: 8px; }
     .quick-bar { display: flex; gap: 8px; }
     .quick-bar input { flex: 1; }
@@ -114,30 +115,31 @@
         <div class="card">
           <h2>
             <span>Live Voice & Point-and-Ask Camera</span>
-            <span id="session-status" style="font-size: 0.82rem; color: var(--muted);">Disconnected</span>
+            <span id="session-status" style="font-size: 0.82rem; color: var(--muted);">Ready</span>
           </h2>
           <div class="video-wrap" id="video-wrap" title="Tap any object on video to identify it in Spanish">
+            <div id="cam-fps-pill">📸 Camera Live (1 FPS)</div>
             <div id="video-placeholder" class="video-placeholder">
               Camera Off<br>
-              <small>Start camera and <strong>tap any object on screen</strong> to ask "¿Cómo se dice esto?"</small>
+              <small>Tap <strong>Start Camera (1 FPS)</strong> below, then <strong>tap any object on screen</strong> to ask "¿Cómo se dice esto?"</small>
             </div>
-            <video id="camera-feed" playsinline autoplay muted></video>
+            <video id="camera-feed" playsinline webkit-playsinline autoplay muted></video>
             <div id="focus-reticle"></div>
           </div>
           <div class="controls">
             <button id="btn-connect" class="success">Start Live Session</button>
-            <button id="btn-camera" class="secondary" disabled>Start Camera (1 FPS)</button>
-            <button id="btn-flip" class="secondary" style="display:none;">Flip Camera</button>
-            <button id="btn-ask-object" class="accent" style="display:none;">¿Cómo se dice esto?</button>
+            <button id="btn-camera" class="primary">Start Camera (1 FPS)</button>
+            <button id="btn-flip" class="secondary" style="display:none;">Flip Camera 🔄</button>
+            <button id="btn-ask-object" class="accent" style="display:none;">¿Cómo se dice esto? 🔍</button>
           </div>
           <div class="quick-bar">
             <input type="text" id="text-prompt-input" placeholder="Type a message or say 'Can we roleplay...'" />
-            <button id="btn-send-text" class="secondary" disabled>Send</button>
+            <button id="btn-send-text" class="secondary">Send</button>
           </div>
           <div class="hint-box">
             <strong>Everything you can do live:</strong><br>
+            • <strong>Point & Ask Camera:</strong> Click <em>Start Camera (1 FPS)</em> anytime, point at an object, and tap the video screen (or click <em>¿Cómo se dice esto?</em>) to hear its Spanish name with <em>el/la</em> and save a flashcard.<br>
             • <strong>Voice Roleplay:</strong> Say <em>"Can we roleplay? You're a customer designing a kitchen and I'm the specialist."</em><br>
-            • <strong>Point & Ask Camera:</strong> Start the camera and tap any object on the screen (or click <em>¿Cómo se dice esto?</em>) to name it with <em>el/la</em> and save a flashcard.<br>
             • <strong>Live Verb Matrix:</strong> Ask <em>"How do I conjugate poner?"</em> to update the matrix automatically.
           </div>
         </div>
@@ -461,6 +463,94 @@
       ]
     };
 
+    const VOZZI_SYSTEM_INSTRUCTION = `You are Vozzi, an adaptive, encouraging conversational Spanish tutor.
+1. Speak primarily in clear, natural Spanish matched to the user's level, and call 'log_comprehensible_input' with your Spanish sentence and English hint.
+2. CAMERA VISION: When video frames are present or the user asks "¿Cómo se dice esto?", identify the object in Spanish (ALWAYS include 'el' or 'la'), explain its usage briefly, and call 'save_flashcard'.
+3. SILENT GRAMMAR: If the user makes a mistake, call 'log_grammar_correction' silently without interrupting speech.
+4. VERB MATRIX: When discussing verb conjugations, call 'show_verb_matrix'.
+5. VOICE ROLEPLAY: When the user asks to roleplay and describes a scene, call 'start_roleplay_scene' and stay strictly in character until they end the roleplay ('end_roleplay_scene').`;
+
+    const VOZZI_TOOLS = [{
+      functionDeclarations: [
+        {
+          name: "start_roleplay_scene",
+          description: "Starts a voice roleplay scene.",
+          parameters: {
+            type: "OBJECT",
+            properties: {
+              scene_title: { type: "STRING" },
+              ai_persona: { type: "STRING" },
+              user_persona: { type: "STRING" },
+              opening_line_spanish: { type: "STRING" }
+            },
+            required: ["scene_title", "ai_persona", "user_persona", "opening_line_spanish"]
+          }
+        },
+        {
+          name: "end_roleplay_scene",
+          description: "Ends the active roleplay scene.",
+          parameters: {
+            type: "OBJECT",
+            properties: { praise: { type: "STRING" }, key_takeaway: { type: "STRING" } },
+            required: ["praise", "key_takeaway"]
+          }
+        },
+        {
+          name: "save_flashcard",
+          description: "Saves a Spanish vocabulary word with el/la to flashcards.",
+          parameters: {
+            type: "OBJECT",
+            properties: {
+              spanish_term: { type: "STRING" },
+              english_meaning: { type: "STRING" },
+              example_sentence: { type: "STRING" },
+              category: { type: "STRING" }
+            },
+            required: ["spanish_term", "english_meaning", "example_sentence"]
+          }
+        },
+        {
+          name: "log_grammar_correction",
+          description: "Silently logs a grammar correction to the UI drawer.",
+          parameters: {
+            type: "OBJECT",
+            properties: {
+              user_said: { type: "STRING" },
+              natural_spanish: { type: "STRING" },
+              quick_rule: { type: "STRING" }
+            },
+            required: ["user_said", "natural_spanish", "quick_rule"]
+          }
+        },
+        {
+          name: "show_verb_matrix",
+          description: "Updates the Verb Conjugation Matrix.",
+          parameters: {
+            type: "OBJECT",
+            properties: {
+              infinitive: { type: "STRING" }, english_meaning: { type: "STRING" },
+              highlight_pronoun: { type: "STRING" }, highlight_tense: { type: "STRING" },
+              yo_present: { type: "STRING" }, yo_preterite: { type: "STRING" }, yo_imperfect: { type: "STRING" },
+              tu_present: { type: "STRING" }, tu_preterite: { type: "STRING" }, tu_imperfect: { type: "STRING" },
+              el_present: { type: "STRING" }, el_preterite: { type: "STRING" }, el_imperfect: { type: "STRING" },
+              nosotros_present: { type: "STRING" }, nosotros_preterite: { type: "STRING" }, nosotros_imperfect: { type: "STRING" },
+              ellos_present: { type: "STRING" }, ellos_preterite: { type: "STRING" }, ellos_imperfect: { type: "STRING" }
+            },
+            required: ["infinitive", "english_meaning"]
+          }
+        },
+        {
+          name: "log_comprehensible_input",
+          description: "Logs spoken Spanish and an English hint to the subtitle drawer.",
+          parameters: {
+            type: "OBJECT",
+            properties: { spanish_sentence: { type: "STRING" }, english_hint: { type: "STRING" } },
+            required: ["spanish_sentence", "english_hint"]
+          }
+        }
+      ]
+    }];
+
     /* 2. TAB NAVIGATION & STORAGE HELPERS */
     function switchTab(tabId) {
       document.querySelectorAll(".tab-btn").forEach((b) => b.classList.toggle("active", b.dataset.tab === tabId));
@@ -511,7 +601,7 @@
       refreshAllCardViews();
     }
 
-    /* 3. NATIVE TTS & 90% ACCURACY SPEECH GATE */
+    /* 3. NATIVE TTS (WITH MIC ECHO PREVENTION) & 90% ACCURACY SPEECH GATE */
     function speakSpanishTTS(text, onEnd) {
       if (!("speechSynthesis" in window)) { if (onEnd) onEnd(); return; }
       window.speechSynthesis.cancel();
@@ -520,7 +610,8 @@
       u.rate = 0.96;
       const v = window.speechSynthesis.getVoices().find((x) => x.lang.includes("es-MX") || x.lang.includes("es-US") || x.lang.startsWith("es"));
       if (v) u.voice = v;
-      if (onEnd) u.onend = onEnd;
+      u.onend = () => { if (onEnd) onEnd(); };
+      u.onerror = () => { if (onEnd) onEnd(); };
       window.speechSynthesis.speak(u);
     }
 
@@ -757,7 +848,7 @@
     });
 
     function renderVerbMatrix(v) {
-      document.getElementById("verb-title").textContent = `${v.infinitive} (${v.english_meaning})`;
+      document.getElementById("verb-title").textContent = `${v.infinitive} (${v.english_meaning || ""})`;
       const rows = [
         { k: "yo", l: "yo", p: v.yo_present, pr: v.yo_preterite, im: v.yo_imperfect },
         { k: "tú", l: "tú", p: v.tu_present, pr: v.tu_preterite, im: v.tu_imperfect },
@@ -836,6 +927,7 @@
     const videoWrap = document.getElementById("video-wrap");
     const videoEl = document.getElementById("camera-feed");
     const videoPlaceholder = document.getElementById("video-placeholder");
+    const camFpsPill = document.getElementById("cam-fps-pill");
     const focusReticle = document.getElementById("focus-reticle");
     const transcriptList = document.getElementById("transcript-list");
     const grammarList = document.getElementById("grammar-list");
@@ -863,8 +955,6 @@
       statusDot.classList.add("live");
       btnConnect.textContent = "End Session";
       btnConnect.className = "danger";
-      btnCamera.disabled = false;
-      btnSendText.disabled = false;
       sessionStatus.textContent = "Connecting Live Audio...";
 
       startWebSocketWithFallback(apiKey);
@@ -882,8 +972,12 @@
           ws.send(JSON.stringify({
             setup: {
               model: "models/gemini-2.0-flash-live-001",
-              generationConfig: { responseModalities: ["AUDIO"] },
-              systemInstruction: { parts: [{ text: "You are Vozzi, an adaptive Spanish tutor. Speak clear Spanish. If asked to roleplay, stay strictly in character." }] }
+              generationConfig: {
+                responseModalities: ["AUDIO"],
+                speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Aoede" } } }
+              },
+              systemInstruction: { parts: [{ text: VOZZI_SYSTEM_INSTRUCTION }] },
+              tools: VOZZI_TOOLS
             }
           }));
         };
@@ -907,28 +1001,77 @@
           for (const p of parts) {
             if (p.inlineData?.mimeType?.startsWith("audio/pcm")) playPcmChunk(p.inlineData.data);
           }
+          if (msg.toolCall?.functionCalls) {
+            handleWsToolCalls(msg.toolCall.functionCalls);
+          }
         };
 
         ws.onclose = () => {
           if (isConnected && liveMode !== "HYBRID") {
-            console.log("WebSocket closed early; switching seamlessly to Continuous Hybrid Live Mode.");
+            cleanupWsAudioOnly();
             activateHybridFallback();
           }
         };
         ws.onerror = () => {
-          if (isConnected && liveMode !== "HYBRID") activateHybridFallback();
+          if (isConnected && liveMode !== "HYBRID") {
+            cleanupWsAudioOnly();
+            activateHybridFallback();
+          }
         };
       } catch (_) {
+        cleanupWsAudioOnly();
         activateHybridFallback();
+      }
+    }
+
+    function cleanupWsAudioOnly() {
+      if (workletNode) { try { workletNode.disconnect(); } catch (_) {} workletNode = null; }
+      if (micStream) { micStream.getTracks().forEach((t) => t.stop()); micStream = null; }
+      if (ws) { try { ws.close(); } catch (_) {} ws = null; }
+    }
+
+    function handleWsToolCalls(calls) {
+      const functionResponses = [];
+      for (const call of calls) {
+        const { id, name, args } = call;
+        if (name === "start_roleplay_scene") {
+          activeRoleplayState = args;
+          rpBanner.style.display = "flex";
+          document.getElementById("rp-title").textContent = args.scene_title;
+          document.getElementById("rp-ai").textContent = args.ai_persona;
+          document.getElementById("rp-user").textContent = args.user_persona;
+          logComprehensibleEntry(args.opening_line_spanish, `Roleplay: ${args.scene_title}`);
+          functionResponses.push({ id, name, response: { result: { status: "Roleplay started. Speak opening line in character." } } });
+        } else if (name === "end_roleplay_scene") {
+          activeRoleplayState = null;
+          rpBanner.style.display = "none";
+          functionResponses.push({ id, name, response: { result: { status: "Roleplay ended." } } });
+        } else if (name === "save_flashcard") {
+          saveCardToDeck(args);
+          functionResponses.push({ id, name, response: { result: { saved: true, term: args.spanish_term } } });
+        } else if (name === "log_grammar_correction") {
+          appendGrammarBox(args.user_said, args.natural_spanish, args.quick_rule);
+          functionResponses.push({ id, name, response: { result: { logged: true } } });
+        } else if (name === "show_verb_matrix") {
+          renderVerbMatrix(args);
+          functionResponses.push({ id, name, response: { result: { displayed: true } } });
+        } else if (name === "log_comprehensible_input") {
+          logComprehensibleEntry(args.spanish_sentence, args.english_hint);
+          functionResponses.push({ id, name, response: { result: { logged: true } } });
+        }
+      }
+      if (functionResponses.length > 0 && ws?.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ toolResponse: { functionResponses } }));
       }
     }
 
     async function startPcmMicrophone() {
       try {
-        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
         const blob = new Blob([WORKLET_CODE], { type: "application/javascript" });
         const url = URL.createObjectURL(blob);
         await audioCtx.audioWorklet.addModule(url);
+        URL.revokeObjectURL(url);
         const src = audioCtx.createMediaStreamSource(micStream);
         workletNode = new AudioWorkletNode(audioCtx, "pcm-recorder-processor");
         workletNode.port.onmessage = (e) => {
@@ -941,6 +1084,7 @@
         };
         src.connect(workletNode);
       } catch (_) {
+        cleanupWsAudioOnly();
         activateHybridFallback();
       }
     }
@@ -980,77 +1124,130 @@
         }
       };
       hybridRecognizer.onend = () => {
-        if (isConnected && liveMode === "HYBRID" && hybridRecognizer) {
+        if (isConnected && liveMode === "HYBRID" && hybridRecognizer && !window.speechSynthesis.speaking) {
           try { hybridRecognizer.start(); } catch (_) {}
         }
       };
       try { hybridRecognizer.start(); } catch (_) {}
     }
 
-    async function processUserTurnWithGemini(userText, forceImage) {
-      if (!isConnected) return;
+    async function processUserTurnWithGemini(userText, includeCameraImage) {
       const apiKey = apiKeyInput.value.trim() || getStoredApiKey();
-      sessionStatus.textContent = "Vozzi is thinking...";
+      if (!apiKey) {
+        alert("Paste your Google AI Studio API key in the top bar first!");
+        return;
+      }
+
+      // If WebSocket is actively open AND user didn't force a REST vision call, also send to WS
+      if (liveMode === "WS" && ws?.readyState === WebSocket.OPEN && !includeCameraImage) {
+        ws.send(JSON.stringify({
+          clientContent: { turns: [{ role: "user", parts: [{ text: userText }] }], turnComplete: true }
+        }));
+        return;
+      }
+
+      sessionStatus.textContent = includeCameraImage ? "📸 Analyzing Camera Object..." : "Vozzi is thinking...";
 
       const sysPrompt = `You are Vozzi, an adaptive Spanish tutor.
 ${activeRoleplayState ? `ACTIVE ROLEPLAY: "${activeRoleplayState.scene_title}" (AI: ${activeRoleplayState.ai_persona}, User: ${activeRoleplayState.user_persona}). STAY STRICTLY IN CHARACTER in Spanish!` : ""}
-Return valid JSON matching:
+Return strictly valid JSON matching this structure:
 {
-  "spoken_spanish": "Natural Spanish reply",
-  "english_hint": "English translation",
+  "spoken_spanish": "Your natural Spanish spoken reply (if identifying an object, name it clearly with el or la and ask a short follow-up question)",
+  "english_hint": "English translation of your spoken_spanish reply",
   "grammar_correction": null or { "user_said": "...", "natural_spanish": "...", "quick_rule": "..." },
-  "new_flashcard": null or { "spanish_term": "with el/la", "english_meaning": "...", "example_sentence": "...", "category": "Camera Object" },
+  "new_flashcard": null or { "spanish_term": "Spanish noun with el/la", "english_meaning": "English meaning", "example_sentence": "Short Spanish sentence", "category": "Camera Object" },
   "start_roleplay": null or { "scene_title": "...", "ai_persona": "...", "user_persona": "..." },
   "end_roleplay": false,
   "verb_lookup": null or "estar"
 }`;
 
-      const parts = [{ text: userText }];
-      if ((forceImage || cameraStream) && latestJpegBase64) {
-        parts.push({ inline_data: { mime_type: "image/jpeg", data: latestJpegBase64 } });
+      const currentTurnParts = [{ text: userText }];
+      if ((includeCameraImage || cameraStream) && latestJpegBase64) {
+        currentTurnParts.push({ inline_data: { mime_type: "image/jpeg", data: latestJpegBase64 } });
       }
-      hybridChatHistory.push({ role: "user", parts });
-      if (hybridChatHistory.length > 10) hybridChatHistory = hybridChatHistory.slice(-10);
 
-      try {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            system_instruction: { parts: [{ text: sysPrompt }] },
-            contents: hybridChatHistory,
-            generationConfig: { responseMimeType: "application/json" }
-          })
+      // Build clean alternating history without mutating until request succeeds
+      const requestContents = [...hybridChatHistory, { role: "user", parts: currentTurnParts }];
+
+      const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash"];
+      let parsed = null;
+      let lastError = "";
+
+      for (const modelName of modelsToTry) {
+        try {
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              system_instruction: { parts: [{ text: sysPrompt }] },
+              contents: requestContents,
+              generationConfig: { responseMimeType: "application/json" }
+            })
+          });
+          const data = await res.json();
+          if (data.error) {
+            lastError = data.error.message;
+            continue;
+          }
+          const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (rawText) {
+            parsed = JSON.parse(rawText);
+            break;
+          }
+        } catch (err) {
+          lastError = err.message;
+        }
+      }
+
+      if (!parsed) {
+        sessionStatus.textContent = "API Error (See Log)";
+        logComprehensibleEntry("⚠️ Error de conexión con Gemini API", lastError || "Check your API key in the top bar.");
+        return;
+      }
+
+      // Save text-only turn into history so future turns never bloat with old base64 images
+      hybridChatHistory.push({ role: "user", parts: [{ text: userText }] });
+      hybridChatHistory.push({ role: "model", parts: [{ text: parsed.spoken_spanish || "" }] });
+      if (hybridChatHistory.length > 12) hybridChatHistory = hybridChatHistory.slice(-12);
+
+      if (parsed.start_roleplay?.scene_title) {
+        activeRoleplayState = parsed.start_roleplay;
+        rpBanner.style.display = "flex";
+        document.getElementById("rp-title").textContent = activeRoleplayState.scene_title;
+        document.getElementById("rp-ai").textContent = activeRoleplayState.ai_persona;
+        document.getElementById("rp-user").textContent = activeRoleplayState.user_persona;
+      }
+      if (parsed.end_roleplay) { activeRoleplayState = null; rpBanner.style.display = "none"; }
+
+      if (parsed.spoken_spanish) {
+        logComprehensibleEntry(parsed.spoken_spanish, parsed.english_hint || "");
+        if (hybridRecognizer) { try { hybridRecognizer.stop(); } catch (_) {} }
+        speakSpanishTTS(parsed.spoken_spanish, () => {
+          sessionStatus.textContent = isConnected ? "Live (Listening...)" : "Ready";
+          if (isConnected && liveMode === "HYBRID" && hybridRecognizer) {
+            try { hybridRecognizer.start(); } catch (_) {}
+          }
         });
-        const data = await res.json();
-        const parsed = JSON.parse(data?.candidates?.[0]?.content?.parts?.[0]?.text || "{}");
-        hybridChatHistory.push({ role: "model", parts: [{ text: parsed.spoken_spanish || "" }] });
-
-        if (parsed.start_roleplay?.scene_title) {
-          activeRoleplayState = parsed.start_roleplay;
-          rpBanner.style.display = "flex";
-          document.getElementById("rp-title").textContent = activeRoleplayState.scene_title;
-          document.getElementById("rp-ai").textContent = activeRoleplayState.ai_persona;
-          document.getElementById("rp-user").textContent = activeRoleplayState.user_persona;
-        }
-        if (parsed.end_roleplay) { activeRoleplayState = null; rpBanner.style.display = "none"; }
-        if (parsed.spoken_spanish) {
-          logComprehensibleEntry(parsed.spoken_spanish, parsed.english_hint || "");
-          speakSpanishTTS(parsed.spoken_spanish, () => { if (isConnected) sessionStatus.textContent = "Live (Listening...)"; });
-        }
-        if (parsed.grammar_correction?.natural_spanish) {
-          const g = parsed.grammar_correction;
-          if (grammarList.children.length === 1 && !grammarList.children[0].classList.contains("item-box")) grammarList.innerHTML = "";
-          const div = document.createElement("div");
-          div.className = "item-box grammar";
-          div.innerHTML = `You said: <s>${g.user_said}</s> → <strong>${g.natural_spanish}</strong><small>${g.quick_rule}</small>`;
-          grammarList.prepend(div);
-        }
-        if (parsed.new_flashcard?.spanish_term) saveCardToDeck(parsed.new_flashcard);
-        if (parsed.verb_lookup && VERB_PRESETS[parsed.verb_lookup]) renderVerbMatrix(VERB_PRESETS[parsed.verb_lookup]);
-      } catch (e) {
-        sessionStatus.textContent = "Live (Ready)";
       }
+
+      if (parsed.grammar_correction?.natural_spanish) {
+        const g = parsed.grammar_correction;
+        appendGrammarBox(g.user_said, g.natural_spanish, g.quick_rule);
+      }
+      if (parsed.new_flashcard?.spanish_term) {
+        saveCardToDeck(parsed.new_flashcard);
+      }
+      if (parsed.verb_lookup && VERB_PRESETS[parsed.verb_lookup]) {
+        renderVerbMatrix(VERB_PRESETS[parsed.verb_lookup]);
+      }
+    }
+
+    function appendGrammarBox(userSaid, naturalSpanish, quickRule) {
+      if (grammarList.children.length === 1 && !grammarList.children[0].classList.contains("item-box")) grammarList.innerHTML = "";
+      const div = document.createElement("div");
+      div.className = "item-box grammar";
+      div.innerHTML = `You said: <s>${userSaid}</s> → <strong>${naturalSpanish}</strong><small>${quickRule}</small>`;
+      grammarList.prepend(div);
     }
 
     function logComprehensibleEntry(es, en) {
@@ -1071,60 +1268,112 @@ Return valid JSON matching:
     textPromptInput.addEventListener("keydown", (e) => { if (e.key === "Enter") btnSendText.click(); });
     btnEndRp.addEventListener("click", () => { activeRoleplayState = null; rpBanner.style.display = "none"; processUserTurnWithGemini("End roleplay and summarize.", false); });
 
-    /* 7. 1 FPS CAMERA STREAMER & TAP-TO-IDENTIFY RETICLE */
+    /* 7. 1 FPS CAMERA STREAMER & TAP-TO-IDENTIFY RETICLE (FIXED) */
     function captureFrameToBuffer() {
-      if (!videoEl.videoWidth) return false;
-      const scale = 640 / videoEl.videoWidth;
+      const vw = videoEl.videoWidth || 640;
+      const vh = videoEl.videoHeight || 480;
+      if (!cameraStream || videoEl.readyState < 2) return false;
+
+      const scale = 640 / vw;
       offscreenCanvas.width = 640;
-      offscreenCanvas.height = videoEl.videoHeight * scale;
+      offscreenCanvas.height = Math.round(vh * scale);
       ctx.drawImage(videoEl, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
-      latestJpegBase64 = offscreenCanvas.toDataURL("image/jpeg", 0.65).split(",")[1];
+      latestJpegBase64 = offscreenCanvas.toDataURL("image/jpeg", 0.7).split(",")[1];
+
+      camFpsPill.style.display = "block";
+      camFpsPill.textContent = "📸 1 FPS Vision Active";
+
       if (liveMode === "WS" && ws?.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({ realtimeInput: { mediaChunks: [{ mimeType: "image/jpeg", data: latestJpegBase64 }] } }));
       }
       return true;
     }
 
-    videoWrap.addEventListener("click", (e) => {
-      if (!cameraStream || !isConnected) return;
-      const r = videoWrap.getBoundingClientRect();
-      focusReticle.style.left = `${e.clientX - r.left}px`;
-      focusReticle.style.top = `${e.clientY - r.top}px`;
-      focusReticle.style.display = "block";
-      setTimeout(() => (focusReticle.style.display = "none"), 1400);
-      if (captureFrameToBuffer()) {
-        processUserTurnWithGemini("¿Cómo se dice el objeto principal que te muestro en la cámara? Incluye el artículo (el o la) y guárdalo en mis flashcards.", true);
+    function triggerCameraObjectIdentify(clientX, clientY) {
+      if (!cameraStream) {
+        alert("Tap 'Start Camera (1 FPS)' first so Vozzi can see the object!");
+        return;
       }
+      if (clientX !== null && clientY !== null) {
+        const r = videoWrap.getBoundingClientRect();
+        focusReticle.style.left = `${clientX - r.left}px`;
+        focusReticle.style.top = `${clientY - r.top}px`;
+        focusReticle.style.display = "block";
+        setTimeout(() => (focusReticle.style.display = "none"), 1400);
+      }
+      if (captureFrameToBuffer()) {
+        processUserTurnWithGemini(
+          "¿Cómo se dice el objeto principal que te estoy mostrando en la cámara? Dime su nombre en español con su artículo (el o la), guárdalo en mis flashcards en 'new_flashcard' y hazme una pregunta corta.",
+          true
+        );
+      } else {
+        alert("Camera is still warming up—wait 1 second and tap the object again.");
+      }
+    }
+
+    videoWrap.addEventListener("click", (e) => {
+      if (!cameraStream) return;
+      triggerCameraObjectIdentify(e.clientX, e.clientY);
     });
 
     btnAskObject.addEventListener("click", () => {
-      if (captureFrameToBuffer()) processUserTurnWithGemini("¿Cómo se dice esto en español? Incluye el artículo (el o la) y guárdalo como flashcard.", true);
+      triggerCameraObjectIdentify(null, null);
     });
 
-    btnCamera.addEventListener("click", async () => { if (cameraStream) stopCamera(); else await startCamera(); });
-    btnFlip.addEventListener("click", async () => { facingMode = facingMode === "environment" ? "user" : "environment"; stopCamera(); await startCamera(); });
+    btnCamera.addEventListener("click", async () => {
+      if (cameraStream) stopCamera();
+      else await startCamera();
+    });
+
+    btnFlip.addEventListener("click", async () => {
+      facingMode = facingMode === "environment" ? "user" : "environment";
+      stopCamera();
+      await startCamera();
+    });
 
     async function startCamera() {
       try {
-        cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode, width: { ideal: 640 }, height: { ideal: 480 } }, audio: false });
+        try {
+          cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: facingMode }, width: { ideal: 640 }, height: { ideal: 480 } },
+            audio: false
+          });
+        } catch (_) {
+          // Fallback for desktop webcams or browsers that reject facingMode constraints
+          cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        }
+
         videoEl.srcObject = cameraStream;
+        videoEl.muted = true;
+        await videoEl.play(); // Critical fix: explicitly play the video stream on mobile!
+
         videoPlaceholder.style.display = "none";
+        camFpsPill.style.display = "block";
         btnCamera.textContent = "Stop Camera";
         btnCamera.className = "danger";
         btnFlip.style.display = "inline-block";
         btnAskObject.style.display = "inline-block";
+
+        // Capture initial frame once metadata loads, then every 1000ms (1 FPS)
+        setTimeout(captureFrameToBuffer, 300);
         cameraInterval = setInterval(captureFrameToBuffer, 1000);
-      } catch (err) { alert("Camera error: " + err.message); }
+      } catch (err) {
+        alert("Camera permission or hardware error: " + err.message + "\nMake sure you allowed camera access in your browser bar.");
+      }
     }
 
     function stopCamera() {
       if (cameraInterval) clearInterval(cameraInterval);
       cameraInterval = null;
-      if (cameraStream) { cameraStream.getTracks().forEach((t) => t.stop()); cameraStream = null; }
+      if (cameraStream) {
+        cameraStream.getTracks().forEach((t) => t.stop());
+        cameraStream = null;
+      }
       videoEl.srcObject = null;
       videoPlaceholder.style.display = "block";
+      camFpsPill.style.display = "none";
       btnCamera.textContent = "Start Camera (1 FPS)";
-      btnCamera.className = "secondary";
+      btnCamera.className = "primary";
       btnFlip.style.display = "none";
       btnAskObject.style.display = "none";
     }
@@ -1135,16 +1384,12 @@ Return valid JSON matching:
       stopCamera();
       window.speechSynthesis.cancel();
       if (hybridRecognizer) { try { hybridRecognizer.stop(); } catch (_) {} hybridRecognizer = null; }
-      if (workletNode) { workletNode.disconnect(); workletNode = null; }
-      if (micStream) { micStream.getTracks().forEach((t) => t.stop()); micStream = null; }
-      if (audioCtx) { audioCtx.close(); audioCtx = null; }
-      if (ws) { ws.close(); ws = null; }
+      cleanupWsAudioOnly();
+      if (audioCtx) { try { audioCtx.close(); } catch (_) {} audioCtx = null; }
       statusDot.classList.remove("live");
-      sessionStatus.textContent = "Disconnected";
+      sessionStatus.textContent = "Ready";
       btnConnect.textContent = "Start Live Session";
       btnConnect.className = "success";
-      btnCamera.disabled = true;
-      btnSendText.disabled = true;
       rpBanner.style.display = "none";
     }
 
